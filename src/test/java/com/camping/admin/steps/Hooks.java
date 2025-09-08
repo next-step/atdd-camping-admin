@@ -16,7 +16,7 @@ public class Hooks {
     public static void initTokens() {
         RequestSpecification spec = RequestSpecFactory.create();
         
-        // Get admin token
+        // 관리자 토큰 획득
         String adminToken = given().spec(spec)
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .when().post("/auth/login")

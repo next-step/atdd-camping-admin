@@ -1,11 +1,13 @@
 package com.camping.admin.support;
 
+import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
 public final class CommonContext {
     private static RequestSpecification requestSpec;
     private static String adminToken;
     private static String userToken;
+    private static Response lastResponse;
 
     private CommonContext() {}
 
@@ -31,5 +33,13 @@ public final class CommonContext {
 
     public static void setUserToken(String token) {
         userToken = token;
+    }
+
+    public static Response getLastResponse() {
+        return lastResponse;
+    }
+
+    public static void setLastResponse(Response response) {
+        lastResponse = response;
     }
 }
