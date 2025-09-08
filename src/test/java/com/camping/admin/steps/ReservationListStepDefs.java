@@ -36,6 +36,6 @@ public class ReservationListStepDefs {
     public void 예약정보에는고객명과캠프사이트정보가포함된다() {
         lastResponse.then()
                 .body("[0].customerName", notNullValue())
-                .body("[0].campsiteId", notNullValue());
+                .body("[0].campsiteSiteNumber", notNullValue());
     }
 }

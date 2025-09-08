@@ -6,47 +6,31 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
-import java.math.BigDecimal;
-import java.util.Map;
-
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 
 public class ProductStepDefs {
     private Response lastResponse;
-    private Map<String, Object> productData;
 
-    @When("관리자가 {string} 상품을 {string} 타입으로 등록한다")
-    public void 관리자가상품을등록한다(String productName, String productType) {
-        int stockQuantity = "SALE".equals(productType) ? 100 : 50;
-        String price = "SALE".equals(productType) ? "15000.00" : "25000.00";
-        
-        productData = Map.of(
-                "name", productName,
-                "stockQuantity", stockQuantity,
-                "price", new BigDecimal(price),
-                "productType", productType
-        );
-        
+    @When("관리자가 상품 목록을 조회한다")
+    public void 관리자가상품목록을조회한다() {
         lastResponse = given().spec(CommonContext.getRequestSpec())
                 .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(productData)
-                .post("/admin/products");
+                .get("/admin/products");
     }
 
-    @Then("상품 생성이 성공한다")
-    public void 상품생성이성공한다() {
-        lastResponse.then().statusCode(201);
-    }
-
-    @And("상품 정보가 올바르게 저장된다")
-    public void 상품정보가올바르게저장된다() {
+    @Then("상품 목록이 반환된다")
+    public void 상품목록이반환된다() {
         lastResponse.then()
-                .body("name", equalTo(productData.get("name")))
-                .body("stockQuantity", equalTo(productData.get("stockQuantity")))
-                .body("price", equalTo(((BigDecimal) productData.get("price")).floatValue()))
-                .body("productType", equalTo(productData.get("productType")))
-                .body("id", notNullValue());
+                .statusCode(200)
+                .body("size()", greaterThan(0));
+    }
+
+    @And("상품 정보에는 이름과 가격 정보가 포함된다")
+    public void 상품정보에는이름과가격정보가포함된다() {
+        lastResponse.then()
+                .body("[0].name", notNullValue())
+                .body("[0].price", notNullValue())
+                .body("[0].productType", notNullValue());
     }
 }

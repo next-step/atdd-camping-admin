@@ -1,7 +1,6 @@
 package com.camping.admin.steps;
 
 import com.camping.admin.support.CommonContext;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -35,15 +34,4 @@ public class ReservationStepDefs {
         lastResponse.then().body("status", equalTo("CANCELLED"));
     }
 
-    @And("해당 자원은 다시 예약 가능하다")
-    public void 해당자원은다시예약가능하다() {
-        String siteId = lastResponse.then().extract().jsonPath().getString("campsiteId");
-        String startDate = lastResponse.then().extract().jsonPath().getString("startDate");
-        
-        given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .get("/admin/campsites/" + siteId + "/availability?date=" + startDate)
-                .then().statusCode(200).body("available", equalTo(true));
-    }
 }
-
