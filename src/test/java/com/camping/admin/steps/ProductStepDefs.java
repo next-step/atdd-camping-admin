@@ -17,28 +17,16 @@ public class ProductStepDefs {
     private Response lastResponse;
     private Map<String, Object> productData;
 
-    @When("관리자가 판매용 상품을 등록한다")
-    public void 관리자가판매용상품을등록한다() {
-        productData = Map.of(
-                "name", "테스트 판매 상품",
-                "stockQuantity", 100,
-                "price", new BigDecimal("15000.00"),
-                "productType", "SALE"
-        );
+    @When("관리자가 {string} 상품을 {string} 타입으로 등록한다")
+    public void 관리자가상품을등록한다(String productName, String productType) {
+        int stockQuantity = "SALE".equals(productType) ? 100 : 50;
+        String price = "SALE".equals(productType) ? "15000.00" : "25000.00";
         
-        lastResponse = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(productData)
-                .post("/admin/products");
-    }
-
-    @When("관리자가 대여용 상품을 등록한다")
-    public void 관리자가대여용상품을등록한다() {
         productData = Map.of(
-                "name", "테스트 대여 상품",
-                "stockQuantity", 50,
-                "price", new BigDecimal("25000.00"),
-                "productType", "RENTAL"
+                "name", productName,
+                "stockQuantity", stockQuantity,
+                "price", new BigDecimal(price),
+                "productType", productType
         );
         
         lastResponse = given().spec(CommonContext.getRequestSpec())

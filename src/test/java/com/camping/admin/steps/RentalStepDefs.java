@@ -19,22 +19,25 @@ public class RentalStepDefs {
     private Long productId;
     private Map<String, Object> rentalData;
 
-    @Given("확정된 예약이 존재한다")
-    public void 확정된예약이존재한다() {
-        reservationId = 1L; // data.sql의 기존 예약 데이터 활용
+    @Given("확정된 예약 {int}이 존재한다")
+    public void 확정된예약이존재한다(int id) {
+        reservationId = (long) id; // data.sql의 기존 예약 데이터 활용
     }
 
-    @Given("대여 가능한 상품이 존재한다")
-    public void 대여가능한상품이존재한다() {
-        productId = 1L; // data.sql의 기존 RENTAL 상품 활용 (랜턴)
+    @Given("대여 가능한 상품 {int}이 존재한다")
+    public void 대여가능한상품이존재한다(int id) {
+        productId = (long) id; // data.sql의 기존 RENTAL 상품 활용 (랜턴)
     }
 
-    @When("관리자가 예약에 대여를 등록한다")
-    public void 관리자가예약에대여를등록한다() {
+    @When("관리자가 예약 {int}에 상품 {int}을 {int}개 대여 등록한다")
+    public void 관리자가예약에대여를등록한다(int reservationId, int productId, int quantity) {
+        this.reservationId = (long) reservationId;
+        this.productId = (long) productId;
+        
         rentalData = Map.of(
                 "reservationId", reservationId,
                 "productId", productId,
-                "quantity", 2
+                "quantity", quantity
         );
         
         lastResponse = given().spec(CommonContext.getRequestSpec())
@@ -43,11 +46,13 @@ public class RentalStepDefs {
                 .post("/admin/rentals");
     }
 
-    @When("관리자가 워크인 대여를 등록한다")
-    public void 관리자가워크인대여를등록한다() {
+    @When("관리자가 상품 {int}을 {int}개 워크인 대여로 등록한다")
+    public void 관리자가워크인대여를등록한다(int productId, int quantity) {
+        this.productId = (long) productId;
+        
         rentalData = Map.of(
                 "productId", productId,
-                "quantity", 1
+                "quantity", quantity
         );
         
         lastResponse = given().spec(CommonContext.getRequestSpec())

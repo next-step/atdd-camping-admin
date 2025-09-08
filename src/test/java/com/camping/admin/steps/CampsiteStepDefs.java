@@ -16,12 +16,12 @@ public class CampsiteStepDefs {
     private Response lastResponse;
     private Map<String, Object> campsiteData;
 
-    @When("관리자가 캠프사이트를 등록한다")
-    public void 관리자가캠프사이트를등록한다() {
+    @When("관리자가 {string} 캠프사이트를 최대 {int}명으로 등록한다")
+    public void 관리자가캠프사이트를등록한다(String siteNumber, int maxPeople) {
         campsiteData = Map.of(
-                "siteNumber", "TEST-01",
+                "siteNumber", siteNumber,
                 "description", "테스트용 캠프사이트",
-                "maxPeople", 6
+                "maxPeople", maxPeople
         );
         
         lastResponse = given().spec(CommonContext.getRequestSpec())

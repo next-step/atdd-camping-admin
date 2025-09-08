@@ -21,12 +21,13 @@ public class ReservationStepDefs {
         reservationId = 1L;
     }
 
-    @When("관리자가 예약을 취소했다")
-    public void 관리자가예약을취소했다() {
+    @When("관리자가 예약 {int}을 취소했다")
+    public void 관리자가예약을취소했다(int reservationId) {
         lastResponse = given().spec(CommonContext.getRequestSpec())
                 .header("Authorization", "Bearer " + CommonContext.getAdminToken())
                 .body(Map.of("status", "CANCELLED"))
                 .patch("/admin/reservations/" + reservationId + "/status");
+        this.reservationId = (long) reservationId;
     }
 
     @Then("예약은 취소 상태다")
