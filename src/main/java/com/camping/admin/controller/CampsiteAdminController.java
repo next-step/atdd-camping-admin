@@ -1,10 +1,12 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteDto;
 import com.camping.admin.repository.CampsiteRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,21 +20,19 @@ public class CampsiteAdminController {
     private final CampsiteRepository campsiteRepository;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
-        List<Campsite> result;
+    public ResponseEntity<List<CampsiteDto>> getAllCampsites() {
+        List<CampsiteDto> result;
         List<Campsite> all = campsiteRepository.findAll();
         if (all == null) {
             result = new ArrayList<>();
         } else if (all.isEmpty()) {
-            result = all; // 빈 목록 그대로 반환
-        } else {
-            // 그대로 반환하지만, 혹시 null 요소가 있으면 필터링
             result = new ArrayList<>();
-            for (Campsite c : all) {
-                if (c != null) {
-                    result.add(c);
-                }
-            }
+        } else {
+            // Entity를 DTO로 변환하여 순환 참조 방지
+            result = all.stream()
+                    .filter(c -> c != null)
+                    .map(CampsiteDto::new)
+                    .collect(Collectors.toList());
         }
         return ResponseEntity.ok(result);
     }
