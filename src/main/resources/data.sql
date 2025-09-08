@@ -54,4 +54,11 @@ insert into rental_records (id, reservation_id, product_id, quantity, is_returne
   (5, 7, 7, 4, false, DATEADD('DAY', -15, current_timestamp)),
   (6, null, 3, 1, false, DATEADD('DAY', -3, current_timestamp));
 
+-- Reset auto-increment sequences to avoid conflicts with hardcoded IDs
+ALTER TABLE products ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE campsites ALTER COLUMN id RESTART WITH 100;  
+ALTER TABLE rental_records ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE reservations ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE sales_records ALTER COLUMN id RESTART WITH 100;
+
 

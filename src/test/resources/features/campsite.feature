@@ -1,4 +1,4 @@
-Feature: 캠프사이트 관리
+Feature: 캠프사이트를 관리자가 관리한다
 
   Background:
     Given 관리자가 로그인했다
@@ -21,7 +21,7 @@ Feature: 캠프사이트 관리
     When 관리자가 다음 정보로 캠프사이트를 생성한다:
       | description      | maxPeople |
       | 호수 근처 자리   | 6         |
-    Then 응답 상태코드는 500이다
+    Then 응답 상태코드는 400이다
 
   Scenario: 관리자가 최대 인원 없이 캠프사이트를 생성하면 성공한다
     When 관리자가 다음 정보로 캠프사이트를 생성한다:

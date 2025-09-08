@@ -1,4 +1,4 @@
-Feature: 대여 관리
+Feature: 대여를 관리자가 관리한다
 
   Background:
     Given 관리자가 로그인했다
@@ -28,4 +28,4 @@ Feature: 대여 관리
     When 관리자가 다음 정보로 대여를 생성한다:
       | productId | quantity |
       | 999       | 1        |
-    Then 응답 상태코드는 500이다
+    Then 응답 상태코드는 404이다

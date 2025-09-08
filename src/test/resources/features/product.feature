@@ -1,4 +1,4 @@
-Feature: 상품 관리
+Feature: 상품을 관리자가 관리한다
 
   Background:
     Given 관리자가 로그인했다
@@ -21,7 +21,7 @@ Feature: 상품 관리
     When 관리자가 다음 정보로 상품을 생성한다:
       | price | stockQuantity | productType |
       | 50000 | 10           | RENTAL      |
-    Then 응답 상태코드는 500이다
+    Then 응답 상태코드는 400이다
 
   Scenario: 관리자가 잘못된 상품 타입으로 상품을 생성하면 기본값이 적용된다
     When 관리자가 다음 정보로 상품을 생성한다:

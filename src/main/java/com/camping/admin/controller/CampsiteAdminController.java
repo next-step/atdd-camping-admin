@@ -3,14 +3,22 @@ package com.camping.admin.controller;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CampsiteDto;
 import com.camping.admin.repository.CampsiteRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/campsites")
@@ -51,6 +59,10 @@ public class CampsiteAdminController {
             siteNumber = null;
         }
 
+        if (siteNumber == null || siteNumber.trim().isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         String description;
         if (body.containsKey("description")) {
             Object d = body.get("description");
@@ -77,12 +89,16 @@ public class CampsiteAdminController {
             maxPeople = null;
         }
 
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        try {
+            Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
+            Campsite saved = campsiteRepository.save(newCampsite);
+            if (saved == null) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                return new ResponseEntity<>(saved, HttpStatus.CREATED);
+            }
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
     }
 
