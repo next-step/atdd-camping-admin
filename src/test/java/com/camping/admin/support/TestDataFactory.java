@@ -12,7 +12,9 @@ public final class TestDataFactory {
     private TestDataFactory() {}
 
     public static String generateAdminToken() {
-        return generateToken("admin", "admin123");
+        String username = System.getProperty("admin.username", "admin");
+        String password = System.getProperty("admin.password", "admin123");
+        return generateToken(username, password);
     }
 
 

@@ -34,9 +34,9 @@ public class RentalAdminController {
     public ResponseEntity<RentalResponse> createRental(@RequestBody CreateRentalRequest request) {
         try {
             RentalResponse createdRental = rentalService.createRental(
-                    request.getProductId(),
-                    request.getQuantity(),
-                    request.getReservationId()
+                    request.productId(),
+                    request.quantity(),
+                    request.reservationId()
             );
             return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
