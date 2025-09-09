@@ -32,21 +32,21 @@ public class CampsiteStepDefs {
 
     @Then("캠프사이트 목록이 반환된다")
     public void 캠프사이트목록이반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .statusCode(200)
                 .body("size()", greaterThan(0));
     }
 
     @And("캠프사이트 정보에는 사이트 번호와 최대 인원이 포함된다")
     public void 캠프사이트정보에는사이트번호와최대인원이포함된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("[0].siteNumber", notNullValue())
                 .body("[0].maxPeople", notNullValue());
     }
 
     @And("생성된 캠프사이트 정보가 반환된다")
     public void 생성된캠프사이트정보가반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("id", notNullValue())
                 .body("siteNumber", notNullValue());
     }
@@ -54,25 +54,25 @@ public class CampsiteStepDefs {
     @And("캠프사이트 번호는 {string}이다")
     public void 캠프사이트번호는이다(String expectedSiteNumber) {
         // 고유 접미사를 추가했으므로 사이트 번호가 예상 값으로 시작하는지만 확인
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("siteNumber", startsWith(expectedSiteNumber));
     }
 
     @And("최대 인원은 {int}이다")
     public void 최대인원은이다(int expectedMaxPeople) {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("maxPeople", equalTo(expectedMaxPeople));
     }
 
     @And("생성된 캠프사이트의 사이트 번호는 null이다")
     public void 생성된캠프사이트의사이트번호는null이다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("siteNumber", nullValue());
     }
 
     @And("생성된 캠프사이트의 최대 인원은 null이다")
     public void 생성된캠프사이트의최대인원은null이다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("maxPeople", nullValue());
     }
 

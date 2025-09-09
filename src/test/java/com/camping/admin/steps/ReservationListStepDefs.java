@@ -23,21 +23,21 @@ public class ReservationListStepDefs {
 
     @Then("예약 목록이 반환된다")
     public void 예약목록이반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .statusCode(200)
                 .body("size()", greaterThan(0));
     }
 
     @And("예약 정보에는 고객명과 캠프사이트 정보가 포함된다")
     public void 예약정보에는고객명과캠프사이트정보가포함된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("[0].customerName", notNullValue())
                 .body("[0].campsiteSiteNumber", notNullValue());
     }
 
     @And("빈 예약 목록이 반환된다")
     public void 빈예약목록이반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("size()", equalTo(0));
     }
 

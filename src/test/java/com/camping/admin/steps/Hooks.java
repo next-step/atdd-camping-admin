@@ -11,11 +11,11 @@ public class Hooks {
     @BeforeAll
     public static void initTokens() {
         String adminToken = TestDataFactory.generateAdminToken();
-        CommonContext.setAdminToken(adminToken);
+        CommonContext.adminToken = adminToken;
     }
     
     @Before
     public void beforeScenario() {
-        CommonContext.setRequestSpec(RequestSpecFactory.create());
+        CommonContext.requestSpec = RequestSpecFactory.create();
     }
 }

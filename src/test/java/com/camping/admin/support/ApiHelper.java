@@ -12,7 +12,7 @@ public final class ApiHelper {
     private ApiHelper() {}
 
     public static Response makeAuthenticatedRequest(String method, String endpoint, Object body) {
-        return makeRequest(method, endpoint, body, CommonContext.getAdminToken());
+        return makeRequest(method, endpoint, body, CommonContext.adminToken);
     }
 
     public static Response makeUnauthenticatedRequest(String method, String endpoint, Object body) {
@@ -22,12 +22,12 @@ public final class ApiHelper {
     public static Response makeRequest(String method, String endpoint, Object body, String token) {
         var requestSpec = prepareRequestSpec(token, body);
         Response response = executeHttpMethod(method, endpoint, requestSpec);
-        CommonContext.setLastResponse(response);
+        CommonContext.lastResponse = response;
         return response;
     }
 
     private static RequestSpecification prepareRequestSpec(String token, Object body) {
-        var requestSpec = given().spec(CommonContext.getRequestSpec());
+        var requestSpec = given().spec(CommonContext.requestSpec);
 
         if (token != null) {
             requestSpec = requestSpec.header("Authorization", "Bearer " + token);
@@ -58,7 +58,7 @@ public final class ApiHelper {
     }
 
     public static Response updateReservationStatus(Long reservationId, String status) {
-        return updateReservationStatus(reservationId, status, CommonContext.getAdminToken());
+        return updateReservationStatus(reservationId, status, CommonContext.adminToken);
     }
 
     public static Response updateReservationStatus(Long reservationId, String status, String token) {

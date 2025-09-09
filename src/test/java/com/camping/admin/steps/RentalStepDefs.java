@@ -27,21 +27,21 @@ public class RentalStepDefs {
 
     @Then("대여 목록이 반환된다")
     public void 대여목록이반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .statusCode(200)
                 .body("size()", greaterThan(0));
     }
 
     @And("대여 정보에는 상품과 수량 정보가 포함된다")
     public void 대여정보에는상품과수량정보가포함된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("[0].productId", notNullValue())
                 .body("[0].quantity", notNullValue());
     }
 
     @And("생성된 대여 정보가 반환된다")
     public void 생성된대여정보가반환된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("id", notNullValue())
                 .body("productId", notNullValue())
                 .body("quantity", notNullValue());
@@ -49,13 +49,13 @@ public class RentalStepDefs {
 
     @And("대여 수량은 {int}이다")
     public void 대여수량은이다(int expectedQuantity) {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("quantity", equalTo(expectedQuantity));
     }
 
     @And("대여의 예약 ID는 null이다")
     public void 대여의예약ID는null이다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("reservationId", nullValue());
     }
 

@@ -43,12 +43,12 @@ public class ReservationStepDefs {
     public void 관리자가동일예약을다시취소했다() {
         Long reservationIdFromResponse = extractReservationIdFromLastResponse();
         Response response = cancelReservationDirectly(reservationIdFromResponse);
-        CommonContext.setLastResponse(response);
+        CommonContext.lastResponse = response;
     }
 
     @Then("예약은 취소 상태다")
     public void 예약은취소상태다() {
-        CommonContext.getLastResponse().then().body("status", equalTo("CANCELLED"));
+        CommonContext.lastResponse.then().body("status", equalTo("CANCELLED"));
     }
 
     @And("해당 자원은 다시 예약 가능하다")
@@ -75,31 +75,31 @@ public class ReservationStepDefs {
 
     @And("예약 상태는 변경된다")
     public void 예약상태는변경된다() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("status", notNullValue());
     }
 
     @When("관리자가 빈 요청으로 예약 상태를 변경했다")
     public void 관리자가빈요청으로예약상태를변경했다() {
         Response response = updateReservationWithEmptyBody();
-        CommonContext.setLastResponse(response);
+        CommonContext.lastResponse = response;
     }
 
     @When("관리자가 null 상태로 예약을 변경했다")
     public void 관리자가null상태로예약을변경했다() {
         Response response = updateReservationWithNullStatus();
-        CommonContext.setLastResponse(response);
+        CommonContext.lastResponse = response;
     }
 
     @And("예약 상태는 변경되지 않는다")
     public void 예약상태는변경되지않는다() {
         // 원래 상태가 유지되는지 확인 (예: CONFIRMED 상태 유지)
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .body("status", notNullValue());
     }
 
     private Long extractReservationIdFromLastResponse() {
-        Object idObj = CommonContext.getLastResponse().then().extract().path("id");
+        Object idObj = CommonContext.lastResponse.then().extract().path("id");
         if (idObj instanceof Integer) {
             return ((Integer) idObj).longValue();
         } else {
@@ -108,21 +108,21 @@ public class ReservationStepDefs {
     }
 
     private Response cancelReservationDirectly(Long reservationId) {
-        return given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+        return given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body(Map.of("status", "CANCELLED"))
                 .patch("/admin/reservations/" + reservationId + "/status");
     }
 
     private void verifyCancellationResponse() {
-        CommonContext.getLastResponse().then()
+        CommonContext.lastResponse.then()
                 .statusCode(200)
                 .body("status", equalTo("CANCELLED"));
     }
 
     private void verifyReservationStatusInList(Long reservationId) {
-        given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+        given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .get("/admin/reservations")
                 .then()
                 .statusCode(200)
@@ -130,25 +130,25 @@ public class ReservationStepDefs {
     }
 
     private void validateSystemPolicyResponse() {
-        int statusCode = CommonContext.getLastResponse().getStatusCode();
+        int statusCode = CommonContext.lastResponse.getStatusCode();
         assert statusCode == 200 || statusCode == 400 : 
             "Expected 200 (idempotent) or 400 (invalid transition), but got: " + statusCode;
         
         if (statusCode == 200) {
-            CommonContext.getLastResponse().then().body("status", equalTo("CANCELLED"));
+            CommonContext.lastResponse.then().body("status", equalTo("CANCELLED"));
         }
     }
 
     private Response updateReservationWithEmptyBody() {
-        return given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+        return given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body("{}")
                 .patch("/admin/reservations/" + reservationId + "/status");
     }
 
     private Response updateReservationWithNullStatus() {
-        return given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+        return given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body("{\"status\": null}")
                 .patch("/admin/reservations/" + reservationId + "/status");
     }
