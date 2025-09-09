@@ -32,6 +32,15 @@ public class RentalService {
 
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
+        // 입력 검증
+        if (productId == null) {
+            throw new IllegalArgumentException("Product ID cannot be null");
+        }
+        
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0");
+        }
+        
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
 

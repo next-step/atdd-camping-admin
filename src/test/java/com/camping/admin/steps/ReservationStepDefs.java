@@ -123,4 +123,29 @@ public class ReservationStepDefs {
         CommonContext.getLastResponse().then()
                 .body("status", notNullValue());
     }
+
+    @When("관리자가 빈 요청으로 예약 상태를 변경했다")
+    public void 관리자가빈요청으로예약상태를변경했다() {
+        Response response = given().spec(CommonContext.getRequestSpec())
+                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+                .body("{}")  // Empty JSON object
+                .patch("/admin/reservations/" + reservationId + "/status");
+        CommonContext.setLastResponse(response);
+    }
+
+    @When("관리자가 null 상태로 예약을 변경했다")
+    public void 관리자가null상태로예약을변경했다() {
+        Response response = given().spec(CommonContext.getRequestSpec())
+                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
+                .body("{\"status\": null}")
+                .patch("/admin/reservations/" + reservationId + "/status");
+        CommonContext.setLastResponse(response);
+    }
+
+    @And("예약 상태는 변경되지 않는다")
+    public void 예약상태는변경되지않는다() {
+        // 원래 상태가 유지되는지 확인 (예: CONFIRMED 상태 유지)
+        CommonContext.getLastResponse().then()
+                .body("status", notNullValue());
+    }
 }

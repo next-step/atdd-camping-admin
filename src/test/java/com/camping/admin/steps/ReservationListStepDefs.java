@@ -1,5 +1,7 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import io.cucumber.java.en.And;
@@ -33,5 +35,16 @@ public class ReservationListStepDefs {
         CommonContext.getLastResponse().then()
                 .body("[0].customerName", notNullValue())
                 .body("[0].campsiteSiteNumber", notNullValue());
+    }
+
+    @And("빈 예약 목록이 반환된다")
+    public void 빈예약목록이반환된다() {
+        CommonContext.getLastResponse().then()
+                .body("size()", equalTo(0));
+    }
+
+    @When("권한 없는 사용자가 예약 목록을 조회한다")
+    public void 권한없는사용자가예약목록을조회한다() {
+        ApiHelper.makeUnauthenticatedRequest("GET", "/admin/reservations", null);
     }
 }

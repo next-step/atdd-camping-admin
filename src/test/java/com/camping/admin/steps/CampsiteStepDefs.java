@@ -3,14 +3,19 @@ package com.camping.admin.steps;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import com.camping.admin.support.DataTableHelper;
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.datatable.DataTable;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.startsWith;
 
 public class CampsiteStepDefs {
 
@@ -69,5 +74,22 @@ public class CampsiteStepDefs {
     public void 생성된캠프사이트의최대인원은null이다() {
         CommonContext.getLastResponse().then()
                 .body("maxPeople", nullValue());
+    }
+
+    @Given("관리자가 다음 정보로 캠프사이트를 생성했다:")
+    public void 관리자가다음정보로캠프사이트를생성했다(DataTable dataTable) {
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, true);
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("권한 없는 사용자가 다음 정보로 캠프사이트를 생성한다:")
+    public void 권한없는사용자가다음정보로캠프사이트를생성한다(DataTable dataTable) {
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, true);
+        ApiHelper.makeUnauthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("권한 없는 사용자가 캠프사이트 목록을 조회한다")
+    public void 권한없는사용자가캠프사이트목록을조회한다() {
+        ApiHelper.makeUnauthenticatedRequest("GET", "/admin/campsites", null);
     }
 }

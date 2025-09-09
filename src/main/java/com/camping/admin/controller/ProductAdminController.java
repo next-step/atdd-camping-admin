@@ -107,6 +107,16 @@ public class ProductAdminController {
             productType = ProductType.SALE;
         }
 
+        // 음수 재고 검증
+        if (stockQuantity < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        // 음수 가격 검증
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         try {
             Product newProduct = new Product(name, stockQuantity, price, productType);
             Product saved = productRepository.save(newProduct);

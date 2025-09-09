@@ -40,9 +40,11 @@ public class RentalAdminController {
             );
             return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("Cannot find product")) {
+            if (e.getMessage().contains("Cannot find product") || e.getMessage().contains("Cannot find reservation")) {
                 return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            } else if (e.getMessage().contains("not a rental item")) {
+            } else if (e.getMessage().contains("not a rental item") || 
+                      e.getMessage().contains("Quantity must be greater than 0") ||
+                      e.getMessage().contains("Product ID cannot be null")) {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else {
                 return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);

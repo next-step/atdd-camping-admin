@@ -73,4 +73,15 @@ public class ProductStepDefs {
         CommonContext.getLastResponse().then()
                 .body("productType", equalTo(expectedType));
     }
+
+    @When("권한 없는 사용자가 다음 정보로 상품을 생성한다:")
+    public void 권한없는사용자가다음정보로상품을생성한다(DataTable dataTable) {
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, true);
+        ApiHelper.makeUnauthenticatedRequest("POST", "/admin/products", requestBody);
+    }
+
+    @When("권한 없는 사용자가 상품 목록을 조회한다")
+    public void 권한없는사용자가상품목록을조회한다() {
+        ApiHelper.makeUnauthenticatedRequest("GET", "/admin/products", null);
+    }
 }

@@ -26,7 +26,7 @@ public final class DataTableHelper {
 
             switch (key) {
                 case "name", "siteNumber":
-                    if (makeUnique) {
+                    if (makeUnique && !value.equals("TEST-DUPLICATE")) {
                         requestBody.put(key, value + "_" + System.currentTimeMillis());
                     } else {
                         requestBody.put(key, value);

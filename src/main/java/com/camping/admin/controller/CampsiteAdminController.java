@@ -89,6 +89,11 @@ public class CampsiteAdminController {
             maxPeople = null;
         }
 
+        // 음수 최대 인원 검증
+        if (maxPeople != null && maxPeople < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         try {
             Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
             Campsite saved = campsiteRepository.save(newCampsite);

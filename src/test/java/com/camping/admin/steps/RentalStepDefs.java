@@ -58,4 +58,15 @@ public class RentalStepDefs {
         CommonContext.getLastResponse().then()
                 .body("reservationId", nullValue());
     }
+
+    @When("권한 없는 사용자가 다음 정보로 대여를 생성한다:")
+    public void 권한없는사용자가다음정보로대여를생성한다(DataTable dataTable) {
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, false);
+        ApiHelper.makeUnauthenticatedRequest("POST", "/admin/rentals", requestBody);
+    }
+
+    @When("권한 없는 사용자가 대여 목록을 조회한다")
+    public void 권한없는사용자가대여목록을조회한다() {
+        ApiHelper.makeUnauthenticatedRequest("GET", "/admin/rentals", null);
+    }
 }
