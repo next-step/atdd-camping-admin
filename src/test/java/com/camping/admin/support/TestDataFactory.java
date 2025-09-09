@@ -28,11 +28,4 @@ public final class TestDataFactory {
         }
         throw new RuntimeException("Failed to generate token for " + username + ". Status: " + response.getStatusCode());
     }
-
-    public static Long createTestReservation() {
-        // data.sql에서 기존 예약 데이터를 사용
-        // 실제 환경에서는 API를 통해 예약을 생성할 수 있음
-        return 1L;
-    }
-
 }

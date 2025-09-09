@@ -1,7 +1,5 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import io.cucumber.java.en.And;

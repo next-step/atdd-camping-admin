@@ -1,6 +1,7 @@
 package com.camping.admin.support;
 
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import java.util.Map;
 
@@ -19,6 +20,13 @@ public final class ApiHelper {
     }
 
     public static Response makeRequest(String method, String endpoint, Object body, String token) {
+        var requestSpec = prepareRequestSpec(token, body);
+        Response response = executeHttpMethod(method, endpoint, requestSpec);
+        CommonContext.setLastResponse(response);
+        return response;
+    }
+
+    private static RequestSpecification prepareRequestSpec(String token, Object body) {
         var requestSpec = given().spec(CommonContext.getRequestSpec());
 
         if (token != null) {
@@ -28,30 +36,25 @@ public final class ApiHelper {
         if (body != null) {
             requestSpec = requestSpec.body(body);
         }
+        
+        return requestSpec;
+    }
 
-        Response response;
+    private static Response executeHttpMethod(String method, String endpoint, RequestSpecification requestSpec) {
         switch (method.toUpperCase()) {
             case "GET":
-                response = requestSpec.get(endpoint);
-                break;
+                return requestSpec.get(endpoint);
             case "POST":
-                response = requestSpec.post(endpoint);
-                break;
+                return requestSpec.post(endpoint);
             case "PATCH":
-                response = requestSpec.patch(endpoint);
-                break;
+                return requestSpec.patch(endpoint);
             case "PUT":
-                response = requestSpec.put(endpoint);
-                break;
+                return requestSpec.put(endpoint);
             case "DELETE":
-                response = requestSpec.delete(endpoint);
-                break;
+                return requestSpec.delete(endpoint);
             default:
                 throw new IllegalArgumentException("Unsupported HTTP method: " + method);
         }
-
-        CommonContext.setLastResponse(response);
-        return response;
     }
 
     public static Response updateReservationStatus(Long reservationId, String status) {
