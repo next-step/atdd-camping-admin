@@ -4,49 +4,42 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.response.Response;
 
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
-    private String adminToken;
-    private Long reservationId;
-    private Response lastResponse;
+    private final TestContext testContext;
 
-    @Given("관리자가 로그인 한다.")
-    public void loginAdmin() {
-        adminToken = RestAssured.given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when().post("/auth/login")
-                .then().log().all()
-                .extract()
-                .cookie("AUTH_TOKEN");
+    public ReservationSteps(TestContext testContext) {
+        this.testContext = testContext;
     }
 
     @Given("사용자가 예약을 한다.")
     public void reserve() {
-        reservationId = 1L;
+        testContext.setReservationId(1L);
     }
 
     @When("관리자가 예약을 {string} 한다.")
     public void cancelReservation(String status) {
-        Map<String, Object> statusUpdate = Map.of("status", status);
+        Map<String, Object> request = Map.of("status", status);
         
-        lastResponse = RestAssured.given()
+        var response = RestAssured.given()
             .contentType("application/json")
-            .header("Authorization", "Bearer " + adminToken)
-            .body(statusUpdate)
-            .when().patch("/admin/reservations/" + reservationId + "/status")
+            .header("Authorization", "Bearer " + testContext.getAdminToken())
+            .body(request)
+            .when().patch("/admin/reservations/" + testContext.getReservationId() + "/status")
             .then().log().all()
             .extract().response();
+
+        testContext.setResponse(response);
     }
 
     @Then("예약이 {string} 된다.")
     public void canceledReservation(String status) {
-        assertThat(lastResponse.getStatusCode()).isEqualTo(200);
-        assertThat(lastResponse.jsonPath().getString("status")).isEqualTo(status);
+        var response = testContext.getResponse();
+        assertThat(response.getStatusCode()).isEqualTo(200);
+        assertThat(response.jsonPath().getString("status")).isEqualTo(status);
     }
 }
