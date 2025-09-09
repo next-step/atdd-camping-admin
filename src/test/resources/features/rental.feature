@@ -6,55 +6,36 @@ Feature: 대여를 관리자가 관리한다
     And 대여 정보에는 상품과 수량 정보가 포함된다
 
   Scenario: 관리자가 예약과 함께 대여를 생성하면 성공한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity | reservationId |
-      | 1         | 2        | 1            |
-    Then 대여 생성에 성공한다
-    And 생성된 대여 정보가 반환된다
-    And 대여 수량은 2이다
+    When 관리자가 상품 1번을 예약 1번과 함께 2개 대여한다
+    Then 대여 수량이 2인 대여가 생성된다
 
   Scenario: 관리자가 예약 없이 대여를 생성하면 성공한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity |
-      | 3         | 1        |
-    Then 대여 생성에 성공한다
-    And 생성된 대여 정보가 반환된다
+    When 관리자가 상품 3번을 예약 없이 1개 대여한다
+    Then 예약 없는 대여가 생성된다
     And 대여의 예약 ID는 null이다
 
   Scenario: 관리자가 존재하지 않는 상품으로 대여를 생성하면 실패한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity |
-      | 999       | 1        |
+    When 관리자가 존재하지 않는 상품 999번으로 대여를 생성한다
     Then 대여 생성에 실패한다
 
   Scenario: 관리자가 존재하지 않는 예약으로 대여를 생성하면 실패한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity | reservationId |
-      | 1         | 1        | 999          |
+    When 관리자가 상품 1번을 존재하지 않는 예약 999번과 함께 대여한다
     Then 대여 생성에 실패한다
 
   Scenario: 관리자가 음수 수량으로 대여를 생성하면 실패한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity |
-      | 1         | -1       |
+    When 관리자가 상품 1번을 음수 수량으로 대여한다
     Then 잘못된 요청으로 인해 실패한다
 
   Scenario: 관리자가 0 수량으로 대여를 생성하면 실패한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | productId | quantity |
-      | 1         | 0        |
+    When 관리자가 상품 1번을 0개 대여한다
     Then 잘못된 요청으로 인해 실패한다
 
   Scenario: 관리자가 필수 정보 없이 대여를 생성하면 실패한다
-    When 관리자가 다음 정보로 대여를 생성한다:
-      | quantity |
-      | 1        |
+    When 관리자가 상품 ID 없이 대여를 생성한다
     Then 잘못된 요청으로 인해 실패한다
 
   Scenario: 권한 없는 사용자가 대여를 생성하려 하면 실패한다
-    When 권한 없는 사용자가 다음 정보로 대여를 생성한다:
-      | productId | quantity |
-      | 1         | 1        |
+    When 권한 없는 사용자가 상품 1번으로 대여를 생성한다
     Then 권한 없음으로 인해 실패한다
 
   Scenario: 권한 없는 사용자가 대여 목록을 조회하려 하면 실패한다

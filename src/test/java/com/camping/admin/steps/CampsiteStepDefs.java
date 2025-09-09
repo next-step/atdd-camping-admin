@@ -107,4 +107,80 @@ public class CampsiteStepDefs {
     public void 캠프사이트생성에실패한다() {
         CommonContext.lastResponse.then().statusCode(409);
     }
+
+    @When("관리자가 {string} 번호의 캠프사이트를 생성한다")
+    public void 관리자가번호의캠프사이트를생성한다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber + "-" + System.currentTimeMillis(),
+                "description", "테스트 캠프사이트",
+                "maxPeople", 4
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @Then("캠프사이트 번호가 {string} 인 캠프사이트가 생성된다")
+    public void 캠프사이트번호가인캠프사이트가생성된다(String expectedSiteNumber) {
+        CommonContext.lastResponse.then()
+                .statusCode(201)
+                .body("id", notNullValue())
+                .body("siteNumber", startsWith(expectedSiteNumber));
+    }
+
+    @When("관리자가 사이트 번호 없이 캠프사이트를 생성한다")
+    public void 관리자가사이트번호없이캠프사이트를생성한다() {
+        Map<String, Object> requestBody = Map.of(
+                "description", "호수 근처 자리",
+                "maxPeople", 6
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("관리자가 {string} 번호로 최대 인원 없이 캠프사이트를 생성한다")
+    public void 관리자가번호로최대인원없이캠프사이트를생성한다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber + "-" + System.currentTimeMillis(),
+                "description", "산책로 근처 자리"
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @Given("관리자가 {string} 번호로 캠프사이트를 생성했다")
+    public void 관리자가번호로캠프사이트를생성했다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber,
+                "description", "첫 번째 사이트",
+                "maxPeople", 4
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("관리자가 {string} 번호로 캠프사이트를 생성한다")
+    public void 관리자가번호로캠프사이트를생성한다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber,
+                "description", "두 번째 사이트",
+                "maxPeople", 6
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("관리자가 {string} 번호로 음수 최대 인원으로 캠프사이트를 생성한다")
+    public void 관리자가번호로음수최대인원으로캠프사이트를생성한다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber + "-" + System.currentTimeMillis(),
+                "description", "테스트 사이트",
+                "maxPeople", -1
+        );
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
+
+    @When("권한 없는 사용자가 {string} 번호로 캠프사이트를 생성한다")
+    public void 권한없는사용자가번호로캠프사이트를생성한다(String siteNumber) {
+        Map<String, Object> requestBody = Map.of(
+                "siteNumber", siteNumber,
+                "description", "권한 없음",
+                "maxPeople", 4
+        );
+        ApiHelper.makeUnauthenticatedRequest("POST", "/admin/campsites", requestBody);
+    }
 }
