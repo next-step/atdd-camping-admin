@@ -1,8 +1,5 @@
 Feature: 예약 목록을 관리자가 조회한다
 
-  Background:
-    Given 관리자가 로그인했다
-
   Scenario: 관리자가 전체 예약 목록을 조회하면 성공한다
     Given 예약 데이터가 존재한다
     When 관리자가 예약 목록을 조회한다

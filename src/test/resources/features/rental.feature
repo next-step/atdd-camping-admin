@@ -1,8 +1,5 @@
 Feature: 대여를 관리자가 관리한다
 
-  Background:
-    Given 관리자가 로그인했다
-
   Scenario: 관리자가 대여 목록을 조회하면 성공한다
     When 관리자가 대여 목록을 조회한다
     Then 대여 목록이 반환된다
