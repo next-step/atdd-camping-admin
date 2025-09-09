@@ -1,6 +1,8 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
+import com.camping.admin.support.TestDataFactory;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -11,42 +13,30 @@ import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class ReservationStepDefs {
     private Long reservationId;
 
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {
-        // data.sql에서 기존 예약 데이터 사용
-        reservationId = 1L;
+        reservationId = TestDataFactory.createTestReservation();
     }
 
     @Given("관리자가 해당 예약을 취소했다")
     public void 관리자가해당예약을취소했다() {
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(Map.of("status", "CANCELLED"))
-                .patch("/admin/reservations/" + reservationId + "/status");
-        CommonContext.setLastResponse(response);
+        ApiHelper.updateReservationStatus(reservationId, "CANCELLED");
     }
 
     @When("관리자가 예약을 취소했다")
     public void 관리자가예약을취소했다() {
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(Map.of("status", "CANCELLED"))
-                .patch("/admin/reservations/" + reservationId + "/status");
-        CommonContext.setLastResponse(response);
+        ApiHelper.updateReservationStatus(reservationId, "CANCELLED");
     }
 
-    @When("관리자가 예약 {int}을 취소했다")
+    @When("관리자가 예약 {int}를 취소했다")
     public void 관리자가예약을취소했다(int reservationId) {
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(Map.of("status", "CANCELLED"))
-                .patch("/admin/reservations/" + reservationId + "/status");
         this.reservationId = (long) reservationId;
-        CommonContext.setLastResponse(response);
+        ApiHelper.updateReservationStatus(this.reservationId, "CANCELLED");
     }
 
     @When("관리자가 동일 예약을 다시 취소했다")
@@ -116,5 +106,21 @@ public class ReservationStepDefs {
         if (statusCode == 200) {
             CommonContext.getLastResponse().then().body("status", equalTo("CANCELLED"));
         }
+    }
+
+    @When("관리자가 예약을 {string}로 상태 변경했다")
+    public void 관리자가예약을로상태변경했다(String status) {
+        ApiHelper.updateReservationStatus(reservationId, status);
+    }
+
+    @When("권한 없는 사용자가 예약을 취소했다")
+    public void 권한없는사용자가예약을취소했다() {
+        ApiHelper.updateReservationStatus(reservationId, "CANCELLED", null);
+    }
+
+    @And("예약 상태는 변경된다")
+    public void 예약상태는변경된다() {
+        CommonContext.getLastResponse().then()
+                .body("status", notNullValue());
     }
 }

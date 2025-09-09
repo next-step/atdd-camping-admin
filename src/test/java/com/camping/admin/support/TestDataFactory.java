@@ -1,0 +1,38 @@
+package com.camping.admin.support;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+import java.util.Map;
+
+import static io.restassured.RestAssured.given;
+
+public final class TestDataFactory {
+
+    private TestDataFactory() {}
+
+    public static String generateAdminToken() {
+        return generateToken("admin", "admin123");
+    }
+
+
+    private static String generateToken(String username, String password) {
+        RequestSpecification spec = RequestSpecFactory.create();
+
+        Response response = given().spec(spec)
+                .body(Map.of("username", username, "password", password))
+                .when().post("/auth/login");
+
+        if (response.getStatusCode() == 200) {
+            return response.then().extract().cookie("AUTH_TOKEN");
+        }
+        throw new RuntimeException("Failed to generate token for " + username + ". Status: " + response.getStatusCode());
+    }
+
+    public static Long createTestReservation() {
+        // data.sql에서 기존 예약 데이터를 사용
+        // 실제 환경에서는 API를 통해 예약을 생성할 수 있음
+        return 1L;
+    }
+
+}

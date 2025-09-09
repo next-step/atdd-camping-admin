@@ -1,54 +1,29 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
+import com.camping.admin.support.DataTableHelper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.But;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
-import io.restassured.response.Response;
 
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 public class ProductStepDefs {
 
     @When("관리자가 상품 목록을 조회한다")
     public void 관리자가상품목록을조회한다() {
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .get("/admin/products");
-        CommonContext.setLastResponse(response);
+        ApiHelper.makeAuthenticatedRequest("GET", "/admin/products", null);
     }
 
     @When("관리자가 다음 정보로 상품을 생성한다:")
     public void 관리자가다음정보로상품을생성한다(DataTable dataTable) {
-        Map<String, String> productData = dataTable.asMaps().get(0);
-        
-        Map<String, Object> requestBody = new java.util.HashMap<>();
-        
-        if (productData.containsKey("name")) {
-            // 중복 방지를 위해 고유 접미사 추가
-            String uniqueName = productData.get("name") + "_" + System.currentTimeMillis();
-            requestBody.put("name", uniqueName);
-        }
-        if (productData.containsKey("price")) {
-            requestBody.put("price", Integer.parseInt(productData.get("price")));
-        }
-        if (productData.containsKey("stockQuantity")) {
-            requestBody.put("stockQuantity", Integer.parseInt(productData.get("stockQuantity")));
-        }
-        if (productData.containsKey("productType")) {
-            requestBody.put("productType", productData.get("productType"));
-        }
-        
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(requestBody)
-                .post("/admin/products");
-        CommonContext.setLastResponse(response);
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, true);
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/products", requestBody);
     }
 
     @Then("상품 목록이 반환된다")

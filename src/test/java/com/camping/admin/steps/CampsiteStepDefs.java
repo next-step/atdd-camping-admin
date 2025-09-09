@@ -1,50 +1,28 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
+import com.camping.admin.support.DataTableHelper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.datatable.DataTable;
-import io.restassured.response.Response;
 
 import java.util.Map;
 
-import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.*;
 
 public class CampsiteStepDefs {
 
     @When("관리자가 캠프사이트 목록을 조회한다")
     public void 관리자가캠프사이트목록을조회한다() {
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .get("/admin/campsites");
-        CommonContext.setLastResponse(response);
+        ApiHelper.makeAuthenticatedRequest("GET", "/admin/campsites", null);
     }
 
     @When("관리자가 다음 정보로 캠프사이트를 생성한다:")
     public void 관리자가다음정보로캠프사이트를생성한다(DataTable dataTable) {
-        Map<String, String> campsiteData = dataTable.asMaps().get(0);
-        
-        Map<String, Object> requestBody = new java.util.HashMap<>();
-        
-        if (campsiteData.containsKey("siteNumber")) {
-            // 중복 방지를 위해 고유 접미사 추가
-            String uniqueSiteNumber = campsiteData.get("siteNumber") + "_" + System.currentTimeMillis();
-            requestBody.put("siteNumber", uniqueSiteNumber);
-        }
-        if (campsiteData.containsKey("description")) {
-            requestBody.put("description", campsiteData.get("description"));
-        }
-        if (campsiteData.containsKey("maxPeople")) {
-            requestBody.put("maxPeople", Integer.parseInt(campsiteData.get("maxPeople")));
-        }
-        
-        Response response = given().spec(CommonContext.getRequestSpec())
-                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
-                .body(requestBody)
-                .post("/admin/campsites");
-        CommonContext.setLastResponse(response);
+        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, true);
+        ApiHelper.makeAuthenticatedRequest("POST", "/admin/campsites", requestBody);
     }
 
     @Then("캠프사이트 목록이 반환된다")

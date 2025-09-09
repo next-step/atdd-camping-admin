@@ -6,7 +6,6 @@ import io.restassured.specification.RequestSpecification;
 public final class CommonContext {
     private static RequestSpecification requestSpec;
     private static String adminToken;
-    private static String userToken;
     private static Response lastResponse;
 
     private CommonContext() {}
@@ -25,14 +24,6 @@ public final class CommonContext {
 
     public static void setAdminToken(String token) {
         adminToken = token;
-    }
-
-    public static String getUserToken() {
-        return userToken;
-    }
-
-    public static void setUserToken(String token) {
-        userToken = token;
     }
 
     public static Response getLastResponse() {
