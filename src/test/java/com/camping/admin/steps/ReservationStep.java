@@ -31,9 +31,9 @@ public class ReservationStep {
         reservationId = 1L;
     }
 
-    @When("관리자가 예약을 취소 한다.")
-    public void cancelReservation() {
-        Map<String, Object> statusUpdate = Map.of("status", "CANCELLED");
+    @When("관리자가 예약을 {string} 한다.")
+    public void cancelReservation(String status) {
+        Map<String, Object> statusUpdate = Map.of("status", status);
         
         lastResponse = RestAssured.given()
             .contentType("application/json")
@@ -44,9 +44,9 @@ public class ReservationStep {
             .extract().response();
     }
 
-    @Then("예약이 취소 된다.")
-    public void canceledReservation() {
+    @Then("예약이 {string} 된다.")
+    public void canceledReservation(String status) {
         assertThat(lastResponse.getStatusCode()).isEqualTo(200);
-        assertThat(lastResponse.jsonPath().getString("status")).isEqualTo("CANCELLED");
+        assertThat(lastResponse.jsonPath().getString("status")).isEqualTo(status);
     }
 }
