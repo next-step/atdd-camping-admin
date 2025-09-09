@@ -152,4 +152,19 @@ public class ReservationStepDefs {
                 .body("{\"status\": null}")
                 .patch("/admin/reservations/" + reservationId + "/status");
     }
+
+    @Then("예약 취소에 실패한다")
+    public void 예약취소에실패한다() {
+        CommonContext.lastResponse.then().statusCode(404);
+    }
+
+    @Then("예약 상태 변경에 성공한다")
+    public void 예약상태변경에성공한다() {
+        CommonContext.lastResponse.then().statusCode(200);
+    }
+
+    @Then("예약 처리에 성공한다")
+    public void 예약처리에성공한다() {
+        CommonContext.lastResponse.then().statusCode(200);
+    }
 }

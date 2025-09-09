@@ -69,4 +69,14 @@ public class RentalStepDefs {
     public void 권한없는사용자가대여목록을조회한다() {
         ApiHelper.makeUnauthenticatedRequest("GET", "/admin/rentals", null);
     }
+
+    @Then("대여 생성에 성공한다")
+    public void 대여생성에성공한다() {
+        CommonContext.lastResponse.then().statusCode(201);
+    }
+
+    @Then("대여 생성에 실패한다")
+    public void 대여생성에실패한다() {
+        CommonContext.lastResponse.then().statusCode(404);
+    }
 }

@@ -84,4 +84,14 @@ public class ProductStepDefs {
     public void 권한없는사용자가상품목록을조회한다() {
         ApiHelper.makeUnauthenticatedRequest("GET", "/admin/products", null);
     }
+
+    @Then("새 상품 생성에 성공한다")
+    public void 새상품생성에성공한다() {
+        CommonContext.lastResponse.then().statusCode(201);
+    }
+
+    @Then("상품 생성에 성공한다")
+    public void 상품생성에성공한다() {
+        CommonContext.lastResponse.then().statusCode(201);
+    }
 }
