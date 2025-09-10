@@ -14,7 +14,7 @@ import java.util.Map;
 public class ReservationSteps {
 
     @Given("{string} 상태인 예약이 있다")
-    public void 상태인_예약이_있다(String status) {
+    public void stateReservation(String status) {
         String token = ScenarioContext.get().get("accessToken", String.class);
 
         Response response = RestAssured
@@ -38,7 +38,7 @@ public class ReservationSteps {
     }
 
     @When("예약을 {string} 상태로 변경한다")
-    public void 예약을_상태로_변경한다(String newStatus) {
+    public void changeReservation(String newStatus) {
         String token = ScenarioContext.get().get("accessToken", String.class);
         Long reservationId = ScenarioContext.get().get("reservationId", Long.class);
 
@@ -54,7 +54,7 @@ public class ReservationSteps {
     }
 
     @Then("예약 상태가 {string}으로 변경된다")
-    public void 예약_상태가_으로_변경된다(String expectedStatus) {
+    public void completeReservation(String expectedStatus) {
         Response lastResponse = ScenarioContext.get().get("response", Response.class);
         Long id = ScenarioContext.get().get("reservationId", Long.class);
 
