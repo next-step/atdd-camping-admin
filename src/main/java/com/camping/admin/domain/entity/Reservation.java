@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.exception.ValidationException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -18,6 +19,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 
 @Entity
 @Table(name = "reservations")
@@ -87,5 +89,21 @@ public class Reservation {
 
     public boolean isOnDate(LocalDate date) {
         return this.reservationDate != null && this.reservationDate.equals(date);
+    }
+
+    public static void validateStatusUpdateRequest(Map<String, Object> body) {
+        if (body == null || body.isEmpty()) {
+            throw new ValidationException("Request body cannot be empty");
+        }
+    }
+
+    public void updateStatus(Map<String, Object> body) {
+        Object statusObject = body.get("status");
+        if (statusObject != null) {
+            String statusValue = statusObject.toString();
+            if (!statusValue.isBlank()) {
+                this.status = statusValue;
+            }
+        }
     }
 }

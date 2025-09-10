@@ -35,32 +35,15 @@ public class CampsiteService {
 
     @Transactional
     public Campsite createCampsite(Map<String, Object> body) {
-        validateCampsiteData(body);
+        String siteNumber = Campsite.extractSiteNumber(body);
+        String description = Campsite.extractDescription(body);
+        Integer maxPeople = Campsite.extractMaxPeople(body);
 
-        String siteNumber = extractSiteNumber(body);
-        String description = extractDescription(body);
-        Integer maxPeople = extractMaxPeople(body);
+        Campsite.validateMaxPeople(maxPeople);
 
         return createAndSaveCampsite(siteNumber, description, maxPeople);
     }
 
-    private void validateCampsiteData(Map<String, Object> body) {
-        String siteNumber = extractSiteNumber(body);
-        validateSiteNumber(siteNumber);
-        validateMaxPeople(extractMaxPeople(body));
-    }
-
-    private void validateSiteNumber(String siteNumber) {
-        if (siteNumber == null || siteNumber.trim().isEmpty()) {
-            throw new ValidationException("Site number is required");
-        }
-    }
-
-    private void validateMaxPeople(Integer maxPeople) {
-        if (maxPeople != null && maxPeople < 0) {
-            throw new ValidationException("Max people cannot be negative");
-        }
-    }
 
     private Campsite createAndSaveCampsite(String siteNumber, String description, Integer maxPeople) {
         try {
@@ -74,7 +57,7 @@ public class CampsiteService {
     @Transactional
     public Campsite updateCampsite(Long campsiteId, Map<String, Object> body) {
         Campsite campsite = findById(campsiteId);
-        updateCampsiteFields(campsite, body);
+        campsite.updateFromMap(body);
         return campsite;
     }
 
@@ -83,88 +66,6 @@ public class CampsiteService {
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find campsite with id: " + campsiteId));
     }
 
-    private void updateCampsiteFields(Campsite campsite, Map<String, Object> body) {
-        if (body != null && !body.isEmpty()) {
-            updateSiteNumber(campsite, body);
-            updateDescription(campsite, body);
-            updateMaxPeople(campsite, body);
-        }
-    }
-
-    private String extractSiteNumber(Map<String, Object> body) {
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v == null) {
-                return null;
-            } else {
-                return v.toString();
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private String extractDescription(Map<String, Object> body) {
-        if (body.containsKey("description")) {
-            Object d = body.get("description");
-            return d == null ? "" : d.toString();
-        } else {
-            return "";
-        }
-    }
-
-    private Integer extractMaxPeople(Map<String, Object> body) {
-        if (body.containsKey("maxPeople")) {
-            Object m = body.get("maxPeople");
-            if (m == null) {
-                return null;
-            } else if (m instanceof Number) {
-                return ((Number) m).intValue();
-            } else {
-                try {
-                    return Integer.valueOf(m.toString());
-                } catch (Exception e) {
-                    return null;
-                }
-            }
-        } else {
-            return null;
-        }
-    }
-
-    private void updateSiteNumber(Campsite campsite, Map<String, Object> body) {
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v != null) {
-                campsite.setSiteNumber(v.toString());
-            }
-        }
-    }
- 
-    private void updateDescription(Campsite campsite, Map<String, Object> body) {
-        if (body.containsKey("description")) {
-            Object v = body.get("description");
-            if (v == null) {
-                campsite.setDescription("");
-            } else {
-                campsite.setDescription(v.toString());
-            }
-        }
-    }
-
-    private void updateMaxPeople(Campsite campsite, Map<String, Object> body) {
-        if (body.containsKey("maxPeople")) {
-            Object v = body.get("maxPeople");
-            if (v instanceof Number) {
-                campsite.setMaxPeople(((Number) v).intValue());
-            } else if (v != null) {
-                try {
-                    campsite.setMaxPeople(Integer.valueOf(v.toString()));
-                } catch (Exception ignore) {
-                }
-            }
-        }
-    }
 
     @Transactional
     public Campsite createCampsiteFromWebForm(Map<String, String> params) {
@@ -193,7 +94,14 @@ public class CampsiteService {
     }
 
     private String extractSiteNumberFromForm(Map<String, String> params) {
-        return params.containsKey("siteNumber") ? params.get("siteNumber") : null;
+        if (params.containsKey("siteNumber")) {
+            String siteNumber = params.get("siteNumber");
+            if (siteNumber == null || siteNumber.trim().isEmpty()) {
+                throw new ValidationException("Site number cannot be empty in form");
+            }
+            return siteNumber;
+        }
+        throw new ValidationException("Site number is required in form");
     }
 
     private String extractDescriptionFromForm(Map<String, String> params) {
@@ -202,27 +110,44 @@ public class CampsiteService {
 
     private Integer extractMaxPeopleFromForm(Map<String, String> params) {
         if (params.containsKey("maxPeople")) {
-            try {
-                return Integer.valueOf(params.get("maxPeople"));
-            } catch (Exception e) {
-                return null;
-            }
+            return parseMaxPeopleFromFormValue(params.get("maxPeople"));
         } else {
-            return null;
+            throw new ValidationException("Max people is required in form");
+        }
+    }
+
+    private Integer parseMaxPeopleFromFormValue(String maxPeopleValue) {
+        try {
+            return Integer.valueOf(maxPeopleValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid max people format in form: " + maxPeopleValue);
         }
     }
 
     private void updateCampsiteFromForm(Campsite campsite, Map<String, String> params) {
+        updateSiteNumberFromForm(campsite, params);
+        updateDescriptionFromForm(campsite, params);
+        updateMaxPeopleFromForm(campsite, params);
+    }
+
+    private void updateSiteNumberFromForm(Campsite campsite, Map<String, String> params) {
         if (params.containsKey("siteNumber")) {
             campsite.setSiteNumber(params.get("siteNumber"));
         }
+    }
+
+    private void updateDescriptionFromForm(Campsite campsite, Map<String, String> params) {
         if (params.containsKey("description")) {
             campsite.setDescription(params.get("description"));
         }
+    }
+
+    private void updateMaxPeopleFromForm(Campsite campsite, Map<String, String> params) {
         if (params.containsKey("maxPeople")) {
             try {
                 campsite.setMaxPeople(Integer.valueOf(params.get("maxPeople")));
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                throw new ValidationException("Invalid max people format during form update: " + params.get("maxPeople"));
             }
         }
     }

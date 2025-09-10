@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -73,6 +74,179 @@ public class Product {
     private void validateQuantity(Integer quantity) {
         if (quantity == null || quantity <= 0) {
             throw new ValidationException("Quantity must be greater than 0");
+        }
+    }
+
+    public static String extractName(Map<String, Object> body) {
+        if (body.containsKey("name")) {
+            Object value = body.get("name");
+            if (value == null) {
+                throw new ValidationException("Product name cannot be null");
+            }
+            return value.toString();
+        }
+        throw new ValidationException("Product name is required");
+    }
+
+    public static Integer extractStockQuantity(Map<String, Object> body) {
+        if (body.containsKey("stockQuantity")) {
+            Object value = body.get("stockQuantity");
+            return parseIntegerValue(value);
+        }
+        return 0;
+    }
+
+    private static Integer parseIntegerValue(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        } else if (value == null) {
+            return 0;
+        } else {
+            return parseStringToInteger(value.toString());
+        }
+    }
+
+    private static Integer parseStringToInteger(String stringValue) {
+        try {
+            return Integer.valueOf(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid stock quantity format: " + stringValue);
+        }
+    }
+
+    public static BigDecimal extractPrice(Map<String, Object> body) {
+        if (body.containsKey("price")) {
+            Object value = body.get("price");
+            return parseBigDecimalValue(value);
+        }
+        return BigDecimal.ZERO;
+    }
+
+    private static BigDecimal parseBigDecimalValue(Object value) {
+        if (value instanceof Number) {
+            return new BigDecimal(((Number) value).toString());
+        } else if (value == null) {
+            return BigDecimal.ZERO;
+        } else {
+            return parseStringToBigDecimal(value.toString());
+        }
+    }
+
+    private static BigDecimal parseStringToBigDecimal(String stringValue) {
+        try {
+            return new BigDecimal(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid price format: " + stringValue);
+        }
+    }
+
+    public static ProductType extractProductType(Map<String, Object> body) {
+        if (body.containsKey("productType")) {
+            Object value = body.get("productType");
+            return parseProductTypeValue(value);
+        }
+        return ProductType.SALE;
+    }
+
+    private static ProductType parseProductTypeValue(Object value) {
+        if (value == null) {
+            return ProductType.SALE;
+        } else {
+            return parseStringToProductType(value.toString());
+        }
+    }
+
+    private static ProductType parseStringToProductType(String stringValue) {
+        try {
+            return ProductType.valueOf(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid product type: " + stringValue);
+        }
+    }
+
+    public void updateFromMap(Map<String, Object> body) {
+        if (body == null) {
+            return;
+        }
+        updateName(body);
+        updateStockQuantity(body);
+        updatePrice(body);
+        updateProductType(body);
+    }
+
+    private void updateName(Map<String, Object> body) {
+        if (body.containsKey("name")) {
+            Object value = body.get("name");
+            if (value != null) {
+                this.name = value.toString();
+            }
+        }
+    }
+
+    private void updateStockQuantity(Map<String, Object> body) {
+        if (body.containsKey("stockQuantity")) {
+            Object value = body.get("stockQuantity");
+            updateStockQuantityFromValue(value);
+        }
+    }
+
+    private void updateStockQuantityFromValue(Object value) {
+        if (value instanceof Number) {
+            this.stockQuantity = ((Number) value).intValue();
+        } else if (value != null) {
+            updateStockQuantityFromString(value.toString());
+        }
+    }
+
+    private void updateStockQuantityFromString(String stringValue) {
+        try {
+            this.stockQuantity = Integer.valueOf(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid stock quantity format during update: " + stringValue);
+        }
+    }
+
+    private void updatePrice(Map<String, Object> body) {
+        if (body.containsKey("price")) {
+            Object value = body.get("price");
+            updatePriceFromValue(value);
+        }
+    }
+
+    private void updatePriceFromValue(Object value) {
+        if (value instanceof Number) {
+            this.price = new BigDecimal(((Number) value).toString());
+        } else if (value != null) {
+            updatePriceFromString(value.toString());
+        }
+    }
+
+    private void updatePriceFromString(String stringValue) {
+        try {
+            this.price = new BigDecimal(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid price format during update: " + stringValue);
+        }
+    }
+
+    private void updateProductType(Map<String, Object> body) {
+        if (body.containsKey("productType")) {
+            Object value = body.get("productType");
+            updateProductTypeFromValue(value);
+        }
+    }
+
+    private void updateProductTypeFromValue(Object value) {
+        if (value != null) {
+            updateProductTypeFromString(value.toString());
+        }
+    }
+
+    private void updateProductTypeFromString(String stringValue) {
+        try {
+            this.productType = ProductType.valueOf(stringValue);
+        } catch (Exception e) {
+            throw new ValidationException("Invalid product type during update: " + stringValue);
         }
     }
 

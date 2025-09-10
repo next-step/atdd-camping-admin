@@ -31,22 +31,9 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find reservation with id: " + reservationId));
 
-        if (body == null || body.isEmpty()) {
-            throw new ValidationException("Request body cannot be empty");
-        }
-
-        updateStatus(reservation, body);
+        Reservation.validateStatusUpdateRequest(body);
+        reservation.updateStatus(body);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);
-    }
-
-    private void updateStatus(Reservation reservation, Map<String, Object> body) {
-        Object statusObj = body.get("status");
-        if (statusObj != null) {
-            String statusValue = statusObj.toString();
-            if (!statusValue.isBlank()) {
-                reservation.setStatus(statusValue);
-            }
-        }
     }
 }

@@ -69,7 +69,7 @@ public class RentalService {
 
     private Reservation findReservationById(Long reservationId) {
         if (reservationId == null) {
-            return null;
+            throw new ValidationException("Reservation ID cannot be null");
         }
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find reservation with id: " + reservationId));

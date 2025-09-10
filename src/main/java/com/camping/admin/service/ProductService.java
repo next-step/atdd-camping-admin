@@ -40,27 +40,14 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(Map<String, Object> body) {
-        validateProductData(body);
+        String name = Product.extractName(body);
+        Integer stockQuantity = Product.extractStockQuantity(body);
+        BigDecimal price = Product.extractPrice(body);
+        ProductType productType = Product.extractProductType(body);
 
-        String name = extractName(body);
-        Integer stockQuantity = extractStockQuantity(body);
-        BigDecimal price = extractPrice(body);
-        ProductType productType = extractProductType(body);
-
+        validateStockQuantity(stockQuantity);
+        validatePrice(price);
         return createAndSaveProduct(name, stockQuantity, price, productType);
-    }
-
-    private void validateProductData(Map<String, Object> body) {
-        String name = extractName(body);
-        validateProductName(name);
-        validateStockQuantity(extractStockQuantity(body));
-        validatePrice(extractPrice(body));
-    }
-
-    private void validateProductName(String name) {
-        if (name == null || name.trim().isEmpty()) {
-            throw new ValidationException("Product name is required");
-        }
     }
 
     private void validateStockQuantity(Integer stockQuantity) {
@@ -87,17 +74,8 @@ public class ProductService {
     @Transactional
     public Product updateProduct(Long productId, Map<String, Object> body) {
         Product product = findById(productId);
-        updateProductFields(product, body);
+        product.updateFromMap(body);
         return product;
-    }
-
-    private void updateProductFields(Product product, Map<String, Object> body) {
-        if (body != null) {
-            updateName(product, body);
-            updateStockQuantity(product, body);
-            updatePrice(product, body);
-            updateProductType(product, body);
-        }
     }
 
     private Product findById(Long productId) {
@@ -105,114 +83,6 @@ public class ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find product with id: " + productId));
     }
 
-    private String extractName(Map<String, Object> body) {
-        if (body.containsKey("name")) {
-            Object v = body.get("name");
-            return v == null ? null : v.toString();
-        }
-        return null;
-    }
-
-    private Integer extractStockQuantity(Map<String, Object> body) {
-        if (body.containsKey("stockQuantity")) {
-            Object v = body.get("stockQuantity");
-            if (v instanceof Number) {
-                return ((Number) v).intValue();
-            } else if (v == null) {
-                return 0;
-            } else {
-                try {
-                    return Integer.valueOf(v.toString());
-                } catch (Exception e) {
-                    return 0;
-                }
-            }
-        }
-        return 0;
-    }
-
-    private BigDecimal extractPrice(Map<String, Object> body) {
-        if (body.containsKey("price")) {
-            Object v = body.get("price");
-            if (v instanceof Number) {
-                return new BigDecimal(((Number) v).toString());
-            } else if (v == null) {
-                return BigDecimal.ZERO;
-            } else {
-                try {
-                    return new BigDecimal(v.toString());
-                } catch (Exception e) {
-                    return BigDecimal.ZERO;
-                }
-            }
-        }
-        return BigDecimal.ZERO;
-    }
-
-    private ProductType extractProductType(Map<String, Object> body) {
-        if (body.containsKey("productType")) {
-            Object v = body.get("productType");
-            if (v == null) {
-                return ProductType.SALE;
-            } else {
-                try {
-                    return ProductType.valueOf(v.toString());
-                } catch (Exception e) {
-                    return ProductType.SALE;
-                }
-            }
-        }
-        return ProductType.SALE;
-    }
-
-    private void updateName(Product product, Map<String, Object> body) {
-        if (body.containsKey("name")) {
-            Object v = body.get("name");
-            if (v != null) {
-                product.setName(v.toString());
-            }
-        }
-    }
-
-    private void updateStockQuantity(Product product, Map<String, Object> body) {
-        if (body.containsKey("stockQuantity")) {
-            Object v = body.get("stockQuantity");
-            if (v instanceof Number) {
-                product.setStockQuantity(((Number) v).intValue());
-            } else if (v != null) {
-                try {
-                    product.setStockQuantity(Integer.valueOf(v.toString()));
-                } catch (Exception ignore) {
-                }
-            }
-        }
-    }
-
-    private void updatePrice(Product product, Map<String, Object> body) {
-        if (body.containsKey("price")) {
-            Object v = body.get("price");
-            if (v instanceof Number) {
-                product.setPrice(new BigDecimal(((Number) v).toString()));
-            } else if (v != null) {
-                try {
-                    product.setPrice(new BigDecimal(v.toString()));
-                } catch (Exception ignore) {
-                }
-            }
-        }
-    }
-
-    private void updateProductType(Product product, Map<String, Object> body) {
-        if (body.containsKey("productType")) {
-            Object v = body.get("productType");
-            if (v != null) {
-                try {
-                    product.setProductType(ProductType.valueOf(v.toString()));
-                } catch (Exception ignore) {
-                }
-            }
-        }
-    }
 
     @Transactional
     public Product createProductFromWebForm(Map<String, String> params) {
@@ -270,25 +140,44 @@ public class ProductService {
     }
 
     private void updateProductFromForm(Product product, Map<String, String> params) {
+        updateNameFromForm(product, params);
+        updateStockQuantityFromForm(product, params);
+        updatePriceFromForm(product, params);
+        updateProductTypeFromForm(product, params);
+    }
+
+    private void updateNameFromForm(Product product, Map<String, String> params) {
         if (params.containsKey("name")) {
             product.setName(params.get("name"));
         }
+    }
+
+    private void updateStockQuantityFromForm(Product product, Map<String, String> params) {
         if (params.containsKey("stockQuantity")) {
             try {
                 product.setStockQuantity(Integer.valueOf(params.get("stockQuantity")));
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                throw new ValidationException("Invalid stock quantity format during form update: " + params.get("stockQuantity"));
             }
         }
+    }
+
+    private void updatePriceFromForm(Product product, Map<String, String> params) {
         if (params.containsKey("price")) {
             try {
                 product.setPrice(new BigDecimal(params.get("price")));
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                throw new ValidationException("Invalid price format during form update: " + params.get("price"));
             }
         }
+    }
+
+    private void updateProductTypeFromForm(Product product, Map<String, String> params) {
         if (params.containsKey("productType")) {
             try {
                 product.setProductType(ProductType.valueOf(params.get("productType")));
-            } catch (Exception ignore) {
+            } catch (Exception e) {
+                throw new ValidationException("Invalid product type during form update: " + params.get("productType"));
             }
         }
     }
