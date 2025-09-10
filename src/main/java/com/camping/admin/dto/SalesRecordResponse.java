@@ -25,5 +25,3 @@ public class SalesRecordResponse {
         this.createdAt = record.getCreatedAt();
     }
 }
-
-

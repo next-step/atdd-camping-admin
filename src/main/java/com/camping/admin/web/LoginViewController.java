@@ -23,5 +23,3 @@ public class LoginViewController {
         return "redirect:/login";
     }
 }
-
-

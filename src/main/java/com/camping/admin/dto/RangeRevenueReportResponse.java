@@ -11,5 +11,3 @@ public record RangeRevenueReportResponse(
     BigDecimal totalRentalRevenue,
     BigDecimal grandTotalRevenue
 ) {}
-
-

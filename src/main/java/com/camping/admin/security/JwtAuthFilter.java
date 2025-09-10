@@ -94,5 +94,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
     }
 }
-
-

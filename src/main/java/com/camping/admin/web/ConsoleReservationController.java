@@ -46,5 +46,3 @@ public class ConsoleReservationController {
         return "reservations/form";
     }
 }
-
-

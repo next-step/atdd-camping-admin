@@ -85,5 +85,3 @@ public class ConsoleCampsiteController {
         return "redirect:/console/campsites";
     }
 }
-
-

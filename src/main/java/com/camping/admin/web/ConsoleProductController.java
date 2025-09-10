@@ -101,5 +101,3 @@ public class ConsoleProductController {
         return "redirect:/console/products";
     }
 }
-
-

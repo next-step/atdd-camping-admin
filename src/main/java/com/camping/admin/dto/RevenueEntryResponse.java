@@ -11,5 +11,3 @@ public record RevenueEntryResponse(
 ) {
     public enum EntryType { RESERVATION, SALE, RENTAL }
 }
-
-

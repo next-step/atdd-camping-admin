@@ -2,6 +2,9 @@ package com.camping.admin.controller;
 
 import com.camping.admin.dto.CreateRentalRequest;
 import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.exception.EntityNotFoundException;
+import com.camping.admin.exception.RentalConflictException;
+import com.camping.admin.exception.ValidationException;
 import com.camping.admin.service.RentalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -39,16 +42,10 @@ public class RentalAdminController {
                     request.reservationId()
             );
             return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("Cannot find product") || e.getMessage().contains("Cannot find reservation")) {
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            } else if (e.getMessage().contains("not a rental item") || 
-                      e.getMessage().contains("Quantity must be greater than 0") ||
-                      e.getMessage().contains("Product ID cannot be null")) {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            } else {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            }
+        } catch (EntityNotFoundException e) {
+            return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
+        } catch (ValidationException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         } catch (DataIntegrityViolationException e) {
             return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
@@ -56,7 +53,13 @@ public class RentalAdminController {
 
     @PatchMapping("/{rentalRecordId}/return")
     public ResponseEntity<RentalResponse> markAsReturned(@PathVariable Long rentalRecordId) {
-        RentalResponse updatedRental = rentalService.markAsReturned(rentalRecordId);
-        return ResponseEntity.ok(updatedRental);
+        try {
+            RentalResponse updatedRental = rentalService.markAsReturned(rentalRecordId);
+            return ResponseEntity.ok(updatedRental);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (RentalConflictException e) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        }
     }
 }

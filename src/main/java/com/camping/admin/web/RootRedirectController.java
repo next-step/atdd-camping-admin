@@ -11,5 +11,3 @@ public class RootRedirectController {
         return "redirect:/console/dashboard";
     }
 }
-
-
