@@ -56,9 +56,7 @@ public class SalesService {
         productService.decreaseStock(itemDto.productId(), itemDto.quantity());
 
         Product product = findById(itemDto.productId());
-        BigDecimal totalPrice = calculateTotalPrice(product, itemDto.quantity());
-        
-        SalesRecord salesRecord = new SalesRecord(product, itemDto.quantity(), totalPrice);
+        SalesRecord salesRecord = SalesRecord.createFromProduct(product, itemDto.quantity());
         salesRecordRepository.save(salesRecord);
     }
 
@@ -67,9 +65,6 @@ public class SalesService {
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find product with id: " + productId));
     }
 
-    private BigDecimal calculateTotalPrice(Product product, Integer quantity) {
-        return product.getPrice().multiply(new BigDecimal(quantity));
-    }
 
     public List<SalesRecordResponse> findRecentSales(int limit) {
         return salesRecordRepository.findAll().stream()
@@ -90,30 +85,25 @@ public class SalesService {
 
     private BigDecimal calculateDailySalesRevenue(LocalDate date) {
         return salesRecordRepository.findAll().stream()
-                .filter(record -> record.getCreatedAt().toLocalDate().equals(date))
+                .filter(record -> record.isOnDate(date))
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateDailyReservationRevenue(LocalDate date) {
         return reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null && r.getReservationDate().equals(date))
-                .map(this::calculateReservationRevenue)
+                .filter(reservation -> reservation.isOnDate(date))
+                .map(com.camping.admin.domain.entity.Reservation::calculateReservationRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateDailyRentalRevenue(LocalDate date) {
         return rentalRecordRepository.findAll().stream()
-                .filter(rr -> rr.getCreatedAt().toLocalDate().equals(date))
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
+                .filter(rentalRecord -> rentalRecord.getCreatedAt().toLocalDate().equals(date))
+                .map(com.camping.admin.domain.entity.RentalRecord::calculateRentalRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    private BigDecimal calculateReservationRevenue(com.camping.admin.domain.entity.Reservation r) {
-        long nights = java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
-        if (nights < 1) nights = 1;
-        return new BigDecimal(nights).multiply(new BigDecimal("50000"));
-    }
 
     private BigDecimal calculateGrandTotal(BigDecimal... revenues) {
         BigDecimal total = BigDecimal.ZERO;
@@ -134,23 +124,22 @@ public class SalesService {
 
     private BigDecimal calculateRangeSalesRevenue(LocalDate from, LocalDate to) {
         return salesRecordRepository.findAll().stream()
-                .filter(record -> isDateInRange(record.getCreatedAt().toLocalDate(), from, to))
+                .filter(record -> record.isInDateRange(from, to))
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateRangeReservationRevenue(LocalDate from, LocalDate to) {
         return reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> isDateInRange(r.getReservationDate(), from, to))
-                .map(this::calculateReservationRevenue)
+                .filter(reservation -> reservation.isInDateRange(from, to))
+                .map(com.camping.admin.domain.entity.Reservation::calculateReservationRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateRangeRentalRevenue(LocalDate from, LocalDate to) {
         return rentalRecordRepository.findAll().stream()
-                .filter(rr -> isDateInRange(rr.getCreatedAt().toLocalDate(), from, to))
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
+                .filter(rentalRecord -> isDateInRange(rentalRecord.getCreatedAt().toLocalDate(), from, to))
+                .map(com.camping.admin.domain.entity.RentalRecord::calculateRentalRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -169,21 +158,20 @@ public class SalesService {
 
     private void addSalesEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
         salesRecordRepository.findAll().stream()
-                .filter(record -> isDateInRange(record.getCreatedAt().toLocalDate(), from, to))
+                .filter(record -> record.isInDateRange(from, to))
                 .forEach(record -> entries.add(createSalesEntry(record)));
     }
 
     private void addReservationEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
         reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> isDateInRange(r.getReservationDate(), from, to))
-                .forEach(r -> entries.add(createReservationEntry(r)));
+                .filter(reservation -> reservation.isInDateRange(from, to))
+                .forEach(reservation -> entries.add(createReservationEntry(reservation)));
     }
 
     private void addRentalEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
         rentalRecordRepository.findAll().stream()
-                .filter(rr -> isDateInRange(rr.getCreatedAt().toLocalDate(), from, to))
-                .forEach(rr -> entries.add(createRentalEntry(rr)));
+                .filter(rentalRecord -> isDateInRange(rentalRecord.getCreatedAt().toLocalDate(), from, to))
+                .forEach(rentalRecord -> entries.add(createRentalEntry(rentalRecord)));
     }
 
     private RevenueEntryResponse createSalesEntry(SalesRecord record) {
@@ -195,25 +183,25 @@ public class SalesService {
         );
     }
 
-    private RevenueEntryResponse createReservationEntry(com.camping.admin.domain.entity.Reservation r) {
-        BigDecimal revenue = calculateReservationRevenue(r);
+    private RevenueEntryResponse createReservationEntry(com.camping.admin.domain.entity.Reservation reservation) {
+        BigDecimal revenue = reservation.calculateReservationRevenue();
         return new RevenueEntryResponse(
                 RevenueEntryResponse.EntryType.RESERVATION,
-                "예약 #" + r.getId(),
+                "예약 #" + reservation.getId(),
                 revenue,
-                r.getCreatedAt()
+                reservation.getCreatedAt()
         );
     }
 
-    private RevenueEntryResponse createRentalEntry(com.camping.admin.domain.entity.RentalRecord rr) {
-        String description = rr.getProduct().getName() + 
-                (rr.getReservation() != null ? " (예약#" + rr.getReservation().getId() + ")" : "");
-        BigDecimal revenue = rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity()));
+    private RevenueEntryResponse createRentalEntry(com.camping.admin.domain.entity.RentalRecord rentalRecord) {
+        String description = rentalRecord.getProduct().getName() + 
+                (rentalRecord.getReservation() != null ? " (예약#" + rentalRecord.getReservation().getId() + ")" : "");
+        BigDecimal revenue = rentalRecord.calculateRentalRevenue();
         return new RevenueEntryResponse(
                 RevenueEntryResponse.EntryType.RENTAL,
                 description,
                 revenue,
-                rr.getCreatedAt()
+                rentalRecord.getCreatedAt()
         );
     }
 }

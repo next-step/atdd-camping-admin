@@ -5,8 +5,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Entity
 @Table(name = "reservations")
@@ -56,5 +58,25 @@ public class Reservation {
         this.startDate = startDate;
         this.endDate = endDate;
         this.campsite = campsite;
+    }
+
+    public BigDecimal calculateReservationRevenue() {
+        long nights = ChronoUnit.DAYS.between(this.startDate, this.endDate);
+        if (nights < 1) {
+            nights = 1; // 최소 1박 처리
+        }
+        return new BigDecimal(nights).multiply(new BigDecimal("50000"));
+    }
+
+    public boolean isInDateRange(LocalDate from, LocalDate to) {
+        if (this.reservationDate == null) {
+            return false;
+        }
+        LocalDate date = this.reservationDate;
+        return (date.isEqual(from) || date.isAfter(from)) && (date.isEqual(to) || date.isBefore(to));
+    }
+
+    public boolean isOnDate(LocalDate date) {
+        return this.reservationDate != null && this.reservationDate.equals(date);
     }
 }

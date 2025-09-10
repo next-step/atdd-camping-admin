@@ -64,7 +64,7 @@ public class RentalService {
     }
 
     private void validateRentalProduct(Product product) {
-        if (product.getProductType() != ProductType.RENTAL) {
+        if (!product.isRentalType()) {
             throw new ValidationException("Product is not a rental item.");
         }
     }
@@ -85,7 +85,6 @@ public class RentalService {
     @Transactional
     public RentalResponse markAsReturned(Long rentalRecordId) {
         RentalRecord rentalRecord = findRentalRecordById(rentalRecordId);
-        validateNotAlreadyReturned(rentalRecord);
         processReturn(rentalRecord);
         return RentalResponse.from(rentalRecord);
     }
@@ -95,14 +94,8 @@ public class RentalService {
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find rental record with id: " + rentalRecordId));
     }
 
-    private void validateNotAlreadyReturned(RentalRecord rentalRecord) {
-        if (rentalRecord.getIsReturned()) {
-            throw new RentalConflictException("This item has already been returned.");
-        }
-    }
-
     private void processReturn(RentalRecord rentalRecord) {
-        rentalRecord.setReturned(true);
+        rentalRecord.markAsReturned();
         productService.increaseStock(rentalRecord.getProduct().getId(), rentalRecord.getQuantity());
     }
 }

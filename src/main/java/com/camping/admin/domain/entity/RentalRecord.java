@@ -1,10 +1,12 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.exception.RentalConflictException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -44,5 +46,16 @@ public class RentalRecord {
 
     public void setReturned(Boolean returned) {
         isReturned = returned;
+    }
+
+    public void markAsReturned() {
+        if (this.isReturned) {
+            throw new RentalConflictException("This item has already been returned.");
+        }
+        this.isReturned = true;
+    }
+
+    public BigDecimal calculateRentalRevenue() {
+        return this.product.getPrice().multiply(new BigDecimal(this.quantity));
     }
 }
