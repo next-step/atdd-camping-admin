@@ -16,7 +16,7 @@ public class AuthService {
 
     @Value("${admin.username}")
     private String adminUsername;
-
+  
     @Value("${admin.password}")
     private String adminPassword;
 

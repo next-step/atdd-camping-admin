@@ -36,11 +36,11 @@ public class CampsiteService {
     @Transactional
     public Campsite createCampsite(Map<String, Object> body) {
         validateCampsiteData(body);
-        
+
         String siteNumber = extractSiteNumber(body);
         String description = extractDescription(body);
         Integer maxPeople = extractMaxPeople(body);
-        
+
         return createAndSaveCampsite(siteNumber, description, maxPeople);
     }
 
@@ -140,7 +140,7 @@ public class CampsiteService {
             }
         }
     }
-
+ 
     private void updateDescription(Campsite campsite, Map<String, Object> body) {
         if (body.containsKey("description")) {
             Object v = body.get("description");

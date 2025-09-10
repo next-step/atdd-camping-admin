@@ -3,25 +3,26 @@ package com.camping.admin.service;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.SalesRecord;
 import com.camping.admin.dto.DailyRevenueReportResponse;
-import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.ProcessSaleRequest;
+import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.RevenueEntryResponse;
 import com.camping.admin.dto.SaleItemResponse;
 import com.camping.admin.dto.SalesRecordResponse;
+import com.camping.admin.exception.EntityNotFoundException;
+import com.camping.admin.exception.SalesException;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.repository.SalesRecordRepository;
-import com.camping.admin.exception.EntityNotFoundException;
-import com.camping.admin.exception.SalesException;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -194,7 +195,7 @@ public class SalesService {
     }
 
     private RevenueEntryResponse createRentalEntry(com.camping.admin.domain.entity.RentalRecord rentalRecord) {
-        String description = rentalRecord.getProduct().getName() + 
+        String description = rentalRecord.getProduct().getName() +
                 (rentalRecord.getReservation() != null ? " (예약#" + rentalRecord.getReservation().getId() + ")" : "");
         BigDecimal revenue = rentalRecord.calculateRentalRevenue();
         return new RevenueEntryResponse(

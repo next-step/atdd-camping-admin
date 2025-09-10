@@ -1,22 +1,19 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.RentalRecord;
-import java.time.LocalDateTime;
 import lombok.Getter;
+
+import java.time.LocalDateTime;
 
 @Getter
 public class RentalResponse {
-    private Long id;
-    private Long reservationId;
-    private Long productId;
-    private String productName;
-    private Integer quantity;
-    private Boolean isReturned;
-    private LocalDateTime createdAt;
-
-    public static RentalResponse from(RentalRecord rentalRecord) {
-        return new RentalResponse(rentalRecord);
-    }
+    private final Long id;
+    private final Long reservationId;
+    private final Long productId;
+    private final String productName;
+    private final Integer quantity;
+    private final Boolean isReturned;
+    private final LocalDateTime createdAt;
 
     private RentalResponse(RentalRecord rentalRecord) {
         this.id = rentalRecord.getId();
@@ -26,5 +23,9 @@ public class RentalResponse {
         this.quantity = rentalRecord.getQuantity();
         this.isReturned = rentalRecord.getIsReturned();
         this.createdAt = rentalRecord.getCreatedAt();
+    }
+
+    public static RentalResponse from(RentalRecord rentalRecord) {
+        return new RentalResponse(rentalRecord);
     }
 }

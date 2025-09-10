@@ -41,12 +41,12 @@ public class ProductService {
     @Transactional
     public Product createProduct(Map<String, Object> body) {
         validateProductData(body);
-        
+
         String name = extractName(body);
         Integer stockQuantity = extractStockQuantity(body);
         BigDecimal price = extractPrice(body);
         ProductType productType = extractProductType(body);
-        
+
         return createAndSaveProduct(name, stockQuantity, price, productType);
     }
 

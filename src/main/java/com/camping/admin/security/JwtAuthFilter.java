@@ -5,12 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -72,14 +73,14 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     private boolean isExcluded(String path) {
         return pathMatcher.match("/auth/login", path) ||
-               pathMatcher.match("/login", path) ||
-               pathMatcher.match("/css/**", path) ||
-               pathMatcher.match("/js/**", path) ||
-               pathMatcher.match("/images/**", path) ||
-               pathMatcher.match("/webjars/**", path) ||
-               pathMatcher.match("/favicon.ico", path) ||
-               pathMatcher.match("/h2-console/**", path) ||
-               path.equals("/");
+                pathMatcher.match("/login", path) ||
+                pathMatcher.match("/css/**", path) ||
+                pathMatcher.match("/js/**", path) ||
+                pathMatcher.match("/images/**", path) ||
+                pathMatcher.match("/webjars/**", path) ||
+                pathMatcher.match("/favicon.ico", path) ||
+                pathMatcher.match("/h2-console/**", path) ||
+                path.equals("/");
     }
 
     private boolean wantsHtml(HttpServletRequest request) {

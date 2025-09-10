@@ -3,10 +3,8 @@ package com.camping.admin.service;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.dto.RentalResponse;
 import com.camping.admin.exception.EntityNotFoundException;
-import com.camping.admin.exception.RentalConflictException;
 import com.camping.admin.exception.ValidationException;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
@@ -37,15 +35,15 @@ public class RentalService {
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
         validateRentalRequest(productId, quantity);
-        
+
         Product product = findProductById(productId);
         validateRentalProduct(product);
-        
+
         productService.decreaseStock(productId, quantity);
-        
+
         Reservation reservation = findReservationById(reservationId);
         RentalRecord rentalRecord = createRentalRecord(reservation, product, quantity);
-        
+
         return RentalResponse.from(rentalRecord);
     }
 

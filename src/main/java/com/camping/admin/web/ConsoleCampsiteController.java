@@ -2,7 +2,6 @@ package com.camping.admin.web;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.service.CampsiteService;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/console/campsites")

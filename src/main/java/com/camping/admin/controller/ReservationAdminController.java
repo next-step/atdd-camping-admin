@@ -23,7 +23,7 @@ import java.util.Map;
 public class ReservationAdminController {
 
     private final ReservationService reservationService;
-
+ 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
         List<ReservationResponse> result = reservationService.getAllReservations();
