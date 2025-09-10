@@ -1,5 +1,5 @@
 ### 판매 처리
-POST http://localhost:8080/api/sales
+POST http://localhost:8081/api/sales
 Content-Type: application/json
 
 {
@@ -9,4 +9,4 @@ Content-Type: application/json
 }
 
 ### 최근 판매 기록 조회 (10개)
-GET http://localhost:8080/api/sales
+GET http://localhost:8081/api/sales

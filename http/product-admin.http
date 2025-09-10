@@ -1,5 +1,5 @@
 ### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
-POST http://localhost:8080/auth/login
+POST http://localhost:8081/auth/login
 Content-Type: application/json
 
 {
@@ -14,13 +14,13 @@ client.global.set("authToken", response.body.token);
 ###
 
 ### 2️⃣ 모든 제품 조회
-GET http://localhost:8080/admin/products
+GET http://localhost:8081/admin/products
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### 3️⃣ 제품 생성 (판매용)
-POST http://localhost:8080/admin/products
+POST http://localhost:8081/admin/products
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -34,7 +34,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### 4️⃣ 제품 생성 (렌탈용)
-POST http://localhost:8080/admin/products
+POST http://localhost:8081/admin/products
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
@@ -48,7 +48,7 @@ Authorization: Bearer {{authToken}}
 ###
 
 ### 5️⃣ 제품 수정 (제품 ID를 실제 값으로 변경하세요)
-PUT http://localhost:8080/admin/products/1
+PUT http://localhost:8081/admin/products/1
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 

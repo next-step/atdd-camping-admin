@@ -1,5 +1,5 @@
 ### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
-POST http://localhost:8080/auth/login
+POST http://localhost:8081/auth/login
 Content-Type: application/json
 
 {
@@ -14,17 +14,17 @@ client.global.set("authToken", response.body.token);
 ###
 
 ### 2️⃣ 일일 수익 보고서 조회 (날짜를 원하는 날짜로 변경하세요)
-GET http://localhost:8080/admin/reports/revenue/daily?date=2024-01-15
+GET http://localhost:8081/admin/reports/revenue/daily?date=2024-01-15
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### 3️⃣ 기간별 수익 보고서 조회 (날짜 범위를 원하는 범위로 변경하세요)
-GET http://localhost:8080/admin/reports/revenue/range?from=2024-01-01&to=2024-01-31
+GET http://localhost:8081/admin/reports/revenue/range?from=2024-01-01&to=2024-01-31
 Authorization: Bearer {{authToken}}
 
 ###
 
 ### 4️⃣ 기간별 수익 상세 내역 조회 (날짜 범위를 원하는 범위로 변경하세요)
-GET http://localhost:8080/admin/reports/revenue/range/entries?from=2024-01-01&to=2024-01-31
+GET http://localhost:8081/admin/reports/revenue/range/entries?from=2024-01-01&to=2024-01-31
 Authorization: Bearer {{authToken}}
