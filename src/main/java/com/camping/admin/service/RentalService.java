@@ -36,48 +36,73 @@ public class RentalService {
 
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
-        // 입력 검증
+        validateRentalRequest(productId, quantity);
+        
+        Product product = findProductById(productId);
+        validateRentalProduct(product);
+        
+        productService.decreaseStock(productId, quantity);
+        
+        Reservation reservation = findReservationById(reservationId);
+        RentalRecord rentalRecord = createRentalRecord(reservation, product, quantity);
+        
+        return RentalResponse.from(rentalRecord);
+    }
+
+    private void validateRentalRequest(Long productId, Integer quantity) {
         if (productId == null) {
             throw new ValidationException("Product ID cannot be null");
         }
-
         if (quantity == null || quantity <= 0) {
             throw new ValidationException("Quantity must be greater than 0");
         }
+    }
 
-        Product product = productRepository.findById(productId)
+    private Product findProductById(Long productId) {
+        return productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find product with id: " + productId));
+    }
 
+    private void validateRentalProduct(Product product) {
         if (product.getProductType() != ProductType.RENTAL) {
             throw new ValidationException("Product is not a rental item.");
         }
+    }
 
-        productService.decreaseStock(productId, quantity);
-
-        Reservation reservation = null;
-        if (reservationId != null) {
-            reservation = reservationRepository.findById(reservationId)
-                    .orElseThrow(() -> new EntityNotFoundException("Cannot find reservation with id: " + reservationId));
+    private Reservation findReservationById(Long reservationId) {
+        if (reservationId == null) {
+            return null;
         }
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find reservation with id: " + reservationId));
+    }
 
+    private RentalRecord createRentalRecord(Reservation reservation, Product product, Integer quantity) {
         RentalRecord rentalRecord = new RentalRecord(reservation, product, quantity);
-        RentalRecord savedRentalRecord = rentalRecordRepository.save(rentalRecord);
-
-        return RentalResponse.from(savedRentalRecord);
+        return rentalRecordRepository.save(rentalRecord);
     }
 
     @Transactional
     public RentalResponse markAsReturned(Long rentalRecordId) {
-        RentalRecord rentalRecord = rentalRecordRepository.findById(rentalRecordId)
-                .orElseThrow(() -> new EntityNotFoundException("Cannot find rental record with id: " + rentalRecordId));
+        RentalRecord rentalRecord = findRentalRecordById(rentalRecordId);
+        validateNotAlreadyReturned(rentalRecord);
+        processReturn(rentalRecord);
+        return RentalResponse.from(rentalRecord);
+    }
 
+    private RentalRecord findRentalRecordById(Long rentalRecordId) {
+        return rentalRecordRepository.findById(rentalRecordId)
+                .orElseThrow(() -> new EntityNotFoundException("Cannot find rental record with id: " + rentalRecordId));
+    }
+
+    private void validateNotAlreadyReturned(RentalRecord rentalRecord) {
         if (rentalRecord.getIsReturned()) {
             throw new RentalConflictException("This item has already been returned.");
         }
+    }
+
+    private void processReturn(RentalRecord rentalRecord) {
         rentalRecord.setReturned(true);
-
         productService.increaseStock(rentalRecord.getProduct().getId(), rentalRecord.getQuantity());
-
-        return RentalResponse.from(rentalRecord);
     }
 }
