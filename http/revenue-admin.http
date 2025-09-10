@@ -1,0 +1,8 @@
+### 일일 수익 보고서 조회
+GET http://localhost:8080/admin/reports/revenue/daily?date=2024-01-15
+
+### 기간별 수익 보고서 조회
+GET http://localhost:8080/admin/reports/revenue/range?from=2024-01-01&to=2024-01-31
+
+### 기간별 수익 상세 내역 조회
+GET http://localhost:8080/admin/reports/revenue/range/entries?from=2024-01-01&to=2024-01-31

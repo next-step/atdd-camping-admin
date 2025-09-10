@@ -1,0 +1,35 @@
+### 모든 제품 조회
+GET http://localhost:8080/admin/products
+
+### 제품 생성 (판매용)
+POST http://localhost:8080/admin/products
+Content-Type: application/json
+
+{
+  "name": "캠핑 텐트",
+  "stockQuantity": 10,
+  "price": 150000,
+  "productType": "SALE"
+}
+
+### 제품 생성 (렌탈용)
+POST http://localhost:8080/admin/products
+Content-Type: application/json
+
+{
+  "name": "캠핑 의자",
+  "stockQuantity": 20,
+  "price": 5000,
+  "productType": "RENTAL"
+}
+
+### 제품 수정
+PUT http://localhost:8080/admin/products/1
+Content-Type: application/json
+
+{
+  "name": "수정된 제품명",
+  "stockQuantity": 15,
+  "price": 200000,
+  "productType": "SALE"
+}

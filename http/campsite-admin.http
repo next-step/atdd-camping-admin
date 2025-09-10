@@ -1,0 +1,22 @@
+### 모든 캠프사이트 조회
+GET http://localhost:8080/admin/campsites
+
+### 캠프사이트 생성
+POST http://localhost:8080/admin/campsites
+Content-Type: application/json
+
+{
+  "siteNumber": "A001",
+  "description": "전망이 좋은 캠프사이트",
+  "maxPeople": 4
+}
+
+### 캠프사이트 수정
+PUT http://localhost:8080/admin/campsites/1
+Content-Type: application/json
+
+{
+  "siteNumber": "A002",
+  "description": "수정된 설명",
+  "maxPeople": 6
+}
