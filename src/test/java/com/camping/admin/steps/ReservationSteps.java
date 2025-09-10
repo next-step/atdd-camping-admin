@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -13,9 +14,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class ReservationSteps {
     private int reservationId;
 
-    @When("관리자가 로그인을 한다.")
+    @Given("관리자가 로그인을 한다.")
     public void 관리자가로그인을한다() {
         Map<String, String> params = Map.of("username", "admin", "password", "admin123");
+
         ExtractableResponse<Response> response = RestAssured.given()
                 .header("Content-Type", "application/json")
                 .body(params)
@@ -31,10 +33,12 @@ public class ReservationSteps {
     @When("관리자가 예약 상태를 \"CONFIRMED\"로 변경한다.")
     public void 관리자가예약상태를CONFIRMED로변경한다() {
         reservationId = 1;
+        String body = "{\"status\": \"CONFIRMED\"}";
+
         RestAssured.given()
                 .header("Authorization", "Bearer " + StepContext.getAccessToken())
                 .header("Content-Type", "application/json")
-                .body("{\"status\": \"CONFIRMED\"}")
+                .body(body)
                 .when()
                 .patch("http://localhost:8081/admin/reservations/" + reservationId + "/status")
                 .then()
@@ -51,11 +55,11 @@ public class ReservationSteps {
                 .statusCode(200)
                 .extract();
 
-        String status = response.jsonPath().getList("$").stream()
+        Map<String, Object> reservation = (Map<String, Object>) response.jsonPath().getList("$").stream()
                 .filter(s -> ((Integer) ((Map<String, Object>) s).get("id")) == reservationId)
                 .findFirst()
-                .toString();
+                .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다."));
 
-        assertThat(status).contains("CONFIRMED");
+        assertThat(reservation.get("status")).isEqualTo("CONFIRMED");
     }
 }
