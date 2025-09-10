@@ -1,9 +1,28 @@
-### 모든 캠프사이트 조회
-GET http://localhost:8080/admin/campsites
+### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 캠프사이트 생성
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+> {%
+client.global.set("authToken", response.body.token);
+%}
+
+###
+
+### 2️⃣ 모든 캠프사이트 조회
+GET http://localhost:8080/admin/campsites
+Authorization: Bearer {{authToken}}
+
+###
+
+### 3️⃣ 캠프사이트 생성
 POST http://localhost:8080/admin/campsites
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "siteNumber": "A001",
@@ -11,9 +30,12 @@ Content-Type: application/json
   "maxPeople": 4
 }
 
-### 캠프사이트 수정
+###
+
+### 4️⃣ 캠프사이트 수정 (캠프사이트 ID를 실제 값으로 변경하세요)
 PUT http://localhost:8080/admin/campsites/1
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "siteNumber": "A002",

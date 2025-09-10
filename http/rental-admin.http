@@ -1,9 +1,28 @@
-### 모든 대여 기록 조회
-GET http://localhost:8080/admin/rentals
+### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 대여 기록 생성
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+> {%
+client.global.set("authToken", response.body.token);
+%}
+
+###
+
+### 2️⃣ 모든 대여 기록 조회
+GET http://localhost:8080/admin/rentals
+Authorization: Bearer {{authToken}}
+
+###
+
+### 3️⃣ 대여 기록 생성
 POST http://localhost:8080/admin/rentals
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "productId": 1,
@@ -11,5 +30,8 @@ Content-Type: application/json
   "reservationId": 1
 }
 
-### 대여 반납 처리
+###
+
+### 4️⃣ 대여 반납 처리 (대여 ID를 실제 값으로 변경하세요)
 PATCH http://localhost:8080/admin/rentals/1/return
+Authorization: Bearer {{authToken}}

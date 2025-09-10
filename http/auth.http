@@ -1,8 +1,12 @@
-### 로그인
-POST http://localhost:8080/auth/login
+### 로그인 (토큰 획득 후 수동으로 복사해서 사용)
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
   "username": "admin",
   "password": "admin123"
 }
+
+> {%
+client.global.set("authToken", response.body.token);
+%}

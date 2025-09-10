@@ -1,17 +1,39 @@
-### 모든 예약 조회
-GET http://localhost:8080/admin/reservations
+### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 예약 상태 변경
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+> {%
+client.global.set("authToken", response.body.token);
+%}
+
+###
+
+### 2️⃣ 모든 예약 조회 (위 로그인 실행 후 바로 사용 가능)
+GET http://localhost:8080/admin/reservations
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzQ5MjM0OSwiZXhwIjoxNzU3NDk0MTQ5fQ.JFhxOHdgD4M-dJAWLLL0vRTYqv0OabGETbnuULz4s0U
+
+###
+
+### 3️⃣ 예약 상태 변경 (예약 ID를 실제 값으로 변경하세요)
 PATCH http://localhost:8080/admin/reservations/1/status
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "status": "CONFIRMED"
 }
 
-### 예약 취소
+###
+
+### 4️⃣ 예약 취소 (예약 ID를 실제 값으로 변경하세요)
 PATCH http://localhost:8080/admin/reservations/1/status
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "status": "CANCELLED"

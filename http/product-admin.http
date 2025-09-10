@@ -1,9 +1,28 @@
-### 모든 제품 조회
-GET http://localhost:8080/admin/products
+### 1️⃣ 먼저 이 요청을 실행해서 토큰을 받으세요
+POST http://localhost:8080/auth/login
+Content-Type: application/json
 
-### 제품 생성 (판매용)
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+> {%
+client.global.set("authToken", response.body.token);
+%}
+
+###
+
+### 2️⃣ 모든 제품 조회
+GET http://localhost:8080/admin/products
+Authorization: Bearer {{authToken}}
+
+###
+
+### 3️⃣ 제품 생성 (판매용)
 POST http://localhost:8080/admin/products
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "name": "캠핑 텐트",
@@ -12,9 +31,12 @@ Content-Type: application/json
   "productType": "SALE"
 }
 
-### 제품 생성 (렌탈용)
+###
+
+### 4️⃣ 제품 생성 (렌탈용)
 POST http://localhost:8080/admin/products
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "name": "캠핑 의자",
@@ -23,9 +45,12 @@ Content-Type: application/json
   "productType": "RENTAL"
 }
 
-### 제품 수정
+###
+
+### 5️⃣ 제품 수정 (제품 ID를 실제 값으로 변경하세요)
 PUT http://localhost:8080/admin/products/1
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
   "name": "수정된 제품명",
