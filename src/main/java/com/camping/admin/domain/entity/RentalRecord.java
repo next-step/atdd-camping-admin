@@ -52,10 +52,6 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
-    }
-
     public void markAsReturned() {
         if (this.isReturned) {
             throw new RentalConflictException("This item has already been returned.");

@@ -10,7 +10,8 @@ public class TestConfig {
     @Bean
     public AdminCredentials adminCredentials(
             @Value("${admin.username}") String username,
-            @Value("${admin.password}") String password) {
+            @Value("${admin.password}") String password
+    ) {
         return new AdminCredentials(username, password);
     }
 }

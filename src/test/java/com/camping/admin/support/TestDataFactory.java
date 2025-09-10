@@ -17,7 +17,6 @@ public final class TestDataFactory {
         return generateToken(username, password);
     }
 
-
     private static String generateToken(String username, String password) {
         RequestSpecification spec = RequestSpecFactory.create();
 

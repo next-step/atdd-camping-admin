@@ -2,11 +2,9 @@ package com.camping.admin.steps;
 
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
-import com.camping.admin.support.DataTableHelper;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.cucumber.datatable.DataTable;
 
 import java.util.Map;
 
@@ -17,12 +15,6 @@ public class RentalStepDefs {
     @When("관리자가 대여 목록을 조회한다")
     public void 관리자가대여목록을조회한다() {
         ApiHelper.makeAuthenticatedRequest("GET", "/admin/rentals", null);
-    }
-
-    @When("관리자가 다음 정보로 대여를 생성한다:")
-    public void 관리자가다음정보로대여를생성한다(DataTable dataTable) {
-        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, false);
-        ApiHelper.makeAuthenticatedRequest("POST", "/admin/rentals", requestBody);
     }
 
     @Then("대여 목록이 반환된다")
@@ -39,41 +31,11 @@ public class RentalStepDefs {
                 .body("[0].quantity", notNullValue());
     }
 
-    @And("생성된 대여 정보가 반환된다")
-    public void 생성된대여정보가반환된다() {
-        CommonContext.lastResponse.then()
-                .body("id", notNullValue())
-                .body("productId", notNullValue())
-                .body("quantity", notNullValue());
-    }
-
-    @And("대여 수량은 {int}이다")
-    public void 대여수량은이다(int expectedQuantity) {
-        CommonContext.lastResponse.then()
-                .body("quantity", equalTo(expectedQuantity));
-    }
-
-    @And("대여의 예약 ID는 null이다")
-    public void 대여의예약ID는null이다() {
-        CommonContext.lastResponse.then()
-                .body("reservationId", nullValue());
-    }
-
-    @When("권한 없는 사용자가 다음 정보로 대여를 생성한다:")
-    public void 권한없는사용자가다음정보로대여를생성한다(DataTable dataTable) {
-        Map<String, Object> requestBody = DataTableHelper.buildRequestBodyFromDataTable(dataTable, false);
-        ApiHelper.makeUnauthenticatedRequest("POST", "/admin/rentals", requestBody);
-    }
-
     @When("권한 없는 사용자가 대여 목록을 조회한다")
     public void 권한없는사용자가대여목록을조회한다() {
         ApiHelper.makeUnauthenticatedRequest("GET", "/admin/rentals", null);
     }
 
-    @Then("대여 생성에 성공한다")
-    public void 대여생성에성공한다() {
-        CommonContext.lastResponse.then().statusCode(201);
-    }
 
     @Then("대여 생성에 실패한다")
     public void 대여생성에실패한다() {
@@ -105,14 +67,6 @@ public class RentalStepDefs {
                 "quantity", quantity
         );
         ApiHelper.makeAuthenticatedRequest("POST", "/admin/rentals", requestBody);
-    }
-
-    @Then("예약 없는 대여가 생성된다")
-    public void 예약없는대여가생성된다() {
-        CommonContext.lastResponse.then()
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("reservationId", nullValue());
     }
 
     @When("관리자가 존재하지 않는 상품 {int}번으로 대여를 생성한다")

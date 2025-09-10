@@ -35,12 +35,6 @@ public class ReservationListStepDefs {
                 .body("[0].campsiteSiteNumber", notNullValue());
     }
 
-    @And("빈 예약 목록이 반환된다")
-    public void 빈예약목록이반환된다() {
-        CommonContext.lastResponse.then()
-                .body("size()", equalTo(0));
-    }
-
     @When("권한 없는 사용자가 예약 목록을 조회한다")
     public void 권한없는사용자가예약목록을조회한다() {
         ApiHelper.makeUnauthenticatedRequest("GET", "/admin/reservations", null);
