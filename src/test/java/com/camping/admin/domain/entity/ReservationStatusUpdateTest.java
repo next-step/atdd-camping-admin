@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.exception.ValidationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,7 +26,7 @@ class ReservationStatusUpdateTest {
                 LocalDate.of(2024, 1, 3),
                 new Campsite("A-01", "일반 캠프사이트", 4)
         );
-        reservation.setStatus("CONFIRMED");
+        reservation.setStatus(ReservationStatus.CONFIRMED);
     }
 
     @DisplayName("상태 업데이트 요청을 정상적으로 검증한다")
@@ -63,24 +64,24 @@ class ReservationStatusUpdateTest {
 
         reservation.updateStatus(body);
 
-        assertThat(reservation.getStatus()).isEqualTo("CANCELLED");
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELLED);
     }
 
     @DisplayName("다른 상태로 업데이트할 수 있다")
     @Test
     void updateStatus_DifferentStatus_Success() {
         Map<String, Object> body = new HashMap<>();
-        body.put("status", "COMPLETED");
+        body.put("status", "REJECTED");
 
         reservation.updateStatus(body);
 
-        assertThat(reservation.getStatus()).isEqualTo("COMPLETED");
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.REJECTED);
     }
 
     @DisplayName("상태가 null인 경우 업데이트하지 않는다")
     @Test
     void updateStatus_NullStatus_NoUpdate() {
-        String originalStatus = reservation.getStatus();
+        ReservationStatus originalStatus = reservation.getStatus();
         Map<String, Object> body = new HashMap<>();
         body.put("status", null);
 
@@ -92,7 +93,7 @@ class ReservationStatusUpdateTest {
     @DisplayName("상태가 빈 문자열인 경우 업데이트하지 않는다")
     @Test
     void updateStatus_BlankStatus_NoUpdate() {
-        String originalStatus = reservation.getStatus();
+        ReservationStatus originalStatus = reservation.getStatus();
         Map<String, Object> body = new HashMap<>();
         body.put("status", "");
 
@@ -104,7 +105,7 @@ class ReservationStatusUpdateTest {
     @DisplayName("상태가 공백인 경우 업데이트하지 않는다")
     @Test
     void updateStatus_WhitespaceStatus_NoUpdate() {
-        String originalStatus = reservation.getStatus();
+        ReservationStatus originalStatus = reservation.getStatus();
         Map<String, Object> body = new HashMap<>();
         body.put("status", "   ");
 
@@ -116,7 +117,7 @@ class ReservationStatusUpdateTest {
     @DisplayName("status 키가 없는 경우 업데이트하지 않는다")
     @Test
     void updateStatus_NoStatusKey_NoUpdate() {
-        String originalStatus = reservation.getStatus();
+        ReservationStatus originalStatus = reservation.getStatus();
         Map<String, Object> body = new HashMap<>();
         body.put("otherField", "value");
 
@@ -125,43 +126,18 @@ class ReservationStatusUpdateTest {
         assertThat(reservation.getStatus()).isEqualTo(originalStatus);
     }
 
-    @DisplayName("숫자 값도 문자열로 변환하여 상태로 설정한다")
-    @Test
-    void updateStatus_NumericValue_ConvertsToString() {
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", 1);
-
-        reservation.updateStatus(body);
-
-        assertThat(reservation.getStatus()).isEqualTo("1");
-    }
-
-    @DisplayName("복잡한 객체도 문자열로 변환하여 상태로 설정한다")
-    @Test
-    void updateStatus_ComplexObject_ConvertsToString() {
-        Map<String, Object> statusObject = new HashMap<>();
-        statusObject.put("code", "PENDING");
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("status", statusObject);
-
-        reservation.updateStatus(body);
-
-        assertThat(reservation.getStatus()).contains("PENDING");
-    }
-
     @DisplayName("여러 필드가 있어도 status만 업데이트한다")
     @Test
     void updateStatus_MultipleFields_OnlyUpdatesStatus() {
         String originalCustomerName = reservation.getCustomerName();
         Map<String, Object> body = new HashMap<>();
-        body.put("status", "UPDATED");
+        body.put("status", "REJECTED");
         body.put("customerName", "새 이름");
         body.put("phoneNumber", "010-1234-5678");
 
         reservation.updateStatus(body);
 
-        assertThat(reservation.getStatus()).isEqualTo("UPDATED");
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.REJECTED);
         assertThat(reservation.getCustomerName()).isEqualTo(originalCustomerName); // 변경되지 않음
     }
 }

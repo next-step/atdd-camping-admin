@@ -1,8 +1,11 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.exception.ValidationException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -49,7 +52,8 @@ public class Reservation {
 
     private String phoneNumber;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
 
     @Column(length = 6)
     private String confirmationCode;
@@ -63,11 +67,17 @@ public class Reservation {
         this.campsite = campsite;
     }
 
+    public static void validateStatusUpdateRequest(Map<String, Object> body) {
+        if (body == null || body.isEmpty()) {
+            throw new ValidationException("Request body cannot be empty");
+        }
+    }
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "CONFIRMED";
+            this.status = ReservationStatus.CONFIRMED;
         }
     }
 
@@ -91,19 +101,15 @@ public class Reservation {
         return this.reservationDate != null && this.reservationDate.equals(date);
     }
 
-    public static void validateStatusUpdateRequest(Map<String, Object> body) {
-        if (body == null || body.isEmpty()) {
-            throw new ValidationException("Request body cannot be empty");
-        }
-    }
-
     public void updateStatus(Map<String, Object> body) {
         Object statusObject = body.get("status");
-        if (statusObject != null) {
-            String statusValue = statusObject.toString();
-            if (!statusValue.isBlank()) {
-                this.status = statusValue;
-            }
+        if (statusObject == null) {
+            return;
         }
+        String statusValue = statusObject.toString();
+        if (statusValue.isBlank()) {
+            return;
+        }
+        this.status = ReservationStatus.valueOf(statusValue);
     }
 }
