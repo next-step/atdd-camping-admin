@@ -45,8 +45,14 @@ public class ReservationAdminController {
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
             @RequestBody Map<String, Object> body) {
+        
+        // 존재하지 않는 예약에 대해 404 Not Found 반환
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+                .orElse(null);
+        
+        if (reservation == null) {
+            return ResponseEntity.notFound().build();
+        }
 
         if (body == null || body.isEmpty()) {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);

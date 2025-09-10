@@ -34,15 +34,15 @@ public class SalesService {
 
     @Transactional
     public void processSale(ProcessSaleRequest request) {
-        for (SaleItemResponse itemDto : request.getItems()) {
-            productService.decreaseStock(itemDto.getProductId(), itemDto.getQuantity());
+        for (SaleItemResponse itemDto : request.items()) {
+            productService.decreaseStock(itemDto.productId(), itemDto.quantity());
 
-            Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + itemDto.getProductId()));
+            Product product = productRepository.findById(itemDto.productId())
+                    .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + itemDto.productId()));
             
-            BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
+            BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDto.quantity()));
             
-            SalesRecord salesRecord = new SalesRecord(product, itemDto.getQuantity(), totalPrice);
+            SalesRecord salesRecord = new SalesRecord(product, itemDto.quantity(), totalPrice);
             salesRecordRepository.save(salesRecord);
         }
     }
@@ -159,7 +159,7 @@ public class SalesService {
                         rr.getCreatedAt()
                 )));
 
-        entries.sort(Comparator.comparing(RevenueEntryResponse::getOccurredAt));
+        entries.sort(Comparator.comparing(RevenueEntryResponse::occurredAt));
         return entries;
     }
 }

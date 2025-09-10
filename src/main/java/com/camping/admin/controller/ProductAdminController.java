@@ -3,14 +3,22 @@ package com.camping.admin.controller;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/admin/products")
@@ -41,6 +49,10 @@ public class ProductAdminController {
             name = v == null ? null : v.toString();
         } else {
             name = null;
+        }
+
+        if (name == null || name.trim().isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         Integer stockQuantity;
@@ -95,12 +107,26 @@ public class ProductAdminController {
             productType = ProductType.SALE;
         }
 
-        Product newProduct = new Product(name, stockQuantity, price, productType);
-        Product saved = productRepository.save(newProduct);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        // 음수 재고 검증
+        if (stockQuantity < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+
+        // 음수 가격 검증
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Product newProduct = new Product(name, stockQuantity, price, productType);
+            Product saved = productRepository.save(newProduct);
+            if (saved == null) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        }
     }
 
     @PutMapping("/{productId}")

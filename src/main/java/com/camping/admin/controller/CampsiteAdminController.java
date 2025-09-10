@@ -1,14 +1,24 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteDto;
 import com.camping.admin.repository.CampsiteRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/campsites")
@@ -18,21 +28,19 @@ public class CampsiteAdminController {
     private final CampsiteRepository campsiteRepository;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
-        List<Campsite> result;
+    public ResponseEntity<List<CampsiteDto>> getAllCampsites() {
+        List<CampsiteDto> result;
         List<Campsite> all = campsiteRepository.findAll();
         if (all == null) {
             result = new ArrayList<>();
         } else if (all.isEmpty()) {
-            result = all; // 빈 목록 그대로 반환
-        } else {
-            // 그대로 반환하지만, 혹시 null 요소가 있으면 필터링
             result = new ArrayList<>();
-            for (Campsite c : all) {
-                if (c != null) {
-                    result.add(c);
-                }
-            }
+        } else {
+            // Entity를 DTO로 변환하여 순환 참조 방지
+            result = all.stream()
+                    .filter(c -> c != null)
+                    .map(CampsiteDto::new)
+                    .collect(Collectors.toList());
         }
         return ResponseEntity.ok(result);
     }
@@ -49,6 +57,10 @@ public class CampsiteAdminController {
             }
         } else {
             siteNumber = null;
+        }
+
+        if (siteNumber == null || siteNumber.trim().isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         String description;
@@ -77,12 +89,21 @@ public class CampsiteAdminController {
             maxPeople = null;
         }
 
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        // 음수 최대 인원 검증
+        if (maxPeople != null && maxPeople < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
+            Campsite saved = campsiteRepository.save(newCampsite);
+            if (saved == null) {
+                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            } else {
+                return new ResponseEntity<>(saved, HttpStatus.CREATED);
+            }
+        } catch (DataIntegrityViolationException e) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
         }
     }
 
