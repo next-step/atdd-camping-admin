@@ -1,39 +1,21 @@
 package com.camping.admin.steps;
 
-import static io.restassured.RestAssured.given;
+import static com.camping.admin.steps.hooks.Hooks.authenticatedRequest;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.isA;
 import static org.hamcrest.Matchers.notNullValue;
 
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import java.util.HashMap;
 import java.util.Map;
 
 public class CampsiteSteps {
 
-    private RequestSpecification request;
     private Response response;
     private String generatedSiteNumber;
-
-    @Given("관리자가 로그인되어 있다")
-    public void aUserIsLoggedInAsAnAdmin() {
-        String adminToken = given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when()
-                .post("/auth/login")
-                .then()
-                .extract()
-                .cookie("AUTH_TOKEN");
-
-        request = given().header("Authorization", "Bearer " + adminToken)
-                .contentType("application/json");
-    }
 
     @When("고유한 사이트 번호와 설명 {string}, 최대 인원 {int}명으로 캠프사이트 생성을 요청한다")
     public void requestCampsiteCreation(String description, int maxPeople) {
@@ -43,7 +25,7 @@ public class CampsiteSteps {
         campsiteDetails.put("description", description);
         campsiteDetails.put("maxPeople", maxPeople);
 
-        response = request.body(campsiteDetails)
+        response = authenticatedRequest.body(campsiteDetails)
                 .when()
                 .post("/admin/campsites");
     }
