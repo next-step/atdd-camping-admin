@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -16,19 +15,28 @@ public class ReservationSteps {
 
     @When("관리자가 로그인을 한다.")
     public void 관리자가로그인을한다() {
-        RestAssured.given()
+        Map<String, String> params = Map.of("username", "admin", "password", "admin123");
+        ExtractableResponse<Response> response = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .body(params)
                 .when()
-                .post("http://localhost:8080/admin/login")
+                .post("http://localhost:8081/auth/login")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .extract();
+
+        StepContext.setAccessToken(response.jsonPath().get("accessToken"));
     }
 
-    @When("관리자가 예약 상태를 변경한다.")
-    public void 관리자가예약상태를변경한다() {
+    @When("관리자가 예약 상태를 \"CONFIRMED\"로 변경한다.")
+    public void 관리자가예약상태를CONFIRMED로변경한다() {
         reservationId = 1;
         RestAssured.given()
+                .header("Authorization", "Bearer " + StepContext.getAccessToken())
+                .header("Content-Type", "application/json")
+                .body("{\"status\": \"CONFIRMED\"}")
                 .when()
-                .patch("http://localhost:8080/admin/reservations/" + reservationId + "/status")
+                .patch("http://localhost:8081/admin/reservations/" + reservationId + "/status")
                 .then()
                 .statusCode(200);
     }
@@ -36,30 +44,18 @@ public class ReservationSteps {
     @Then("예약 상태가 변경된다.")
     public void 예약상태가변경된다() {
         ExtractableResponse<Response> response = RestAssured.given()
+                .header("Authorization", "Bearer " + StepContext.getAccessToken())
                 .when()
-                .get("http://localhost:8080/admin/reservations")
+                .get("http://localhost:8081/admin/reservations")
                 .then()
                 .statusCode(200)
                 .extract();
 
         String status = response.jsonPath().getList("$").stream()
-                .filter(s -> ((Integer) ((Map<String, Object>) s).get("id")) == 1)
+                .filter(s -> ((Integer) ((Map<String, Object>) s).get("id")) == reservationId)
                 .findFirst()
                 .toString();
 
         assertThat(status).contains("CONFIRMED");
     }
 }
-
-
-//[
-//        {
-//        "id": 1,
-//        "customerName": "�솉湲몃룞",
-//        "startDate": "2025-09-10",
-//        "endDate": "2025-09-11",
-//        "status": "CONFIRMED",
-//        "campsiteSiteNumber": "A-01",
-//        "reservationDate": "2025-09-10"
-//        },
-//]
