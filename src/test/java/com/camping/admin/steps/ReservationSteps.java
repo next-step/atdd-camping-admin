@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
@@ -13,22 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
     private int reservationId;
-
-    @Given("관리자가 로그인을 한다.")
-    public void 관리자가로그인을한다() {
-        Map<String, String> params = Map.of("username", "admin", "password", "admin123");
-
-        ExtractableResponse<Response> response = RestAssured.given()
-                .header("Content-Type", "application/json")
-                .body(params)
-                .when()
-                .post("http://localhost:8081/auth/login")
-                .then()
-                .statusCode(200)
-                .extract();
-
-        StepContext.setAccessToken(response.jsonPath().get("accessToken"));
-    }
 
     @When("관리자가 예약 상태를 \"CONFIRMED\"로 변경한다.")
     public void 관리자가예약상태를CONFIRMED로변경한다() {
@@ -45,8 +28,8 @@ public class ReservationSteps {
                 .statusCode(200);
     }
 
-    @Then("예약 상태가 변경된다.")
-    public void 예약상태가변경된다() {
+    @Then("예약 상태가 \"CONFIRMED\"로 변경된다.")
+    public void 예약상태가CONFIRMED로변경된다() {
         ExtractableResponse<Response> response = RestAssured.given()
                 .header("Authorization", "Bearer " + StepContext.getAccessToken())
                 .when()

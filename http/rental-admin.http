@@ -22,7 +22,7 @@ Authorization: Bearer {{authToken}}
 ### 3️⃣ 대여 기록 생성
 POST http://localhost:8081/admin/rentals
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzUxNjI3OCwiZXhwIjoxNzU3NTE4MDc4fQ.9vnRH4_Ou-scpdKdsILIeE-VBvfPeFIk0TzQ9oDBIsY
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzUyMDkyOSwiZXhwIjoxNzU3NTIyNzI5fQ.oA51P6j5XR1BTR0vXkBxg1g8dEaxarWRvFNVYziC3b8
 
 {
   "productId": 1,
