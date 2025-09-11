@@ -2,6 +2,7 @@
 insert into campsites (id, site_number, description, max_people) values
   (1, 'A-01', '숲 뷰, 전기가능', 4),
   (2, 'A-02', '강가, 그늘많음', 6);
+alter table campsites alter column id restart with 3;
 
 -- Products
 insert into products (id, name, stock_quantity, price, product_type) values
@@ -19,6 +20,7 @@ insert into products (id, name, stock_quantity, price, product_type) values
   (10, '스낵팩', 60, 3000.00, 'SALE'),
   (11, '휴지', 70, 2500.00, 'SALE'),
   (12, '아이스팩', 90, 1500.00, 'SALE');
+alter table products alter column id restart with 13;
 
 -- Reservations
 insert into reservations (id, customer_name, start_date, end_date, campsite_id, phone_number, status, reservation_date, confirmation_code, created_at)
@@ -36,6 +38,7 @@ values
   (10, '배수아', DATEADD('DAY', -6, current_date), DATEADD('DAY', -5, current_date), 2, '010-5656-7878', 'CONFIRMED', DATEADD('DAY', -7, current_date), 'R00010', DATEADD('DAY', -7, current_timestamp)),
   (11, '고다빈', DATEADD('DAY', -3, current_date), DATEADD('DAY', -2, current_date), 1, '010-9090-1010', 'CONFIRMED', DATEADD('DAY', -4, current_date), 'R00011', DATEADD('DAY', -4, current_timestamp)),
   (12, '한도윤', DATEADD('DAY', -1, current_date), current_date, 2, '010-2323-4545', 'CONFIRMED', DATEADD('DAY', -2, current_date), 'R00012', DATEADD('DAY', -2, current_timestamp));
+alter table reservations alter column id restart with 13;
 
 -- Sales Records
 insert into sales_records (id, product_id, quantity, total_price, created_at) values
@@ -44,6 +47,7 @@ insert into sales_records (id, product_id, quantity, total_price, created_at) va
   (3, 8, 5, 10000.00, DATEADD('DAY', -7, current_timestamp)),
   (4, 9, 2, 8000.00, DATEADD('DAY', -15, current_timestamp)),
   (5, 10, 10, 30000.00, DATEADD('DAY', -25, current_timestamp));
+alter table sales_records alter column id restart with 6;
 
 -- Rental Records (연결된 예약과 무관한 워크인 포함)
 insert into rental_records (id, reservation_id, product_id, quantity, is_returned, created_at) values
@@ -53,5 +57,4 @@ insert into rental_records (id, reservation_id, product_id, quantity, is_returne
   (4, 6, 6, 1, true, DATEADD('DAY', -18, current_timestamp)),
   (5, 7, 7, 4, false, DATEADD('DAY', -15, current_timestamp)),
   (6, null, 3, 1, false, DATEADD('DAY', -3, current_timestamp));
-
-
+alter table rental_records alter column id restart with 7;

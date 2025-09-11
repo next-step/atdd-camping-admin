@@ -1,4 +1,8 @@
+# AI Assistants
 .claude/
+.serena
+CLAUDE.md
+
 .gradle/
 .idea/
 build/

@@ -10,22 +10,25 @@ import java.util.List;
 
 @Entity
 @Table(name = "campsites")
-@Getter
 @Setter
 @NoArgsConstructor
 public class Campsite {
-    
+
+    @Getter
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
+    @Getter
     @Column(unique = true, nullable = false)
     private String siteNumber;
-    
+
+    @Getter
     private String description;
-    
+
+    @Getter
     private Integer maxPeople;
-    
+
     @OneToMany(mappedBy = "campsite", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
     
