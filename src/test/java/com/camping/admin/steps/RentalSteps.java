@@ -17,8 +17,8 @@ public class RentalSteps {
     private Long rentalId;
     private int statusCode;
 
-    @When("관리자는 특정 상품의 수량 만큼 대여를 시도한다.")
-    public void 관리자는특정상품의수량만큼대여를시도한다(DataTable dataTable) {
+    @When("관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.")
+    public void 관리자는특정상품의수량만큼대여기록을작성한다(DataTable dataTable) {
         ExtractableResponse<Response> response = 대여기록작성요청(extractRentalBodyFromDataTable(dataTable));
         if (response.statusCode() == 201) {
             rentalId = response.jsonPath().getLong("id");
@@ -53,7 +53,7 @@ public class RentalSteps {
         assertThat(statusCode).isEqualTo(500);
     }
 
-    @Then("대여 기록이 생성되지 않는다.")
+    @And("대여 기록이 생성되지 않는다.")
     public void 대여기록이생성되지않는다(DataTable dataTable) {
         long productId = Long.parseLong(dataTable.asMap().get("productId"));
 
