@@ -1,4 +1,4 @@
-package com.camping.admin.steps;
+package com.camping.admin.support;
 
 import io.restassured.response.Response;
 import lombok.Getter;

@@ -29,7 +29,7 @@ ATDD (Acceptance Test Driven Development) 학습을 위해 구축된 Spring Boot
 ./gradlew test --info
 
 # 특정 Cucumber 피처 실행
-./gradlew test --tests "com.camping.CucumberTestRunner"
+./gradlew test --tests "com.camping.admin.CucumberTestRunner"
 ```
 
 ### 데이터베이스 접근

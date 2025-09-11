@@ -1,7 +1,7 @@
 package com.camping.admin.hooks;
 
 import com.camping.admin.steps.AuthSteps;
-import com.camping.admin.steps.TestContext;
+import com.camping.admin.support.TestContext;
 import io.cucumber.java.BeforeAll;
 
 public class TokenHook {

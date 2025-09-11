@@ -19,12 +19,12 @@ Feature: 관리자의 예약 기능
     And 'PIKACHU 예약 상태는 없습니다.' 메시지가 응답 한다.
 
   Scenario: 취소된 예약은 취소가 불가능하다.
-    And 관리자가 예약을 'CANCELLED' 한다.
+    Given 관리자가 예약을 'CANCELLED' 한다.
     When 관리자가 예약을 'CANCELLED' 한다.
     Then 409 코드로 응답 한다.
     And '이미 취소된 예약 입니다.' 메시지가 응답 한다.
 
   Scenario: 취소된 예약은 다시 예약할 수 있다.
-    And 관리자가 예약을 'CANCELLED' 한다.
+    Given 관리자가 예약을 'CANCELLED' 한다.
     When 사용자가 예약을 한다.
     Then 201 코드로 응답 한다.
