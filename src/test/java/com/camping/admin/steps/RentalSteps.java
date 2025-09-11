@@ -19,7 +19,7 @@ public class RentalSteps {
 
     @When("관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.")
     public void 관리자는특정상품의수량만큼대여기록을작성한다(DataTable dataTable) {
-        ExtractableResponse<Response> response = 대여기록작성요청(extractRentalBodyFromDataTable(dataTable));
+        ExtractableResponse<Response> response = 대여_기록_작성_요청(extractRentalBodyFromDataTable(dataTable));
         if (response.statusCode() == 201) {
             rentalId = response.jsonPath().getLong("id");
         }
@@ -38,13 +38,13 @@ public class RentalSteps {
     @Then("대여 기록이 생성된다.")
     public void 대여기록이생성된다() {
         assertThat(statusCode).isEqualTo(201);
-        Map<String, Object> rental = 특정대여기록조회(rentalId);
+        Map<String, Object> rental = 특정_대여_기록_조회(rentalId);
         assertThat(rental.get("isReturned")).isEqualTo(false);
     }
 
     @And("상품의 수량이 대여 기록의 수량 만큼 줄어든다.")
     public void 상품의수량이대여기록의수량만큼줄어든다() {
-        Map<String, Object> rental = 특정대여기록조회(rentalId);
+        Map<String, Object> rental = 특정_대여_기록_조회(rentalId);
         assertThat(rental.get("quantity")).isEqualTo(2);
     }
 
@@ -57,7 +57,7 @@ public class RentalSteps {
     public void 대여기록이생성되지않는다(DataTable dataTable) {
         long productId = Long.parseLong(dataTable.asMap().get("productId"));
 
-        ExtractableResponse<Response> response = 대여기록목록조회();
+        ExtractableResponse<Response> response = 대여_기록_목록_조회();
         Optional<Map> rentalRecord = response.jsonPath().getList(".", Map.class).stream()
                 .filter(record -> ((Number) record.get("productId")).longValue() == productId)
                 .findFirst();
