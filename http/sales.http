@@ -1,0 +1,12 @@
+### 판매 처리
+POST http://localhost:8081/api/sales
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "quantity": 2,
+  "customerName": "홍길동"
+}
+
+### 최근 판매 기록 조회 (10개)
+GET http://localhost:8081/api/sales
