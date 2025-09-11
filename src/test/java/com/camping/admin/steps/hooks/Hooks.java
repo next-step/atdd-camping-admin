@@ -11,6 +11,11 @@ public class Hooks {
 
     @Before
     public void setUp() {
+        authenticate();
+        cleanupDatabase();
+    }
+
+    private void authenticate() {
         String adminToken = given()
                 .contentType("application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
@@ -26,5 +31,15 @@ public class Hooks {
                 .contentType("application/json")
                 .accept("application/json");
     }
+
+    private void cleanupDatabase() {
+        given()
+                .spec(authenticatedRequest)
+                .when()
+                .post("/api/admin/reset-db")
+                .then()
+                .statusCode(200);
+    }
+
 
 }
