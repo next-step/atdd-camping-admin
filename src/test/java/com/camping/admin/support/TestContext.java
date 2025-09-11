@@ -19,4 +19,11 @@ public class TestContext {
             this.userToken = token;
         }
     }
+
+    public String getTokenByRole(String role) {
+        if (role.equals("관리자")) {
+            return this.adminToken;
+        }
+        return this.userToken;
+    }
 }
