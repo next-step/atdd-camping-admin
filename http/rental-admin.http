@@ -15,7 +15,7 @@ client.global.set("authToken", response.body.token);
 
 ### 2️⃣ 모든 대여 기록 조회
 GET http://localhost:8081/admin/rentals
-Authorization: Bearer {{authToken}}
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzU1NzU5MSwiZXhwIjoxNzU3NTU5MzkxfQ.GzjUx2fBPbEojB6AdvgMADCvnuQ_xUGZ7KyJqqtejG4
 
 ###
 
