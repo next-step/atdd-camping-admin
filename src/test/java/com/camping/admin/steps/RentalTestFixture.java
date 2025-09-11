@@ -6,12 +6,13 @@ import io.restassured.response.Response;
 
 import java.util.Map;
 
-public class TestFixture {
+public class RentalTestFixture {
     public static Map<String, Object> 대여기록목록조회(long rentalId) {
         ExtractableResponse<Response> response = RestAssured.given()
+                .spec(StepContext.getRequestSpecification())
                 .header("Authorization", "Bearer " + StepContext.getAccessToken())
                 .when()
-                .get("http://localhost:8081/admin/rentals")
+                .get("/admin/rentals")
                 .then()
                 .statusCode(200)
                 .extract();

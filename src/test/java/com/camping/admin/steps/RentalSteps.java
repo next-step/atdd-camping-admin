@@ -1,16 +1,18 @@
 package com.camping.admin.steps;
 
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
 
 import java.util.Map;
 
-import static com.camping.admin.steps.TestFixture.대여기록목록조회;
+import static com.camping.admin.steps.RentalTestFixture.대여기록목록조회;
+import static com.camping.admin.steps.StepContext.getAccessToken;
+import static com.camping.admin.steps.StepContext.getRequestSpecification;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class RentalSteps {
@@ -19,11 +21,11 @@ public class RentalSteps {
     @When("관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.")
     public void 관리자는특정상품의수량만큼대여기록을작성한다() {
         ExtractableResponse<Response> response = RestAssured.given()
-                .header("Content-Type", "application/json")
-                .header("Authorization", "Bearer " + StepContext.getAccessToken())
+                .spec(getRequestSpecification())
+                .header("Authorization", "Bearer " + getAccessToken())
                 .body("{\"reservationId\": 1, \"productId\": 1, \"quantity\": 2}")
                 .when()
-                .post("http://localhost:8081/admin/rentals")
+                .post("/admin/rentals")
                 .then()
                 .statusCode(201)
                 .extract();

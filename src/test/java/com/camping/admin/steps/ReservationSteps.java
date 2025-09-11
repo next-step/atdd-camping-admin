@@ -19,11 +19,11 @@ public class ReservationSteps {
         String body = "{\"status\": \"CONFIRMED\"}";
 
         RestAssured.given()
+                .spec(StepContext.getRequestSpecification())
                 .header("Authorization", "Bearer " + StepContext.getAccessToken())
-                .header("Content-Type", "application/json")
                 .body(body)
                 .when()
-                .patch("http://localhost:8081/admin/reservations/" + reservationId + "/status")
+                .patch("/admin/reservations/" + reservationId + "/status")
                 .then()
                 .statusCode(200);
     }
@@ -31,9 +31,10 @@ public class ReservationSteps {
     @Then("예약 상태가 \"CONFIRMED\"로 변경된다.")
     public void 예약상태가CONFIRMED로변경된다() {
         ExtractableResponse<Response> response = RestAssured.given()
+                .spec(StepContext.getRequestSpecification())
                 .header("Authorization", "Bearer " + StepContext.getAccessToken())
                 .when()
-                .get("http://localhost:8081/admin/reservations")
+                .get("/admin/reservations")
                 .then()
                 .statusCode(200)
                 .extract();
