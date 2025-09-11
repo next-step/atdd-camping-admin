@@ -19,6 +19,7 @@ public class CucumberTestHooks {
         RestAssured.requestSpecification = new RequestSpecBuilder()
             .setBaseUri(adminApiUrl)
             .setContentType(ContentType.JSON)
+            .setAccept(ContentType.JSON)
             .addFilters(List.of(
                 new RequestLoggingFilter(),
                 new ResponseLoggingFilter()
