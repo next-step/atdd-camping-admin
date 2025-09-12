@@ -2,21 +2,22 @@ package com.camping.admin.steps.hooks;
 
 import static io.restassured.RestAssured.given;
 
+import com.camping.admin.config.RequestSpecFactory;
+import com.camping.admin.context.CommonContext;
 import io.cucumber.java.Before;
-import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 
 public class Hooks {
-    public static RequestSpecification authenticatedRequest;
-
     @Before
     public void setUp() {
+        CommonContext.setRequestSpec(RequestSpecFactory.create());
         authenticate();
         cleanupDatabase();
     }
 
     private void authenticate() {
         String adminToken = given()
+                .spec(CommonContext.getRequestSpec())
                 .contentType("application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .when()
@@ -26,15 +27,12 @@ public class Hooks {
                 .extract()
                 .cookie("AUTH_TOKEN");
 
-        authenticatedRequest = given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType("application/json")
-                .accept("application/json");
+        CommonContext.setAdminToken(adminToken);
     }
 
     private void cleanupDatabase() {
-        given()
-                .spec(authenticatedRequest)
+        given().spec(CommonContext.getRequestSpec())
+                .header("Authorization", "Bearer " + CommonContext.getAdminToken())
                 .when()
                 .post("/api/admin/reset-db")
                 .then()

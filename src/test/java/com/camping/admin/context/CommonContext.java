@@ -1,0 +1,34 @@
+package com.camping.admin.context;
+
+import io.restassured.response.Response;
+import io.restassured.specification.RequestSpecification;
+
+public class CommonContext {
+    private static final ThreadLocal<RequestSpecification> requestSpec = new ThreadLocal<>();
+    private static String adminToken;
+    private Response response;
+
+    public static RequestSpecification getRequestSpec() {
+        return requestSpec.get();
+    }
+
+    public static void setRequestSpec(RequestSpecification spec) {
+        requestSpec.set(spec);
+    }
+
+    public static String getAdminToken() {
+        return adminToken;
+    }
+
+    public static void setAdminToken(String adminToken) {
+        CommonContext.adminToken = adminToken;
+    }
+
+    public Response getResponse() {
+        return response;
+    }
+
+    public void setResponse(Response response) {
+        this.response = response;
+    }
+}
