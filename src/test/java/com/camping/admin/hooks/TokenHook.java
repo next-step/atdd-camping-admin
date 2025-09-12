@@ -13,6 +13,5 @@ public class TokenHook {
         AuthSteps authSteps = new AuthSteps();
 
         authSteps.login("관리자");
-        authSteps.login("사용자");
     }
 }

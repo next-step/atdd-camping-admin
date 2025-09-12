@@ -12,22 +12,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static com.camping.admin.hooks.TokenHook.testContext;
 
 public class ReservationSteps {
-    @Given("{string} 가 예약을 한다.")
-    public void reserve(String role) {
+    @Given("사용자가 예약을 한다.")
+    public void reserve() {
         testContext.setReservationId(1L);
+        updateReservation( "CONFIRMED");
     }
 
-    @When("{string} 가 예약을 {string} 한다.")
-    public void cancelReservation(String role, String status) {
-        String url = "/reservations/" + testContext.getReservationId() + "/status";
-        if (role.equals("관리자")) {
-            url = "/admin" + url;
-        }
+    @When("관리자가 예약을 {string} 한다.")
+    public void updateReservation(String status) {
+        String url = "/admin/reservations/" + testContext.getReservationId() + "/status";
         Map<String, Object> request = Map.of("status", status);
         
         var response = RestAssured.given()
             .contentType("application/json")
-            .header("Authorization", "Bearer " + testContext.getTokenByRole(role))
+            .header("Authorization", "Bearer " + testContext.getAdminToken())
             .body(request)
             .when().patch(url)
             .then().log().all()
