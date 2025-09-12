@@ -56,6 +56,11 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+    // Testcontainers
+    testImplementation "org.testcontainers:testcontainers:1.19.8"
+    testImplementation "org.testcontainers:junit-jupiter:1.19.8"
+    testImplementation "org.testcontainers:mysql:1.19.8"
 }
 
 tasks.named('test') {
