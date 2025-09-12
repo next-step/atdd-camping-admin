@@ -44,7 +44,15 @@ public class Campsite {
         this.maxPeople = maxPeople;
     }
 
-    public static String extractSiteNumber(Map<String, Object> body) {
+    public static Campsite from(Map<String, Object> body) {
+        String siteNumber = extractSiteNumber(body);
+        String description = extractDescription(body);
+        Integer maxPeople = extractMaxPeople(body);
+        validateMaxPeople(maxPeople);
+        return new Campsite(siteNumber, description, maxPeople);
+    }
+
+    private static String extractSiteNumber(Map<String, Object> body) {
         if (body.containsKey("siteNumber")) {
             Object value = body.get("siteNumber");
             if (value == null) {
@@ -55,7 +63,7 @@ public class Campsite {
         throw new ValidationException("Site number is required");
     }
 
-    public static String extractDescription(Map<String, Object> body) {
+    private static String extractDescription(Map<String, Object> body) {
         if (body.containsKey("description")) {
             Object value = body.get("description");
             return value == null ? "" : value.toString();
@@ -63,7 +71,7 @@ public class Campsite {
         return "";
     }
 
-    public static Integer extractMaxPeople(Map<String, Object> body) {
+    private static Integer extractMaxPeople(Map<String, Object> body) {
         if (body.containsKey("maxPeople")) {
             Object value = body.get("maxPeople");
             return parseMaxPeopleValue(value);
@@ -89,13 +97,13 @@ public class Campsite {
         }
     }
 
-    public static void validateSiteNumber(String siteNumber) {
+    private static void validateSiteNumber(String siteNumber) {
         if (siteNumber == null || siteNumber.trim().isEmpty()) {
             throw new ValidationException("Site number is required");
         }
     }
 
-    public static void validateMaxPeople(Integer maxPeople) {
+    private static void validateMaxPeople(Integer maxPeople) {
         if (maxPeople != null && maxPeople < 0) {
             throw new ValidationException("Max people cannot be negative");
         }

@@ -40,14 +40,10 @@ public class ProductService {
 
     @Transactional
     public Product createProduct(Map<String, Object> body) {
-        String name = Product.extractName(body);
-        Integer stockQuantity = Product.extractStockQuantity(body);
-        BigDecimal price = Product.extractPrice(body);
-        ProductType productType = Product.extractProductType(body);
-
-        validateStockQuantity(stockQuantity);
-        validatePrice(price);
-        return createAndSaveProduct(name, stockQuantity, price, productType);
+        Product product = Product.from(body);
+        validateStockQuantity(product.getStockQuantity());
+        validatePrice(product.getPrice());
+        return saveProduct(product);
     }
 
     private void validateStockQuantity(Integer stockQuantity) {
@@ -62,10 +58,9 @@ public class ProductService {
         }
     }
 
-    private Product createAndSaveProduct(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+    private Product saveProduct(Product product) {
         try {
-            Product newProduct = new Product(name, stockQuantity, price, productType);
-            return productRepository.save(newProduct);
+            return productRepository.save(product);
         } catch (DataIntegrityViolationException e) {
             throw new ProductConflictException("Product creation failed due to data integrity violation");
         }

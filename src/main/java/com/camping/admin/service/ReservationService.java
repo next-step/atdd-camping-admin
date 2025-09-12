@@ -31,7 +31,6 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new EntityNotFoundException("Cannot find reservation with id: " + reservationId));
 
-        Reservation.validateStatusUpdateRequest(body);
         reservation.updateStatus(body);
         reservationRepository.save(reservation);
         return ReservationResponse.from(reservation);

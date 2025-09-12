@@ -35,20 +35,14 @@ public class CampsiteService {
 
     @Transactional
     public Campsite createCampsite(Map<String, Object> body) {
-        String siteNumber = Campsite.extractSiteNumber(body);
-        String description = Campsite.extractDescription(body);
-        Integer maxPeople = Campsite.extractMaxPeople(body);
-
-        Campsite.validateMaxPeople(maxPeople);
-
-        return createAndSaveCampsite(siteNumber, description, maxPeople);
+        Campsite campsite = Campsite.from(body);
+        return saveCampsite(campsite);
     }
 
 
-    private Campsite createAndSaveCampsite(String siteNumber, String description, Integer maxPeople) {
+    private Campsite saveCampsite(Campsite campsite) {
         try {
-            Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-            return campsiteRepository.save(newCampsite);
+            return campsiteRepository.save(campsite);
         } catch (DataIntegrityViolationException e) {
             throw new CampsiteConflictException("Site number already exists");
         }

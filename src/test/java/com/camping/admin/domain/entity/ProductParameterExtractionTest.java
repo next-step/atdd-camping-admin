@@ -14,165 +14,171 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class ProductParameterExtractionTest {
 
-    @DisplayName("이름을 정상적으로 추출할 수 있다")
+    @DisplayName("유효한 데이터로 상품을 생성할 수 있다")
     @Test
-    void extractName_Success() {
+    void from_Success() {
         Map<String, Object> body = new HashMap<>();
         body.put("name", "텐트");
+        body.put("stockQuantity", 10);
+        body.put("price", 50000);
+        body.put("productType", "RENTAL");
 
-        String name = Product.extractName(body);
+        Product product = Product.from(body);
 
-        assertThat(name).isEqualTo("텐트");
+        assertThat(product.getName()).isEqualTo("텐트");
+        assertThat(product.getStockQuantity()).isEqualTo(10);
+        assertThat(product.getPrice()).isEqualTo(new BigDecimal("50000"));
+        assertThat(product.getProductType()).isEqualTo(ProductType.RENTAL);
     }
 
     @DisplayName("이름이 null인 경우 예외가 발생한다")
     @Test
-    void extractName_NullValue_ThrowsException() {
+    void from_NullName_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
         body.put("name", null);
+        body.put("stockQuantity", 10);
+        body.put("price", 50000);
+        body.put("productType", "SALE");
 
-        assertThatThrownBy(() -> Product.extractName(body))
+        assertThatThrownBy(() -> Product.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Product name cannot be null");
     }
 
     @DisplayName("이름 키가 없는 경우 예외가 발생한다")
     @Test
-    void extractName_NoKey_ThrowsException() {
+    void from_NoNameKey_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("stockQuantity", 10);
+        body.put("price", 50000);
+        body.put("productType", "SALE");
 
-        assertThatThrownBy(() -> Product.extractName(body))
+        assertThatThrownBy(() -> Product.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Product name is required");
     }
 
-    @DisplayName("재고 수량을 정상적으로 추출할 수 있다")
+    @DisplayName("재고 수량이 문자열인 경우 파싱해서 처리한다")
     @Test
-    void extractStockQuantity_Success() {
+    void from_StockQuantityAsString_ParsesCorrectly() {
         Map<String, Object> body = new HashMap<>();
-        body.put("stockQuantity", 10);
-
-        Integer stockQuantity = Product.extractStockQuantity(body);
-
-        assertThat(stockQuantity).isEqualTo(10);
-    }
-
-    @DisplayName("재고 수량이 문자열인 경우 파싱해서 반환한다")
-    @Test
-    void extractStockQuantity_StringValue_ParsesCorrectly() {
-        Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
         body.put("stockQuantity", "15");
+        body.put("price", 50000);
+        body.put("productType", "SALE");
 
-        Integer stockQuantity = Product.extractStockQuantity(body);
+        Product product = Product.from(body);
 
-        assertThat(stockQuantity).isEqualTo(15);
+        assertThat(product.getStockQuantity()).isEqualTo(15);
     }
 
     @DisplayName("유효하지 않은 재고 수량 문자열인 경우 예외가 발생한다")
     @Test
-    void extractStockQuantity_InvalidStringValue_ThrowsException() {
+    void from_InvalidStockQuantityString_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
         body.put("stockQuantity", "invalid");
+        body.put("price", 50000);
+        body.put("productType", "SALE");
 
-        assertThatThrownBy(() -> Product.extractStockQuantity(body))
+        assertThatThrownBy(() -> Product.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Invalid stock quantity format: invalid");
     }
 
-    @DisplayName("재고 수량이 null인 경우 0을 반환한다")
+    @DisplayName("재고 수량이 null인 경우 0으로 처리된다")
     @Test
-    void extractStockQuantity_NullValue_ReturnsZero() {
+    void from_NullStockQuantity_HandledAsZero() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
         body.put("stockQuantity", null);
-
-        Integer stockQuantity = Product.extractStockQuantity(body);
-
-        assertThat(stockQuantity).isEqualTo(0);
-    }
-
-    @DisplayName("재고 수량 키가 없는 경우 0을 반환한다")
-    @Test
-    void extractStockQuantity_NoKey_ReturnsZero() {
-        Map<String, Object> body = new HashMap<>();
-
-        Integer stockQuantity = Product.extractStockQuantity(body);
-
-        assertThat(stockQuantity).isEqualTo(0);
-    }
-
-    @DisplayName("가격을 정상적으로 추출할 수 있다")
-    @Test
-    void extractPrice_Success() {
-        Map<String, Object> body = new HashMap<>();
         body.put("price", 50000);
+        body.put("productType", "SALE");
 
-        BigDecimal price = Product.extractPrice(body);
+        Product product = Product.from(body);
 
-        assertThat(price).isEqualTo(new BigDecimal("50000"));
+        assertThat(product.getStockQuantity()).isEqualTo(0);
     }
 
-    @DisplayName("가격이 문자열인 경우 파싱해서 반환한다")
+    @DisplayName("재고 수량 키가 없는 경우 0으로 처리된다")
     @Test
-    void extractPrice_StringValue_ParsesCorrectly() {
+    void from_NoStockQuantityKey_HandledAsZero() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("price", 50000);
+        body.put("productType", "SALE");
+
+        Product product = Product.from(body);
+
+        assertThat(product.getStockQuantity()).isEqualTo(0);
+    }
+
+    @DisplayName("가격이 문자열인 경우 파싱해서 처리한다")
+    @Test
+    void from_PriceAsString_ParsesCorrectly() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("stockQuantity", 10);
         body.put("price", "75000");
+        body.put("productType", "SALE");
 
-        BigDecimal price = Product.extractPrice(body);
+        Product product = Product.from(body);
 
-        assertThat(price).isEqualTo(new BigDecimal("75000"));
+        assertThat(product.getPrice()).isEqualTo(new BigDecimal("75000"));
     }
 
     @DisplayName("유효하지 않은 가격 문자열인 경우 예외가 발생한다")
     @Test
-    void extractPrice_InvalidStringValue_ThrowsException() {
+    void from_InvalidPriceString_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("stockQuantity", 10);
         body.put("price", "invalid");
+        body.put("productType", "SALE");
 
-        assertThatThrownBy(() -> Product.extractPrice(body))
+        assertThatThrownBy(() -> Product.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Invalid price format: invalid");
     }
 
-    @DisplayName("가격이 null인 경우 0을 반환한다")
+    @DisplayName("가격이 null인 경우 0으로 처리된다")
     @Test
-    void extractPrice_NullValue_ReturnsZero() {
+    void from_NullPrice_HandledAsZero() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("stockQuantity", 10);
         body.put("price", null);
+        body.put("productType", "SALE");
 
-        BigDecimal price = Product.extractPrice(body);
+        Product product = Product.from(body);
 
-        assertThat(price).isEqualTo(BigDecimal.ZERO);
+        assertThat(product.getPrice()).isEqualTo(BigDecimal.ZERO);
     }
 
-    @DisplayName("상품 타입을 정상적으로 추출할 수 있다")
+    @DisplayName("상품 타입이 null인 경우 SALE로 처리된다")
     @Test
-    void extractProductType_Success() {
+    void from_NullProductType_HandledAsSale() {
         Map<String, Object> body = new HashMap<>();
-        body.put("productType", "RENTAL");
-
-        ProductType productType = Product.extractProductType(body);
-
-        assertThat(productType).isEqualTo(ProductType.RENTAL);
-    }
-
-    @DisplayName("상품 타입이 null인 경우 SALE을 반환한다")
-    @Test
-    void extractProductType_NullValue_ReturnsSale() {
-        Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("stockQuantity", 10);
+        body.put("price", 50000);
         body.put("productType", null);
 
-        ProductType productType = Product.extractProductType(body);
+        Product product = Product.from(body);
 
-        assertThat(productType).isEqualTo(ProductType.SALE);
+        assertThat(product.getProductType()).isEqualTo(ProductType.SALE);
     }
 
     @DisplayName("잘못된 상품 타입인 경우 예외가 발생한다")
     @Test
-    void extractProductType_InvalidValue_ThrowsException() {
+    void from_InvalidProductType_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("name", "텐트");
+        body.put("stockQuantity", 10);
+        body.put("price", 50000);
         body.put("productType", "INVALID");
 
-        assertThatThrownBy(() -> Product.extractProductType(body))
+        assertThatThrownBy(() -> Product.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Invalid product type: INVALID");
     }

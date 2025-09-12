@@ -67,12 +67,6 @@ public class Reservation {
         this.campsite = campsite;
     }
 
-    public static void validateStatusUpdateRequest(Map<String, Object> body) {
-        if (body == null || body.isEmpty()) {
-            throw new ValidationException("Request body cannot be empty");
-        }
-    }
-
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -102,6 +96,10 @@ public class Reservation {
     }
 
     public void updateStatus(Map<String, Object> body) {
+        if (body == null || body.isEmpty()) {
+            throw new ValidationException("Request body cannot be empty");
+        }
+        
         Object statusObject = body.get("status");
         if (statusObject == null) {
             return;

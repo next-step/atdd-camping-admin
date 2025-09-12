@@ -8,175 +8,135 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class CampsiteParameterExtractionTest {
 
-    @DisplayName("사이트 번호를 정상적으로 추출할 수 있다")
+    @DisplayName("유효한 데이터로 캠프사이트를 생성할 수 있다")
     @Test
-    void extractSiteNumber_Success() {
+    void from_Success() {
         Map<String, Object> body = new HashMap<>();
         body.put("siteNumber", "A-01");
+        body.put("description", "일반 캠프사이트");
+        body.put("maxPeople", 4);
 
-        String siteNumber = Campsite.extractSiteNumber(body);
+        Campsite campsite = Campsite.from(body);
 
-        assertThat(siteNumber).isEqualTo("A-01");
+        assertThat(campsite.getSiteNumber()).isEqualTo("A-01");
+        assertThat(campsite.getDescription()).isEqualTo("일반 캠프사이트");
+        assertThat(campsite.getMaxPeople()).isEqualTo(4);
     }
 
     @DisplayName("사이트 번호가 null인 경우 예외가 발생한다")
     @Test
-    void extractSiteNumber_NullValue_ThrowsException() {
+    void from_NullSiteNumber_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
         body.put("siteNumber", null);
+        body.put("description", "설명");
+        body.put("maxPeople", 4);
 
-        assertThatThrownBy(() -> Campsite.extractSiteNumber(body))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Site number cannot be null");
     }
 
     @DisplayName("사이트 번호 키가 없는 경우 예외가 발생한다")
     @Test
-    void extractSiteNumber_NoKey_ThrowsException() {
+    void from_NoSiteNumberKey_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("description", "설명");
+        body.put("maxPeople", 4);
 
-        assertThatThrownBy(() -> Campsite.extractSiteNumber(body))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Site number is required");
     }
 
-    @DisplayName("설명을 정상적으로 추출할 수 있다")
+    @DisplayName("설명이 null인 경우 빈 문자열로 처리된다")
     @Test
-    void extractDescription_Success() {
+    void from_NullDescription_HandledAsEmpty() {
         Map<String, Object> body = new HashMap<>();
-        body.put("description", "일반 캠프사이트");
-
-        String description = Campsite.extractDescription(body);
-
-        assertThat(description).isEqualTo("일반 캠프사이트");
-    }
-
-    @DisplayName("설명이 null인 경우 빈 문자열을 반환한다")
-    @Test
-    void extractDescription_NullValue_ReturnsEmpty() {
-        Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
         body.put("description", null);
-
-        String description = Campsite.extractDescription(body);
-
-        assertThat(description).isEqualTo("");
-    }
-
-    @DisplayName("설명 키가 없는 경우 빈 문자열을 반환한다")
-    @Test
-    void extractDescription_NoKey_ReturnsEmpty() {
-        Map<String, Object> body = new HashMap<>();
-
-        String description = Campsite.extractDescription(body);
-
-        assertThat(description).isEqualTo("");
-    }
-
-    @DisplayName("최대 인원을 정상적으로 추출할 수 있다")
-    @Test
-    void extractMaxPeople_Success() {
-        Map<String, Object> body = new HashMap<>();
         body.put("maxPeople", 4);
 
-        Integer maxPeople = Campsite.extractMaxPeople(body);
+        Campsite campsite = Campsite.from(body);
 
-        assertThat(maxPeople).isEqualTo(4);
+        assertThat(campsite.getDescription()).isEqualTo("");
     }
 
-    @DisplayName("최대 인원이 문자열인 경우 파싱해서 반환한다")
+    @DisplayName("설명 키가 없는 경우 빈 문자열로 처리된다")
     @Test
-    void extractMaxPeople_StringValue_ParsesCorrectly() {
+    void from_NoDescriptionKey_HandledAsEmpty() {
         Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("maxPeople", 4);
+
+        Campsite campsite = Campsite.from(body);
+
+        assertThat(campsite.getDescription()).isEqualTo("");
+    }
+
+    @DisplayName("최대 인원이 문자열인 경우 파싱해서 처리한다")
+    @Test
+    void from_MaxPeopleAsString_ParsesCorrectly() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("description", "설명");
         body.put("maxPeople", "6");
 
-        Integer maxPeople = Campsite.extractMaxPeople(body);
+        Campsite campsite = Campsite.from(body);
 
-        assertThat(maxPeople).isEqualTo(6);
+        assertThat(campsite.getMaxPeople()).isEqualTo(6);
     }
 
     @DisplayName("최대 인원 키가 없는 경우 예외가 발생한다")
     @Test
-    void extractMaxPeople_NoKey_ThrowsException() {
+    void from_NoMaxPeopleKey_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("description", "설명");
 
-        assertThatThrownBy(() -> Campsite.extractMaxPeople(body))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Max people is required");
     }
 
     @DisplayName("유효하지 않은 최대 인원 문자열인 경우 예외가 발생한다")
     @Test
-    void extractMaxPeople_InvalidStringValue_ThrowsException() {
+    void from_InvalidMaxPeopleString_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("description", "설명");
         body.put("maxPeople", "invalid");
 
-        assertThatThrownBy(() -> Campsite.extractMaxPeople(body))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Invalid max people format: invalid");
     }
 
     @DisplayName("최대 인원이 null인 경우 예외가 발생한다")
     @Test
-    void extractMaxPeople_NullValue_ThrowsException() {
+    void from_NullMaxPeople_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("description", "설명");
         body.put("maxPeople", null);
 
-        assertThatThrownBy(() -> Campsite.extractMaxPeople(body))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Max people value cannot be null");
     }
 
-    @DisplayName("유효한 사이트 번호 검증이 성공한다")
+    @DisplayName("음수 최대 인원인 경우 예외가 발생한다")
     @Test
-    void validateSiteNumber_Valid_Success() {
-        assertThatNoException().isThrownBy(() -> Campsite.validateSiteNumber("A-01"));
-    }
+    void from_NegativeMaxPeople_ThrowsException() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("siteNumber", "A-01");
+        body.put("description", "설명");
+        body.put("maxPeople", -1);
 
-    @DisplayName("null 사이트 번호 검증 시 예외가 발생한다")
-    @Test
-    void validateSiteNumber_Null_ThrowsException() {
-        assertThatThrownBy(() -> Campsite.validateSiteNumber(null))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Site number is required");
-    }
-
-    @DisplayName("빈 사이트 번호 검증 시 예외가 발생한다")
-    @Test
-    void validateSiteNumber_Empty_ThrowsException() {
-        assertThatThrownBy(() -> Campsite.validateSiteNumber(""))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Site number is required");
-    }
-
-    @DisplayName("공백 사이트 번호 검증 시 예외가 발생한다")
-    @Test
-    void validateSiteNumber_Whitespace_ThrowsException() {
-        assertThatThrownBy(() -> Campsite.validateSiteNumber("   "))
-                .isInstanceOf(ValidationException.class)
-                .hasMessageContaining("Site number is required");
-    }
-
-    @DisplayName("유효한 최대 인원 검증이 성공한다")
-    @Test
-    void validateMaxPeople_Valid_Success() {
-        assertThatNoException().isThrownBy(() -> Campsite.validateMaxPeople(4));
-    }
-
-    @DisplayName("null 최대 인원 검증이 성공한다")
-    @Test
-    void validateMaxPeople_Null_Success() {
-        assertThatNoException().isThrownBy(() -> Campsite.validateMaxPeople(null));
-    }
-
-    @DisplayName("음수 최대 인원 검증 시 예외가 발생한다")
-    @Test
-    void validateMaxPeople_Negative_ThrowsException() {
-        assertThatThrownBy(() -> Campsite.validateMaxPeople(-1))
+        assertThatThrownBy(() -> Campsite.from(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Max people cannot be negative");
     }

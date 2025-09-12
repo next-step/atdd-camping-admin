@@ -29,29 +29,30 @@ class ReservationStatusUpdateTest {
         reservation.setStatus(ReservationStatus.CONFIRMED);
     }
 
-    @DisplayName("상태 업데이트 요청을 정상적으로 검증한다")
+    @DisplayName("상태 업데이트 요청을 정상적으로 처리한다")
     @Test
-    void validateStatusUpdateRequest_Success() {
+    void updateStatus_ValidRequest_Success() {
         Map<String, Object> body = new HashMap<>();
         body.put("status", "CANCELLED");
 
-        assertThatNoException().isThrownBy(() -> Reservation.validateStatusUpdateRequest(body));
+        assertThatNoException().isThrownBy(() -> reservation.updateStatus(body));
+        assertThat(reservation.getStatus()).isEqualTo(ReservationStatus.CANCELLED);
     }
 
     @DisplayName("null 요청 본문에 대해 예외가 발생한다")
     @Test
-    void validateStatusUpdateRequest_NullBody_ThrowsException() {
-        assertThatThrownBy(() -> Reservation.validateStatusUpdateRequest(null))
+    void updateStatus_NullBody_ThrowsException() {
+        assertThatThrownBy(() -> reservation.updateStatus(null))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Request body cannot be empty");
     }
 
     @DisplayName("빈 요청 본문에 대해 예외가 발생한다")
     @Test
-    void validateStatusUpdateRequest_EmptyBody_ThrowsException() {
+    void updateStatus_EmptyBody_ThrowsException() {
         Map<String, Object> body = new HashMap<>();
 
-        assertThatThrownBy(() -> Reservation.validateStatusUpdateRequest(body))
+        assertThatThrownBy(() -> reservation.updateStatus(body))
                 .isInstanceOf(ValidationException.class)
                 .hasMessageContaining("Request body cannot be empty");
     }
