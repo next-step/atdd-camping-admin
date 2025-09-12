@@ -8,6 +8,7 @@ import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -87,6 +88,7 @@ public class CampsiteAdminController {
     }
 
     @PutMapping("/{campsiteId}")
+    @Transactional // update가 동작하지 않아 임시로 dirty check를 통해 update 되도록 설정
     public ResponseEntity<Campsite> updateCampsite(
             @PathVariable Long campsiteId,
             @RequestBody Map<String, Object> body) {
