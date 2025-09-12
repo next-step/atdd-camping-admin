@@ -70,3 +70,46 @@ tasks.named('test') {
 test {
     systemProperty "cucumber.junit-platform.naming-strategy", "long"
 }
+
+// Cucumber 전용 테스트 태스크 (DB 롤백 보장)
+task cucumberTest(type: Test) {
+    description = 'Cucumber BDD 테스트 실행 (각 시나리오마다 DB 롤백)'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    
+    // Cucumber 테스트만 실행
+    include '**/CucumberTestRunner.class'
+    
+    systemProperty "cucumber.junit-platform.naming-strategy", "long"
+    systemProperty "spring.profiles.active", "test"
+    
+    // 병렬 실행 비활성화로 DB 격리 보장
+    maxParallelForks = 1
+    
+    // 테스트 실행 전 애플리케이션 시작 대기
+    doFirst {
+        println "🚀 Cucumber 테스트 시작 - DB 리셋 기능 활성화"
+    }
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        showStackTraces = true
+        exceptionFormat = "full"
+    }
+}
+
+// 단위 테스트만 실행하는 태스크
+task unitTest(type: Test) {
+    description = '단위 테스트만 실행 (Cucumber 제외)'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    exclude '**/CucumberTestRunner.class'
+    exclude '**/steps/**'
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

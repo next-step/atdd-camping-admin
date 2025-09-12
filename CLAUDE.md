@@ -79,12 +79,23 @@ createExtractableResponse("GET","/health");
 ### 데이터베이스 관리
 
 ```bash
-# 테스트 실행 (자동 롤백)
-./gradlew test
+# 🔄 Cucumber 테스트 (각 시나리오마다 DB 자동 리셋)
+./gradlew cucumberTest
 
-# Cucumber 테스트
-./gradlew test --tests "*CucumberTestRunner"
+# 🧪 단위 테스트만 실행 
+./gradlew unitTest
+
+# 📋 전체 테스트 실행
+./gradlew test
 ```
+
+### 🔄 DB 리셋 메커니즘 (순수 RestAssured)
+
+각 Cucumber 시나리오는 **완전히 독립적**으로 실행됩니다:
+
+- **테스트용 API**: `DELETE /admin/test/reset` (test 프로필에서만 활성화)
+- **@Before Hook**: 시나리오 시작 전 DB 자동 리셋
+- **순수 RestAssured**: SpringBootTest 없이 HTTP 통신으로 DB 정리
 
 ### 권장 네이밍 컨벤션
 
