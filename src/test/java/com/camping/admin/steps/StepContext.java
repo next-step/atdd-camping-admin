@@ -36,4 +36,8 @@ public class StepContext {
     public static RequestSpecification getRequestSpecification() {
         return (RequestSpecification) context.get().get(REQUEST_SPECIFICATION_KEY);
     }
+
+    public static RequestSpecification getRequestSpecificationWithAccessToken() {
+        return getRequestSpecification().header("Authorization", "Bearer " + getAccessToken());
+    }
 }
