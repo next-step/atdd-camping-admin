@@ -1,21 +1,16 @@
 package com.camping.admin.steps;
 
-import io.restassured.RestAssured;
+import com.camping.admin.helper.HttpMethod;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 import java.util.Map;
 
+import static com.camping.admin.helper.ApiHelper.createExtractableResponseWithAuthorization;
+
 public class ReservationTestFixture {
     public static ExtractableResponse<Response> 예약_상태_변경(long reservationId, Map<String, String> body) {
-        return RestAssured.given()
-                .spec(StepContext.getRequestSpecification())
-                .header("Authorization", "Bearer " + StepContext.getAccessToken())
-                .body(body)
-                .when()
-                .patch("/admin/reservations/" + reservationId + "/status")
-                .then()
-                .extract();
+        return createExtractableResponseWithAuthorization(HttpMethod.PATCH, "/admin/reservations/" + reservationId + "/status", body);
     }
 
     public static Map<String, Object> 특정_예약_조회(long reservationId) {
@@ -27,14 +22,11 @@ public class ReservationTestFixture {
     }
 
     public static ExtractableResponse<Response> 예약_목록_조회() {
-        return RestAssured.given()
-                .spec(StepContext.getRequestSpecification())
-                .header("Authorization", "Bearer " + StepContext.getAccessToken())
-                .when()
-                .get("/admin/reservations")
-                .then()
-                .statusCode(200)
-                .extract();
+        ExtractableResponse<Response> response = createExtractableResponseWithAuthorization(HttpMethod.GET, "/admin/reservations");
+        if (response.statusCode() != 200) {
+            throw new AssertionError("예약 목록 조회 실패: " + response.statusCode());
+        }
+        return response;
     }
 
     public static Map<String, Object> 예약상태가_CONFIRMED인_특정예약조회(String reservationStatus) {
