@@ -31,7 +31,7 @@ public class CampsiteCreateSteps {
         var 캠프사이트_목록 = 전체_목록_조회_응답.as(new TypeRef<List<CampsiteDetail>>() {
         });
         for (var campsiteDetail : 캠프사이트_목록) {
-            if (siteNumber.equals(campsiteDetail.siteNumber())) {
+            if (campsiteDetail.siteNumber().equals(siteNumber)) {
                 var 캠프사이트_수정_응답 = CampsiteClient.캠프사이트를_수정한다(
                     LoginSteps.get어드민_인증_토큰(),
                     campsiteDetail.id(),
@@ -45,23 +45,21 @@ public class CampsiteCreateSteps {
         }
     }
 
-    @When("캠프사이트를 생성한다")
-    public void 캠프사이트를_생성한다() {
-        var randomCampsiteNumber = UUID.randomUUID().toString();
-
+    @When("사이트번호가 {string}인 캠프사이트를 생성한다")
+    public void 사이트번호가_XX인_캠프사이트를_생성한다(String siteNumber) {
         var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트를_생성한다(
             LoginSteps.get어드민_인증_토큰(),
-            randomCampsiteNumber,
+            siteNumber,
             "테스트 캠프사이트",
             4
         );
 
-        생성한_캠프사이트_번호 = randomCampsiteNumber;
+        생성한_캠프사이트_번호 = siteNumber;
         this.캠프사이트_생성_응답 = 캠프사이트_생성_응답;
     }
 
-    @Then("캠프사이트가 생성된다")
-    public void 캠프사이트가_생성된다() {
+    @Then("캠프사이트 생성이 성공한다")
+    public void 캠프사이트_생성이_성공한다() {
         Objects.requireNonNull(this.캠프사이트_생성_응답);
         assertThat(this.캠프사이트_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
     }
