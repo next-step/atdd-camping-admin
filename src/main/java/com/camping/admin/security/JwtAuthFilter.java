@@ -5,12 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 public class JwtAuthFilter extends OncePerRequestFilter {
 
@@ -31,55 +32,72 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             return;
         }
 
-        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        String token = null;
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            token = authHeader.substring(7);
-        } else {
-            Cookie[] cookies = request.getCookies();
-            if (cookies != null) {
-                for (Cookie cookie : cookies) {
-                    if ("AUTH_TOKEN".equals(cookie.getName())) {
-                        token = cookie.getValue();
-                        break;
-                    }
-                }
-            }
-        }
+        String token = extractTokenFromRequest(request);
 
         if (token == null) {
-            if (wantsHtml(request)) {
-                response.sendRedirect("/login");
-            } else {
-                unauthorized(response, "Missing or invalid token");
-            }
+            handleUnauthorizedAccess(request, response, "Missing or invalid token");
             return;
         }
         if (!jwtService.isTokenValid(token)) {
-            if (wantsHtml(request)) {
-                response.sendRedirect("/login");
-            } else {
-                unauthorized(response, "Invalid or expired token");
-            }
+            handleUnauthorizedAccess(request, response, "Invalid or expired token");
             return;
         }
 
-        // 현재 로그인 사용자명을 요청 속성으로 전달하여 뷰에서 사용 가능하도록 한다
-        request.setAttribute("currentUsername", jwtService.getUsername(token));
-
+        processAuthenticatedRequest(request, token);
         filterChain.doFilter(request, response);
+    }
+
+    private String extractTokenFromRequest(HttpServletRequest request) {
+        String token = extractTokenFromHeader(request);
+        if (token == null) {
+            token = extractTokenFromCookies(request);
+        }
+        return token;
+    }
+
+    private String extractTokenFromHeader(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
+    }
+
+    private String extractTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies == null) {
+            return null;
+        }
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equals("AUTH_TOKEN")) {
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private void handleUnauthorizedAccess(HttpServletRequest request, HttpServletResponse response, String message) throws IOException {
+        if (wantsHtml(request)) {
+            response.sendRedirect("/login");
+        } else {
+            unauthorized(response, message);
+        }
+    }
+
+    private void processAuthenticatedRequest(HttpServletRequest request, String token) {
+        request.setAttribute("currentUsername", jwtService.getUsername(token));
     }
 
     private boolean isExcluded(String path) {
         return pathMatcher.match("/auth/login", path) ||
-               pathMatcher.match("/login", path) ||
-               pathMatcher.match("/css/**", path) ||
-               pathMatcher.match("/js/**", path) ||
-               pathMatcher.match("/images/**", path) ||
-               pathMatcher.match("/webjars/**", path) ||
-               pathMatcher.match("/favicon.ico", path) ||
-               pathMatcher.match("/h2-console/**", path) ||
-               path.equals("/");
+                pathMatcher.match("/login", path) ||
+                pathMatcher.match("/css/**", path) ||
+                pathMatcher.match("/js/**", path) ||
+                pathMatcher.match("/images/**", path) ||
+                pathMatcher.match("/webjars/**", path) ||
+                pathMatcher.match("/favicon.ico", path) ||
+                pathMatcher.match("/h2-console/**", path) ||
+                path.equals("/");
     }
 
     private boolean wantsHtml(HttpServletRequest request) {
@@ -94,5 +112,3 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         response.getOutputStream().write(body.getBytes(StandardCharsets.UTF_8));
     }
 }
-
-

@@ -1,10 +1,20 @@
 package com.camping.admin.domain.entity;
 
-import jakarta.persistence.*;
+import com.camping.admin.exception.RentalConflictException;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -42,7 +52,14 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
+    public void markAsReturned() {
+        if (this.isReturned) {
+            throw new RentalConflictException("This item has already been returned.");
+        }
+        this.isReturned = true;
+    }
+
+    public BigDecimal calculateRentalRevenue() {
+        return this.product.getPrice().multiply(new BigDecimal(this.quantity));
     }
 }

@@ -13,5 +13,3 @@ public class ConsoleDashboardController {
         return "dashboard/index";
     }
 }
-
-

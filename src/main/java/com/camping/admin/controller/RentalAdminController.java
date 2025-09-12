@@ -4,7 +4,6 @@ import com.camping.admin.dto.CreateRentalRequest;
 import com.camping.admin.dto.RentalResponse;
 import com.camping.admin.service.RentalService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,26 +31,12 @@ public class RentalAdminController {
 
     @PostMapping
     public ResponseEntity<RentalResponse> createRental(@RequestBody CreateRentalRequest request) {
-        try {
-            RentalResponse createdRental = rentalService.createRental(
-                    request.productId(),
-                    request.quantity(),
-                    request.reservationId()
-            );
-            return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
-        } catch (IllegalArgumentException e) {
-            if (e.getMessage().contains("Cannot find product") || e.getMessage().contains("Cannot find reservation")) {
-                return new ResponseEntity<>(null, HttpStatus.NOT_FOUND);
-            } else if (e.getMessage().contains("not a rental item") || 
-                      e.getMessage().contains("Quantity must be greater than 0") ||
-                      e.getMessage().contains("Product ID cannot be null")) {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            } else {
-                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-            }
-        } catch (DataIntegrityViolationException e) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        }
+        RentalResponse createdRental = rentalService.createRental(
+                request.productId(),
+                request.quantity(),
+                request.reservationId()
+        );
+        return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{rentalRecordId}/return")

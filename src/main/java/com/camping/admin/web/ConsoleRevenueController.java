@@ -13,5 +13,3 @@ public class ConsoleRevenueController {
         return "revenue/daily";
     }
 }
-
-

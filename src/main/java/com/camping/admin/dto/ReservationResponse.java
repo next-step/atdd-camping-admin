@@ -1,23 +1,20 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.Reservation;
-import java.time.LocalDate;
-
+import com.camping.admin.domain.enums.ReservationStatus;
 import lombok.Getter;
+
+import java.time.LocalDate;
 
 @Getter
 public class ReservationResponse {
-    private Long id;
-    private String customerName;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String status;
-    private String campsiteSiteNumber;
-    private LocalDate reservationDate;
-
-    public static ReservationResponse from(Reservation reservation) {
-        return new ReservationResponse(reservation);
-    }
+    private final Long id;
+    private final String customerName;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final ReservationStatus status;
+    private final String campsiteSiteNumber;
+    private final LocalDate reservationDate;
 
     private ReservationResponse(Reservation reservation) {
         this.id = reservation.getId();
@@ -27,5 +24,9 @@ public class ReservationResponse {
         this.status = reservation.getStatus();
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
+    }
+
+    public static ReservationResponse from(Reservation reservation) {
+        return new ReservationResponse(reservation);
     }
 }

@@ -1,6 +1,7 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,7 +17,7 @@ public class ReservationDto {
     private LocalDate endDate;
     private LocalDate reservationDate;
     private String phoneNumber;
-    private String status;
+    private ReservationStatus status;
     private String confirmationCode;
     private LocalDateTime createdAt;
 
