@@ -1,6 +1,5 @@
 package com.camping.admin.steps.campsite;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.camping.admin.steps.auth.LoginSteps;
@@ -24,11 +23,7 @@ public class CampsiteGetSteps {
     }
 
     public void 전체_캠프사이트를_조회한다() {
-        전체_목록_조회_응답 = given()
-            .header("Authorization", "Bearer " + LoginSteps.get어드민_인증_토큰())
-            .when()
-            .get("/admin/campsites")
-            .andReturn();
+        전체_목록_조회_응답 = CampsiteClient.전체_캠프사이트를_조회한다(LoginSteps.get어드민_인증_토큰());
     }
 
     public void 전체_캠프사이트_조회가_성공한다() {
