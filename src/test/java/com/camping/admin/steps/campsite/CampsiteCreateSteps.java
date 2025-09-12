@@ -12,13 +12,9 @@ import io.restassured.response.Response;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 public class CampsiteCreateSteps {
-
-    @Getter
-    private static String 생성한_캠프사이트_번호;
 
     private Response 캠프사이트_생성_응답;
 
@@ -45,6 +41,12 @@ public class CampsiteCreateSteps {
         }
     }
 
+    @Given("사이트번호가 {string}인 캠프사이트가 생성되어있다")
+    public void 사이트번호가_XX인_캠프사이트가_생성되어있다(String siteNumber) {
+        사이트번호가_XX인_캠프사이트를_생성한다(siteNumber);
+        캠프사이트_생성이_성공한다();
+    }
+
     @When("사이트번호가 {string}인 캠프사이트를 생성한다")
     public void 사이트번호가_XX인_캠프사이트를_생성한다(String siteNumber) {
         var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트를_생성한다(
@@ -54,7 +56,6 @@ public class CampsiteCreateSteps {
             4
         );
 
-        생성한_캠프사이트_번호 = siteNumber;
         this.캠프사이트_생성_응답 = 캠프사이트_생성_응답;
     }
 
@@ -62,5 +63,12 @@ public class CampsiteCreateSteps {
     public void 캠프사이트_생성이_성공한다() {
         Objects.requireNonNull(this.캠프사이트_생성_응답);
         assertThat(this.캠프사이트_생성_응답.statusCode()).isEqualTo(HttpStatus.CREATED.value());
+    }
+
+    @Then("캠프사이트 생성이 실패한다")
+    public void 캠프사이트_생성이_실패한다() {
+        Objects.requireNonNull(this.캠프사이트_생성_응답);
+        assertThat(this.캠프사이트_생성_응답.statusCode())
+            .isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 }
