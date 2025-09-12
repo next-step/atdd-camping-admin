@@ -1,7 +1,9 @@
 Feature: 캠프사이트 생성 기능
 
-  Scenario: 어드민이 캠프사이트를 생성한다.
+  Background:
     Given 어드민으로 로그인하였다
+
+  Scenario: 캠프사이트를 생성한다.
     When 캠프사이트를 생성한다
     Then 캠프사이트가 생성된다
     And 캠프사이트 목록에 생성한 캠프사이트가 조회된다
