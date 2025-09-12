@@ -28,4 +28,19 @@ public class CampsiteClient {
             .post("/admin/campsites")
             .andReturn();
     }
+
+    public static Response 캠프사이트를_수정한다(String authToken, Long campsiteId, String siteNumber,
+        String description,
+        int maxPeople) {
+        return given()
+            .header("Authorization", "Bearer " + authToken)
+            .body(Map.of(
+                "siteNumber", siteNumber,
+                "description", description,
+                "maxPeople", maxPeople
+            ))
+            .when()
+            .put("/admin/campsites/" + campsiteId)
+            .andReturn();
+    }
 }
