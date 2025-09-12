@@ -44,24 +44,16 @@ public class ConsoleProductController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        try {
-            Product product = productService.findProductById(id);
-            model.addAttribute("formAction", "/console/products/" + id);
-            model.addAttribute("product", product);
-            return "products/form";
-        } catch (Exception e) {
-            return "redirect:/console/products";
-        }
+        Product product = productService.findProductById(id);
+        model.addAttribute("formAction", "/console/products/" + id);
+        model.addAttribute("product", product);
+        return "products/form";
     }
 
     @PostMapping("/{id}")
     public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        try {
-            productService.updateProductFromWebForm(id, params);
-            redirectAttributes.addFlashAttribute("success", "상품이 수정되었습니다.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "상품 수정에 실패했습니다.");
-        }
+        productService.updateProductFromWebForm(id, params);
+        redirectAttributes.addFlashAttribute("success", "상품이 수정되었습니다.");
         return "redirect:/console/products";
     }
 }

@@ -42,24 +42,16 @@ public class ConsoleCampsiteController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        try {
-            Campsite campsite = campsiteService.findCampsiteById(id);
-            model.addAttribute("formAction", "/console/campsites/" + id);
-            model.addAttribute("campsite", campsite);
-            return "campsites/form";
-        } catch (Exception e) {
-            return "redirect:/console/campsites";
-        }
+        Campsite campsite = campsiteService.findCampsiteById(id);
+        model.addAttribute("formAction", "/console/campsites/" + id);
+        model.addAttribute("campsite", campsite);
+        return "campsites/form";
     }
 
     @PostMapping("/{id}")
     public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        try {
-            campsiteService.updateCampsiteFromWebForm(id, params);
-            redirectAttributes.addFlashAttribute("success", "캠프사이트가 수정되었습니다.");
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "캠프사이트 수정에 실패했습니다.");
-        }
+        campsiteService.updateCampsiteFromWebForm(id, params);
+        redirectAttributes.addFlashAttribute("success", "캠프사이트가 수정되었습니다.");
         return "redirect:/console/campsites";
     }
 }

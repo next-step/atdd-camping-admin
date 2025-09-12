@@ -1,11 +1,8 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.dto.ReservationResponse;
-import com.camping.admin.exception.EntityNotFoundException;
-import com.camping.admin.exception.ValidationException;
 import com.camping.admin.service.ReservationService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,13 +31,7 @@ public class ReservationAdminController {
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
             @RequestBody Map<String, Object> body) {
-        try {
-            ReservationResponse result = reservationService.updateReservationStatus(reservationId, body);
-            return ResponseEntity.ok(result);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        } catch (ValidationException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        ReservationResponse result = reservationService.updateReservationStatus(reservationId, body);
+        return ResponseEntity.ok(result);
     }
 }

@@ -1,9 +1,6 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Product;
-import com.camping.admin.exception.EntityNotFoundException;
-import com.camping.admin.exception.ProductConflictException;
-import com.camping.admin.exception.ValidationException;
 import com.camping.admin.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,25 +31,15 @@ public class ProductAdminController {
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody Map<String, Object> body) {
-        try {
-            Product product = productService.createProduct(body);
-            return new ResponseEntity<>(product, HttpStatus.CREATED);
-        } catch (ProductConflictException e) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        } catch (ValidationException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        Product product = productService.createProduct(body);
+        return new ResponseEntity<>(product, HttpStatus.CREATED);
     }
 
     @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long productId,
             @RequestBody Map<String, Object> body) {
-        try {
-            Product product = productService.updateProduct(productId, body);
-            return ResponseEntity.ok(product);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Product product = productService.updateProduct(productId, body);
+        return ResponseEntity.ok(product);
     }
 }

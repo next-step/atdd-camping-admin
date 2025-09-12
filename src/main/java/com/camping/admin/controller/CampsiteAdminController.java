@@ -2,9 +2,6 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CampsiteDto;
-import com.camping.admin.exception.CampsiteConflictException;
-import com.camping.admin.exception.EntityNotFoundException;
-import com.camping.admin.exception.ValidationException;
 import com.camping.admin.service.CampsiteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -35,25 +32,15 @@ public class CampsiteAdminController {
 
     @PostMapping
     public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        try {
-            Campsite campsite = campsiteService.createCampsite(body);
-            return new ResponseEntity<>(campsite, HttpStatus.CREATED);
-        } catch (CampsiteConflictException e) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        } catch (ValidationException e) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
+        Campsite campsite = campsiteService.createCampsite(body);
+        return new ResponseEntity<>(campsite, HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
     public ResponseEntity<Campsite> updateCampsite(
             @PathVariable Long campsiteId,
             @RequestBody Map<String, Object> body) {
-        try {
-            Campsite campsite = campsiteService.updateCampsite(campsiteId, body);
-            return ResponseEntity.ok(campsite);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
+        Campsite campsite = campsiteService.updateCampsite(campsiteId, body);
+        return ResponseEntity.ok(campsite);
     }
 }
