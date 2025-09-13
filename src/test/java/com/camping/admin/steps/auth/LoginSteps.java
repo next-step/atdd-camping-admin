@@ -1,11 +1,9 @@
 package com.camping.admin.steps.auth;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import io.cucumber.java.en.Given;
 import io.restassured.response.Response;
-import java.util.Map;
 import java.util.Objects;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
@@ -25,14 +23,7 @@ public class LoginSteps {
     }
 
     public void 어드민으로_로그인한다() {
-        var 로그인_응답 = given()
-            .body(Map.of(
-                "username", "admin",
-                "password", "admin123"
-            ))
-            .when()
-            .post("/auth/login")
-            .andReturn();
+        var 로그인_응답 = AuthClient.로그인_요청을_한다("admin", "admin123");
         this.로그인_응답 = 로그인_응답;
     }
 
