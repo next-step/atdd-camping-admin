@@ -16,8 +16,15 @@ import io.cucumber.java.en.When;
 public class CampsiteSteps {
     private final CommonContext commonContext = new CommonContext();
 
+    @When("사이트 번호 {string}로 캠프사이트 생성을 요청한다")
+    public void requestCampsiteCreation(String siteNumber) {
+        commonContext.setResponse(
+            TestApiHelper.sendCampsiteCreationRequest(siteNumber, "기본 캠프사이트", 4)
+        );
+    }
+
     @When("사이트 번호 {string}, 설명 {string}, 최대 인원 {int}명으로 캠프사이트 생성을 요청한다")
-    public void requestCampsiteCreation(String siteNumber, String description, int maxPeople) {
+    public void requestCampsiteCreationWithDetails(String siteNumber, String description, int maxPeople) {
         commonContext.setResponse(
             TestApiHelper.sendCampsiteCreationRequest(siteNumber, description, maxPeople)
         );
