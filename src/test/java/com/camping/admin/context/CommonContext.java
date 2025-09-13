@@ -1,5 +1,6 @@
 package com.camping.admin.context;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -9,7 +10,8 @@ public class CommonContext {
     private Response response;
 
     public static RequestSpecification getRequestSpec() {
-        return requestSpec.get();
+        RequestSpecification spec = requestSpec.get();
+        return spec.contentType(ContentType.JSON);
     }
 
     public static void setRequestSpec(RequestSpecification spec) {

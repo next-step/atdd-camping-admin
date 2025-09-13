@@ -10,7 +10,6 @@ public class TestApiHelper {
     public static String authenticateAndGetToken() {
         return given()
             .spec(getRequestSpec())
-            .contentType("application/json")
             .body(Map.of("username", "admin", "password", "admin123"))
             .when()
             .post("/auth/login")
