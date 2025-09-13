@@ -8,7 +8,7 @@ import java.util.Map;
 
 public class CampsiteClient {
 
-    public static Response 전체_캠프사이트를_조회한다(String authToken) {
+    public static Response 전체_캠프사이트_조회_요청을_한다(String authToken) {
         return given()
             .header("Authorization", "Bearer " + authToken)
             .when()
@@ -16,7 +16,7 @@ public class CampsiteClient {
             .andReturn();
     }
 
-    public static Response 캠프사이트를_생성한다(String authToken, String siteNumber, String description,
+    public static Response 캠프사이트_생성_요청을_한다(String authToken, String siteNumber, String description,
         int maxPeople) {
         return given()
             .header("Authorization", "Bearer " + authToken)
@@ -31,7 +31,7 @@ public class CampsiteClient {
             .andReturn();
     }
 
-    public static Response 캠프사이트를_수정한다(String authToken, Long campsiteId, String siteNumber,
+    public static Response 캠프사이트_수정_요청을_한다(String authToken, Long campsiteId, String siteNumber,
         String description,
         int maxPeople) {
         return given()

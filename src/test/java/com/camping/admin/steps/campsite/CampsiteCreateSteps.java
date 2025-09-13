@@ -20,7 +20,7 @@ public class CampsiteCreateSteps {
 
     @Given("사이트번호가 {string}인 캠프사이트가 없다")
     public void 사이트번호가_XX인_캠프사이트가_없다(String siteNumber) {
-        var 전체_목록_조회_응답 = CampsiteClient.전체_캠프사이트를_조회한다(LoginSteps.get어드민_인증_토큰());
+        var 전체_목록_조회_응답 = CampsiteClient.전체_캠프사이트_조회_요청을_한다(LoginSteps.get어드민_인증_토큰());
         assertThat(전체_목록_조회_응답.statusCode()).isEqualTo(HttpStatus.OK.value());
 
         // 파라미터로 들어온 siteNumber와 동일한 캠프사이트가 존재하면, 해당 캠프사이트를 수정
@@ -28,7 +28,7 @@ public class CampsiteCreateSteps {
         });
         for (var campsiteDetail : 캠프사이트_목록) {
             if (campsiteDetail.siteNumber().equals(siteNumber)) {
-                var 캠프사이트_수정_응답 = CampsiteClient.캠프사이트를_수정한다(
+                var 캠프사이트_수정_응답 = CampsiteClient.캠프사이트_수정_요청을_한다(
                     LoginSteps.get어드민_인증_토큰(),
                     campsiteDetail.id(),
                     UUID.randomUUID().toString(),
@@ -49,7 +49,7 @@ public class CampsiteCreateSteps {
 
     @When("사이트번호가 null인 캠프사이트를 생성한다")
     public void 사이트번호가_null인_캠프사이트를_생성한다() {
-        var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트를_생성한다(
+        var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트_생성_요청을_한다(
             LoginSteps.get어드민_인증_토큰(),
             null,
             "테스트 캠프사이트",
@@ -61,7 +61,7 @@ public class CampsiteCreateSteps {
 
     @When("사이트번호가 {string}인 캠프사이트를 생성한다")
     public void 사이트번호가_XX인_캠프사이트를_생성한다(String siteNumber) {
-        var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트를_생성한다(
+        var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트_생성_요청을_한다(
             LoginSteps.get어드민_인증_토큰(),
             siteNumber,
             "테스트 캠프사이트",
