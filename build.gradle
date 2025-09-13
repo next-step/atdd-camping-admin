@@ -56,11 +56,6 @@ dependencies {
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-
-    // Testcontainers
-    testImplementation "org.testcontainers:testcontainers:1.19.8"
-    testImplementation "org.testcontainers:junit-jupiter:1.19.8"
-    testImplementation "org.testcontainers:mysql:1.19.8"
 }
 
 tasks.named('test') {
@@ -71,27 +66,32 @@ test {
     systemProperty "cucumber.junit-platform.naming-strategy", "long"
 }
 
-// Cucumber 전용 테스트 태스크 (DB 롤백 보장)
-task cucumberTest(type: Test) {
-    description = 'Cucumber BDD 테스트 실행 (각 시나리오마다 DB 롤백)'
+task isolatedCucumberTest(type: Test) {
+    description = '완전 격리된 Cucumber 테스트 (각 시나리오마다 새로운 JVM으로 실행)'
     group = 'verification'
-    
+
     useJUnitPlatform()
-    
-    // Cucumber 테스트만 실행
-    include '**/CucumberTestRunner.class'
-    
+
+    // 완전한 격리를 위해 각 테스트마다 새 JVM으로 실행
+    forkEvery = 1
+
+    // JVM 시스템 프로퍼티 설정
     systemProperty "cucumber.junit-platform.naming-strategy", "long"
     systemProperty "spring.profiles.active", "test"
-    
-    // 병렬 실행 비활성화로 DB 격리 보장
+    systemProperty "spring.jpa.hibernate.ddl-auto", "create-drop"
+    systemProperty "spring.sql.init.mode", "always"
+
+    // Cucumber 테스트만 실행
+    include '**/CucumberTestRunner.class'
+
+    // 병렬 실행 비활성화
     maxParallelForks = 1
-    
-    // 테스트 실행 전 애플리케이션 시작 대기
+
     doFirst {
-        println "🚀 Cucumber 테스트 시작 - DB 리셋 기능 활성화"
+        println "격리된 Cucumber 테스트 시작 - 각 시나리오마다 새로운 JVM으로 실행"
+        println "data.sql이 각 시나리오마다 자동으로 재실행됩니다"
     }
-    
+
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
@@ -100,7 +100,6 @@ task cucumberTest(type: Test) {
     }
 }
 
-// 단위 테스트만 실행하는 태스크
 task unitTest(type: Test) {
     description = '단위 테스트만 실행 (Cucumber 제외)'
     group = 'verification'

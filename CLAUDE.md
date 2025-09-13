@@ -79,23 +79,27 @@ createExtractableResponse("GET","/health");
 ### 데이터베이스 관리
 
 ```bash
-# 🔄 Cucumber 테스트 (각 시나리오마다 DB 자동 리셋)
+# 🔄 격리된 Cucumber 테스트 (각 시나리오마다 새로운 JVM으로 완전 격리)
+./gradlew isolatedCucumberTest
+
+# 🚀 기존 Cucumber 테스트 (호환성 유지)
 ./gradlew cucumberTest
 
-# 🧪 단위 테스트만 실행 
+# 🧪 단위 테스트만 실행
 ./gradlew unitTest
 
 # 📋 전체 테스트 실행
 ./gradlew test
 ```
 
-### 🔄 DB 리셋 메커니즘 (순수 RestAssured)
+### 🔄 DB 리셋 메커니즘 (Gradle 기반 완전 격리)
 
 각 Cucumber 시나리오는 **완전히 독립적**으로 실행됩니다:
 
-- **테스트용 API**: `DELETE /admin/test/reset` (test 프로필에서만 활성화)
-- **@Before Hook**: 시나리오 시작 전 DB 자동 리셋
-- **순수 RestAssured**: SpringBootTest 없이 HTTP 통신으로 DB 정리
+- **격리된 테스트**: `isolatedCucumberTest` 사용시 각 시나리오마다 새로운 JVM 실행
+- **자동 스키마 재생성**: `create-drop` + `mode: always`로 data.sql 자동 재실행
+- **순수 RestAssured**: SpringBootTest 없이 HTTP 통신으로 API 검증
+- **TestSets 플러그인**: 완전한 테스트 격리 환경 제공
 
 ### 권장 네이밍 컨벤션
 
