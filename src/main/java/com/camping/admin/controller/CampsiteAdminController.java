@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CreateCampsiteRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.service.CampsiteService;
 import java.util.List;
@@ -31,8 +32,8 @@ public class CampsiteAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        var saved = campsiteService.create(body);
+    public ResponseEntity<Campsite> createCampsite(@RequestBody CreateCampsiteRequest request) {
+        var saved = campsiteService.create(request);
 
         if (saved == null) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
