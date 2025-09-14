@@ -2,10 +2,10 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CreateCampsiteRequest;
+import com.camping.admin.dto.UpdateCampsiteRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.service.CampsiteService;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +45,8 @@ public class CampsiteAdminController {
     @PutMapping("/{campsiteId}")
     public ResponseEntity<Campsite> updateCampsite(
         @PathVariable Long campsiteId,
-        @RequestBody Map<String, Object> body) {
-        var campsite = campsiteService.update(campsiteId, body);
+        @RequestBody UpdateCampsiteRequest request) {
+        var campsite = campsiteService.update(campsiteId, request);
         return ResponseEntity.ok(campsite);
     }
 }
