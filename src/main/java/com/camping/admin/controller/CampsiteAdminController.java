@@ -1,11 +1,12 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
-import com.camping.admin.exception.DuplicateSiteNumberException;
-import com.camping.admin.repository.CampsiteRepository;
-import java.util.ArrayList;
+import com.camping.admin.dto.CampsiteCreateRequest;
+import com.camping.admin.dto.CampsiteResponse;
+import com.camping.admin.dto.UpdateCampsiteRequest;
+import com.camping.admin.service.CampsiteService;
+import jakarta.validation.Valid;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,26 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CampsiteAdminController {
 
-    private final CampsiteRepository campsiteRepository;
+    private final CampsiteService campsiteService;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
-        List<Campsite> result;
-        List<Campsite> all = campsiteRepository.findAll();
-        if (all == null) {
-            result = new ArrayList<>();
-        } else if (all.isEmpty()) {
-            result = all; // 빈 목록 그대로 반환
-        } else {
-            // 그대로 반환하지만, 혹시 null 요소가 있으면 필터링
-            result = new ArrayList<>();
-            for (Campsite c : all) {
-                if (c != null) {
-                    result.add(c);
-                }
-            }
-        }
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<CampsiteResponse>> getAllCampsites() {
+        return ResponseEntity.ok(campsiteService.findAll());
+    }
+
+    @GetMapping("/{campsiteId}")
+    public ResponseEntity<CampsiteResponse> getCampsite(@PathVariable Long campsiteId) {
+        return ResponseEntity.ok(campsiteService.getById(campsiteId));
     }
 
     @PostMapping
