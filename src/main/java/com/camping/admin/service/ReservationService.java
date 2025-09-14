@@ -1,11 +1,13 @@
 package com.camping.admin.service;
 
+import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -14,9 +16,31 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
+    public Reservation create(
+        Campsite campsite,
+        String customerName,
+        LocalDate startDate,
+        LocalDate endDate,
+        String phoneNumber,
+        LocalDate reservationDate
+    ) {
+        String confirmationCode = ReservationCodeGenerator.generate();
+        Reservation reservation = Reservation.create(
+            customerName,
+            startDate,
+            endDate,
+            campsite,
+            phoneNumber,
+            reservationDate,
+            confirmationCode
+        );
+
+        return reservationRepository.save(reservation);
+    }
+
     public Reservation update(Long reservationId, ReservationStatus reservationStatus) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
         reservation.updateStatus(reservationStatus);
         return reservationRepository.save(reservation);
     }

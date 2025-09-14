@@ -7,16 +7,13 @@ import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.service.ReservationCodeGenerator;
 import com.camping.admin.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin/reservations")
@@ -32,19 +29,16 @@ public class ReservationAdminController {
         request.validate();
         Campsite campsite = campsiteRepository.findById(request.getCampsiteId())
             .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + request.getCampsiteId()));
-        String confirmationCode = ReservationCodeGenerator.generate();
-
-        Reservation reservation = Reservation.create(
+        Reservation createdReservation = reservationService.create(
+            campsite,
             request.getCustomerName(),
             request.getStartDate(),
             request.getEndDate(),
-            campsite,
             request.getPhoneNumber(),
-            request.getReservationDate(),
-            confirmationCode
+            request.getReservationDate()
         );
-        Reservation saved = reservationRepository.save(reservation);
-        return new ResponseEntity<>(ReservationResponse.from(saved), HttpStatus.CREATED);
+
+        return new ResponseEntity<>(ReservationResponse.from(createdReservation), HttpStatus.CREATED);
     }
 
     @GetMapping
