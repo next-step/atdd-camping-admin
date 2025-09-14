@@ -15,6 +15,7 @@ public class ReservationSteps {
     private int reservationId;
     private int statusCode;
     private String reservationStatus;
+    private ExtractableResponse<Response> reservationListResponse;
 
     @When("관리자가 예약 상태를 {string} 로 변경한다.")
     public void 관리자가예약상태를변경한다(String status) {
@@ -59,5 +60,24 @@ public class ReservationSteps {
     public void 예약이확인된예약이있다(String reservationStatus) {
         Map<String, Object> reservation = 예약상태가_CONFIRMED인_특정예약조회(reservationStatus);
         reservationId = (int) reservation.get("id");
+    }
+
+    @Given("예약이 존재한다.")
+    public void 예약이존재한다() {
+        ExtractableResponse<Response> response = 예약_목록_조회();
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.jsonPath().getList(".")).isNotEmpty();
+    }
+
+    @When("관리자가 예약 목록을 조회한다.")
+    public void 관리자가예약목록을조회한다() {
+        reservationListResponse = 예약_목록_조회();
+        statusCode = reservationListResponse.statusCode();
+    }
+
+    @Then("예약 목록이 조회된다.")
+    public void 예약목록이조회된다() {
+        assertThat(statusCode).isEqualTo(200);
+        assertThat(reservationListResponse.jsonPath().getList(".")).isNotEmpty();
     }
 }
