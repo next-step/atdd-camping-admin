@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteResponse;
 import com.camping.admin.dto.CreateCampsiteRequest;
 import com.camping.admin.dto.UpdateCampsiteRequest;
 import com.camping.admin.repository.CampsiteRepository;
@@ -26,27 +27,23 @@ public class CampsiteAdminController {
     private final CampsiteRepository campsiteRepository;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
-        var result = campsiteService.getAllCampsites();
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<CampsiteResponse>> getAllCampsites() {
+        var campsites = campsiteService.getAllCampsites();
+        return ResponseEntity.ok(CampsiteResponse.from(campsites));
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody CreateCampsiteRequest request) {
+    public ResponseEntity<CampsiteResponse> createCampsite(
+        @RequestBody CreateCampsiteRequest request) {
         var saved = campsiteService.create(request);
-
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        }
+        return new ResponseEntity<>(CampsiteResponse.from(saved), HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
     public ResponseEntity<Campsite> updateCampsite(
         @PathVariable Long campsiteId,
         @RequestBody UpdateCampsiteRequest request) {
-        var campsite = campsiteService.update(campsiteId, request);
-        return ResponseEntity.ok(campsite);
+        var updated = campsiteService.update(campsiteId, request);
+        return ResponseEntity.ok(updated);
     }
 }
