@@ -1,13 +1,18 @@
 package com.camping.admin.controller;
 
+import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.camping.admin.service.ReservationCodeGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +24,27 @@ import org.springframework.web.bind.annotation.*;
 public class ReservationAdminController {
 
     private final ReservationRepository reservationRepository;
+    private final CampsiteRepository campsiteRepository;
+
+    @PostMapping
+    public ResponseEntity<ReservationResponse> createReservation(@RequestBody CreateReservationRequest request) {
+        request.validate();
+        Campsite campsite = campsiteRepository.findById(request.getCampsiteId())
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + request.getCampsiteId()));
+        String confirmationCode = ReservationCodeGenerator.generate();
+
+        Reservation reservation = Reservation.create(
+            request.getCustomerName(),
+            request.getStartDate(),
+            request.getEndDate(),
+            campsite,
+            request.getPhoneNumber(),
+            request.getReservationDate(),
+            confirmationCode
+        );
+        Reservation saved = reservationRepository.save(reservation);
+        return new ResponseEntity<>(ReservationResponse.from(saved), HttpStatus.CREATED);
+    }
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
@@ -61,6 +87,9 @@ public class ReservationAdminController {
                 // 빈 문자열이면 기존 값 유지
             } else {
                 // 단순히 그대로 대입
+                if(!statusValue.equals("CONFIRMED") && !statusValue.equals("CANCELED")) {
+                    throw new IllegalArgumentException("Invalid status value: " + statusValue);
+                }
                 reservation.setStatus(statusValue);
             }
         }

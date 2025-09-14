@@ -4,10 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+@ToString
 @Entity
 @Table(name = "reservations")
 @Getter
@@ -56,5 +58,38 @@ public class Reservation {
         this.startDate = startDate;
         this.endDate = endDate;
         this.campsite = campsite;
+    }
+
+    public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite, String phoneNumber, LocalDate reservationDate, String confirmationCode) {
+        this.customerName = customerName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.campsite = campsite;
+        this.phoneNumber = phoneNumber;
+        this.reservationDate = reservationDate;
+        this.confirmationCode = confirmationCode;
+    }
+
+    public boolean isReservable() {
+        if(this.status.equals("CONFIRMED")) {
+            return false;
+        }
+        if(this.status.equals("CANCELLED")) {
+            return true;
+        }
+
+        throw new RuntimeException("Invalid reservation status: " + this.status);
+    }
+
+    public static Reservation create(
+        String customerName,
+        LocalDate startDate,
+        LocalDate endDate,
+        Campsite campsite,
+        String phoneNumber,
+        LocalDate reservationDate,
+        String confirmationCode
+    ) {
+        return new Reservation(customerName, startDate, endDate, campsite, phoneNumber, reservationDate, confirmationCode);
     }
 }

@@ -21,21 +21,21 @@ insert into products (id, name, stock_quantity, price, product_type) values
   (12, '아이스팩', 90, 1500.00, 'SALE');
 
 -- Reservations
-insert into reservations (id, customer_name, start_date, end_date, campsite_id, phone_number, status, reservation_date, confirmation_code, created_at)
+insert into reservations (customer_name, start_date, end_date, campsite_id, phone_number, status, reservation_date, confirmation_code, created_at)
 values
-  (1, '홍길동', current_date, current_date + 1, 1, '010-1111-2222', 'CONFIRMED', current_date, 'ABC123', current_timestamp),
-  (2, '김철수', current_date + 1, current_date + 2, 2, '010-3333-4444', 'CONFIRMED', current_date, 'XYZ789', current_timestamp),
+  ('홍길동', current_date, current_date + 1, 1, '010-1111-2222', 'CONFIRMED', current_date, 'ABC123', current_timestamp),
+  ('김철수', current_date + 1, current_date + 2, 2, '010-3333-4444', 'CONFIRMED', current_date, 'XYZ789', current_timestamp),
   -- 최근 한달 예약 더미 데이터
-  (3, '이영희', DATEADD('DAY', -28, current_date), DATEADD('DAY', -27, current_date), 1, '010-5555-6666', 'CONFIRMED', DATEADD('DAY', -29, current_date), 'R00003', DATEADD('DAY', -29, current_timestamp)),
-  (4, '박민수', DATEADD('DAY', -25, current_date), DATEADD('DAY', -24, current_date), 2, '010-7777-8888', 'CONFIRMED', DATEADD('DAY', -26, current_date), 'R00004', DATEADD('DAY', -26, current_timestamp)),
-  (5, '최수정', DATEADD('DAY', -21, current_date), DATEADD('DAY', -19, current_date), 1, '010-9999-0000', 'CONFIRMED', DATEADD('DAY', -22, current_date), 'R00005', DATEADD('DAY', -22, current_timestamp)),
-  (6, '정하늘', DATEADD('DAY', -18, current_date), DATEADD('DAY', -17, current_date), 2, '010-2222-3333', 'CONFIRMED', DATEADD('DAY', -19, current_date), 'R00006', DATEADD('DAY', -19, current_timestamp)),
-  (7, '오세훈', DATEADD('DAY', -15, current_date), DATEADD('DAY', -14, current_date), 1, '010-4444-5555', 'CONFIRMED', DATEADD('DAY', -16, current_date), 'R00007', DATEADD('DAY', -16, current_timestamp)),
-  (8, '유지민', DATEADD('DAY', -12, current_date), DATEADD('DAY', -11, current_date), 2, '010-6666-7777', 'CONFIRMED', DATEADD('DAY', -13, current_date), 'R00008', DATEADD('DAY', -13, current_timestamp)),
-  (9, '선우진', DATEADD('DAY', -9, current_date), DATEADD('DAY', -8, current_date), 1, '010-1212-3434', 'CONFIRMED', DATEADD('DAY', -10, current_date), 'R00009', DATEADD('DAY', -10, current_timestamp)),
-  (10, '배수아', DATEADD('DAY', -6, current_date), DATEADD('DAY', -5, current_date), 2, '010-5656-7878', 'CONFIRMED', DATEADD('DAY', -7, current_date), 'R00010', DATEADD('DAY', -7, current_timestamp)),
-  (11, '고다빈', DATEADD('DAY', -3, current_date), DATEADD('DAY', -2, current_date), 1, '010-9090-1010', 'CONFIRMED', DATEADD('DAY', -4, current_date), 'R00011', DATEADD('DAY', -4, current_timestamp)),
-  (12, '한도윤', DATEADD('DAY', -1, current_date), current_date, 2, '010-2323-4545', 'CONFIRMED', DATEADD('DAY', -2, current_date), 'R00012', DATEADD('DAY', -2, current_timestamp));
+  ('이영희', DATEADD('DAY', -28, current_date), DATEADD('DAY', -27, current_date), 1, '010-5555-6666', 'CONFIRMED', DATEADD('DAY', -29, current_date), 'R00003', DATEADD('DAY', -29, current_timestamp)),
+  ('박민수', DATEADD('DAY', -25, current_date), DATEADD('DAY', -24, current_date), 2, '010-7777-8888', 'CONFIRMED', DATEADD('DAY', -26, current_date), 'R00004', DATEADD('DAY', -26, current_timestamp)),
+  ('최수정', DATEADD('DAY', -21, current_date), DATEADD('DAY', -19, current_date), 1, '010-9999-0000', 'CONFIRMED', DATEADD('DAY', -22, current_date), 'R00005', DATEADD('DAY', -22, current_timestamp)),
+  ('정하늘', DATEADD('DAY', -18, current_date), DATEADD('DAY', -17, current_date), 2, '010-2222-3333', 'CONFIRMED', DATEADD('DAY', -19, current_date), 'R00006', DATEADD('DAY', -19, current_timestamp)),
+  ('오세훈', DATEADD('DAY', -15, current_date), DATEADD('DAY', -14, current_date), 1, '010-4444-5555', 'CONFIRMED', DATEADD('DAY', -16, current_date), 'R00007', DATEADD('DAY', -16, current_timestamp)),
+  ('유지민', DATEADD('DAY', -12, current_date), DATEADD('DAY', -11, current_date), 2, '010-6666-7777', 'CONFIRMED', DATEADD('DAY', -13, current_date), 'R00008', DATEADD('DAY', -13, current_timestamp)),
+  ('선우진', DATEADD('DAY', -9, current_date), DATEADD('DAY', -8, current_date), 1, '010-1212-3434', 'CONFIRMED', DATEADD('DAY', -10, current_date), 'R00009', DATEADD('DAY', -10, current_timestamp)),
+  ( '배수아', DATEADD('DAY', -6, current_date), DATEADD('DAY', -5, current_date), 2, '010-5656-7878', 'CONFIRMED', DATEADD('DAY', -7, current_date), 'R00010', DATEADD('DAY', -7, current_timestamp)),
+  ( '고다빈', DATEADD('DAY', -3, current_date), DATEADD('DAY', -2, current_date), 1, '010-9090-1010', 'CONFIRMED', DATEADD('DAY', -4, current_date), 'R00011', DATEADD('DAY', -4, current_timestamp)),
+  ( '한도윤', DATEADD('DAY', -1, current_date), current_date, 2, '010-2323-4545', 'CONFIRMED', DATEADD('DAY', -2, current_date), 'R00012', DATEADD('DAY', -2, current_timestamp));
 
 -- Sales Records
 insert into sales_records (id, product_id, quantity, total_price, created_at) values

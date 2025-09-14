@@ -1,0 +1,13 @@
+### 예약 생성
+POST localhost:8080/admin/reservations
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsInJvbGUiOiJBRE1JTiIsImlhdCI6MTc1NzY5MTY2MiwiZXhwIjoxNzU3NjkzNDYyfQ.31sSXIMHpiJi_e9NoB4cDc-SZktNYalsBrZpxJ3r6us
+
+{
+  "customerName": "테스터2",
+  "startDate": "2025-09-12",
+  "endDate": "2025-09-13",
+  "campsiteId": 1,
+  "phoneNumber": "010-1234-5678",
+  "reservationDate": "2025-09-11"
+}
