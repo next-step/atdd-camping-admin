@@ -25,6 +25,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
 
+    // 유효성 검증 예외들 - 클라이언트 요청 오류 (400 Bad Request)
+    @ExceptionHandler(InvalidQuantityException.class)
+    public ResponseEntity<ApiResponse<Void>> handleInvalidQuantityException(InvalidQuantityException ex) {
+        ApiResponse<Void> response = ApiResponse.error("INVALID_QUANTITY", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
     // 기본 예외들 - 호환성을 위해 Map 기반 응답 유지 (향후 마이그레이션 예정)
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {

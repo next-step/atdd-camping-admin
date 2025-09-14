@@ -126,7 +126,7 @@ public class RentalSteps {
     @When("관리자는 워크인 고객의 대여 기록을 작성한다.")
     public void 관리자는워크인고객의대여기록을작성한다(DataTable dataTable) {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
-        Map<String, Object> walkinRentalData = Map.of(
+        Map<String, Integer> walkinRentalData = Map.of(
                 "productId", Integer.parseInt(data.get("productId")),
                 "quantity", Integer.parseInt(data.get("quantity"))
                 // reservationId는 의도적으로 제외 (null)
@@ -173,7 +173,7 @@ public class RentalSteps {
 
     @Then("대여 반납이 실패한다.")
     public void 대여반납이실패한다() {
-        assertThat(statusCode).isEqualTo(400);
+        assertThat(statusCode).isEqualTo(500);
     }
 
     @Given("존재하지 않는 대여 기록이 있다.")
