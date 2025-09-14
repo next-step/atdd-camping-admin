@@ -1,12 +1,12 @@
 package com.camping.admin.steps.test_context.auth;
 
 import io.restassured.response.Response;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.Map;
 
 public class AuthTestContext {
 
-    private final Map<Key, Object> context = new HashMap<>();
+    private final Map<Key, Object> context = new EnumMap<>(Key.class);
 
     public void clear() {
         context.clear();
