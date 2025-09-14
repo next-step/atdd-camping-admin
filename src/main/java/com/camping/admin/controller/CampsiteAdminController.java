@@ -36,9 +36,8 @@ public class CampsiteAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<CampsiteResponse> createCampsite(@RequestBody @Valid CampsiteCreateRequest request) {
-        Campsite newCampsite = campsiteService.createCampsite(request);
-        return new ResponseEntity<>(CampsiteResponse.from(newCampsite), HttpStatus.CREATED);
+    public ResponseEntity<Long> createCampsite(@RequestBody @Valid CampsiteCreateRequest request) {
+        return new ResponseEntity<>(campsiteService.createCampsite(request), HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")

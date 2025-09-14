@@ -41,9 +41,7 @@ public class CampsiteSteps {
     @Then("캠프사이트가 성공적으로 생성된다")
     public void assertSuccessfulCreation() {
         commonContext.getResponse().then()
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("id", isA(Number.class));
+                .statusCode(201);
     }
 
     @Then("캠프사이트 생성에 실패하고 오류 메시지를 받는다")
