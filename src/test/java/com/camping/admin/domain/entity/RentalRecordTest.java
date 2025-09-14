@@ -158,7 +158,7 @@ class RentalRecordTest {
         // then
         assertThat(rentalRecord.getReservation()).isEqualTo(reservation);
         assertThat(rentalRecord.getProduct()).isEqualTo(product);
-        assertThat(rentalRecord.getQuantity()).isEqualTo(3);
+        assertThat(rentalRecord.getQuantity().getQuantity()).isEqualTo(3);
         assertThat(rentalRecord.getIsReturned()).isFalse();
         assertThat(rentalRecord.getCreatedAt()).isNotNull();
         assertThat(rentalRecord.getId()).isNull(); // JPA 저장 전이므로 null

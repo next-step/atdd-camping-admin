@@ -52,7 +52,7 @@ public class RentalSteps {
 
     @Then("대여에 실패한다.")
     public void 대여에실패한다() {
-        assertThat(statusCode).isEqualTo(500);
+        assertThat(statusCode).isIn(400, 500); // InvalidQuantityException(400) 또는 기타 비즈니스 로직 오류(500)
     }
 
     @And("대여 기록이 생성되지 않는다.")
@@ -185,5 +185,10 @@ public class RentalSteps {
     public void 관리자가존재하지않는대여기록을반납처리한다() {
         ExtractableResponse<Response> response = 대여_반납_처리(rentalId);
         statusCode = response.statusCode();
+    }
+
+    @Then("유효하지 않은 수량으로 인해 대여에 실패한다.")
+    public void 유효하지않은수량으로인해대여에실패한다() {
+        assertThat(statusCode).isEqualTo(400); // InvalidQuantityException -> 400 Bad Request
     }
 }

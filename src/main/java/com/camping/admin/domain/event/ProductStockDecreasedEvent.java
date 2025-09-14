@@ -1,5 +1,6 @@
 package com.camping.admin.domain.event;
 
+import com.camping.admin.domain.vo.RecordQuantity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -9,10 +10,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ProductStockDecreasedEvent implements DomainEvent {
     private final Long productId;
-    private final Integer quantity;
+    private final RecordQuantity quantity;
     private final LocalDateTime occurredOn;
 
-    public ProductStockDecreasedEvent(Long productId, Integer quantity) {
+    public ProductStockDecreasedEvent(Long productId, RecordQuantity quantity) {
         this.productId = productId;
         this.quantity = quantity;
         this.occurredOn = LocalDateTime.now();

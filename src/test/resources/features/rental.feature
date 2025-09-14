@@ -58,14 +58,14 @@ Feature: 대여 관리
       | reservationId | 1 |
       | productId     | 1 |
       | quantity      | -1 |
-    Then 대여에 실패한다.
+    Then 유효하지 않은 수량으로 인해 대여에 실패한다.
 
   Scenario: 0 수량으로 대여 기록을 작성하려고 하면 실패한다.
     When 관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.
       | reservationId | 1 |
       | productId     | 1 |
       | quantity      | 0 |
-    Then 대여에 실패한다.
+    Then 유효하지 않은 수량으로 인해 대여에 실패한다.
 
   Scenario: 존재하지 않는 예약으로 대여 기록을 작성하려고 하면 실패한다.
     When 관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.

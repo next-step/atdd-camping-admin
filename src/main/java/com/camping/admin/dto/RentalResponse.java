@@ -23,7 +23,7 @@ public class RentalResponse {
         this.reservationId = rentalRecord.getReservation() != null ? rentalRecord.getReservation().getId() : null;
         this.productId = rentalRecord.getProduct().getId();
         this.productName = rentalRecord.getProduct().getName();
-        this.quantity = rentalRecord.getQuantity();
+        this.quantity = rentalRecord.getQuantity().getQuantity();
         this.isReturned = rentalRecord.getIsReturned();
         this.createdAt = rentalRecord.getCreatedAt();
     }

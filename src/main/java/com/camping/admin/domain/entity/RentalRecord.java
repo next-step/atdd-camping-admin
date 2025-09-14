@@ -2,14 +2,18 @@ package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.event.ProductStockDecreasedEvent;
 import com.camping.admin.domain.event.ProductStockIncreasedEvent;
+import com.camping.admin.domain.vo.RecordQuantity;
 import com.camping.admin.exception.RentalAlreadyReturnedException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.AbstractAggregateRoot;
+import org.springframework.data.jpa.domain.AbstractAggregateRoot;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Entity
@@ -30,7 +34,8 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
     private Product product;
 
     @Column(nullable = false)
-    private Integer quantity;
+    @Embedded
+    private RecordQuantity quantity;
 
     @Column(name = "is_returned", nullable = false)
     private Boolean isReturned = false;
@@ -41,7 +46,7 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
     public RentalRecord(Reservation reservation, Product product, Integer quantity) {
         this.reservation = reservation;
         this.product = product;
-        this.quantity = quantity;
+        this.quantity = new RecordQuantity(quantity);
         this.isReturned = false;
         this.createdAt = LocalDateTime.now();
 
@@ -54,21 +59,18 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
         }
         this.isReturned = true;
 
-        registerEvent(new ProductStockIncreasedEvent(product.getId(), quantity));
+        registerEvent(new ProductStockIncreasedEvent(product.getId(), quantity.getQuantity()));
     }
 
-    // 테스트를 위한 도메인 이벤트 접근 메서드
-    public java.util.Collection<Object> getDomainEvents() {
+    public Collection<Object> getDomainEvents() {
         return domainEvents();
     }
 
-    // 테스트를 위한 도메인 이벤트 초기화 메서드
     public void clearEvents() {
         clearDomainEvents();
     }
 
-    // 테스트를 위한 도메인 이벤트 리스트 접근 메서드
-    public java.util.List<Object> getDomainEventsList() {
-        return new java.util.ArrayList<>(domainEvents());
+    public List<Object> getDomainEventsList() {
+        return new ArrayList<>(domainEvents());
     }
 }
