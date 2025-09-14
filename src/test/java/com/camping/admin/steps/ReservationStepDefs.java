@@ -17,9 +17,8 @@ public class ReservationStepDefs {
     private Long reservationId;
     private String adminToken;
 
-    @Given("사용자가 예약을 했다")
-    public void 사용자가예약을했다() {
-        reservationId = 1L;
+    @Given("관리자가 로그인했다")
+    public void 관리자가로그인했다() {
         adminToken = given()
                 .contentType("application/json")
                 .body(Map.of("username", "admin", "password", "admin123"))
@@ -27,6 +26,11 @@ public class ReservationStepDefs {
                 .then().log().all()
                 .extract()
                 .cookie("AUTH_TOKEN");
+    }
+
+    @Given("사용자가 예약을 했다")
+    public void 사용자가예약을했다() {
+        reservationId = 1L;
 
         Map<String, Object> body = Map.of("status", "CONFIRMED");
         given().log().all()
@@ -42,16 +46,9 @@ public class ReservationStepDefs {
 
     @When("관리자가 예약을 취소했다")
     public void 관리자가예약을취소했다() {
-        adminToken = given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when().post("/auth/login")
-                .then().log().all()
-                .extract()
-                .cookie("AUTH_TOKEN");
 
         Map<String, Object> body = Map.of("status", "CANCELLED");
-        ExtractableResponse<Response> response = given().log().all()
+        given().log().all()
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + adminToken)
                 .body(body)
@@ -78,16 +75,9 @@ public class ReservationStepDefs {
 
     @When("관리자가 예약을 체크인 상태로 변경을 요청한다")
     public void 관리자가예약을체크인상태로변경을요청한다() {
-        adminToken = given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when().post("/auth/login")
-                .then().log().all()
-                .extract()
-                .cookie("AUTH_TOKEN");
 
         Map<String, Object> body = Map.of("status", "CHECKED_IN");
-        ExtractableResponse<Response> response = given().log().all()
+        given().log().all()
                 .contentType("application/json")
                 .header("Authorization", "Bearer " + adminToken)
                 .body(body)
