@@ -1,7 +1,9 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.domain.vo.RecordQuantity;
 import com.camping.admin.exception.InsufficientStockException;
+import com.camping.admin.exception.InvalidQuantityException;
 import com.camping.admin.exception.ProductNotRentalException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,10 +21,10 @@ class ProductTest {
         Product rentalProduct = new Product("랜턴", 10, new BigDecimal("30000"), ProductType.RENTAL);
 
         // when
-        rentalProduct.decreaseStock(3);
+        rentalProduct.decreaseStock(new RecordQuantity(3));
 
         // then
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(7);
+        assertThat(rentalProduct.getStockQuantity().getQuantity()).isEqualTo(7);
     }
 
     @Test

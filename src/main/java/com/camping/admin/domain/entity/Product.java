@@ -1,7 +1,8 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.exception.InsufficientStockException;
+import com.camping.admin.domain.vo.RecordQuantity;
+import com.camping.admin.domain.vo.StockQuantity;
 import com.camping.admin.exception.ProductNotRentalException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -25,8 +26,9 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "stock_quantity", nullable = false)
-    private Integer stockQuantity;
+    @Embedded
+    @AttributeOverride(name = "quantity", column = @Column(name = "stock_quantity", nullable = false))
+    private StockQuantity stockQuantity;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
@@ -37,26 +39,23 @@ public class Product {
 
     public Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         this.name = name;
-        this.stockQuantity = stockQuantity;
+        this.stockQuantity = new StockQuantity(stockQuantity);
         this.price = price;
         this.productType = productType;
     }
 
-    public void decreaseStock(Integer quantity) {
-        validateDecreaseStock(quantity);
-        this.stockQuantity -= quantity;
+    public void decreaseStock(RecordQuantity quantity) {
+        validateRentalProduct();
+        this.stockQuantity = this.stockQuantity.decrease(quantity);
     }
 
-    private void validateDecreaseStock(Integer quantity) {
+    public void increaseStock(RecordQuantity quantity) {
+        this.stockQuantity = this.stockQuantity.increase(quantity);
+    }
+
+    private void validateRentalProduct() {
         if (productType != ProductType.RENTAL) {
             throw new ProductNotRentalException("Product is not a rental item.");
         }
-        if (stockQuantity < quantity) {
-            throw new InsufficientStockException("Not enough stock for product " + this.name);
-        }
-    }
-
-    public void increaseStock(Integer quantity) {
-        this.stockQuantity += quantity;
     }
 }

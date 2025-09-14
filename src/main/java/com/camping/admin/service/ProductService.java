@@ -18,13 +18,13 @@ public class ProductService {
     @Transactional
     public void decreaseStock(Long productId, RecordQuantity quantity) {
         Product product = findById(productId);
-        product.decreaseStock(quantity.getQuantity());
+        product.decreaseStock(quantity);
     }
 
     @Transactional
     public void increaseStock(Long productId, RecordQuantity quantity) {
         Product product = findById(productId);
-        product.increaseStock(quantity.getQuantity());
+        product.increaseStock(quantity);
     }
 
     private Product findById(Long productId) {
