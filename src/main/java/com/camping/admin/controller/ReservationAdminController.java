@@ -31,7 +31,7 @@ public class ReservationAdminController {
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody CreateReservationRequest request) {
         request.validate();
         Campsite campsite = campsiteRepository.findById(request.getCampsiteId())
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + request.getCampsiteId()));
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + request.getCampsiteId()));
         String confirmationCode = ReservationCodeGenerator.generate();
 
         Reservation reservation = Reservation.create(
@@ -49,29 +49,15 @@ public class ReservationAdminController {
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
-        List<ReservationResponse> all = reservationRepository.findAll().stream()
-                .map(ReservationResponse::from)
-                .collect(Collectors.toList());
-
-        List<ReservationResponse> result = new ArrayList<>();
-        if (all == null) {
-            // null이면 빈 리스트 반환
-        } else if (all.isEmpty()) {
-            // 그대로 빈 리스트 반환
-        } else {
-            for (ReservationResponse r : all) {
-                if (r != null) {
-                    result.add(r);
-                }
-            }
-        }
+        List<Reservation> reservations = reservationService.getAll();
+        List<ReservationResponse> result = reservations.stream().map(ReservationResponse::from).toList();
         return ResponseEntity.ok(result);
     }
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
-            @PathVariable Long reservationId,
-            @RequestBody UpdateReservationStatusRequest request) {
+        @PathVariable Long reservationId,
+        @RequestBody UpdateReservationStatusRequest request) {
         request.validate();
 
         Reservation reservation = reservationService.update(reservationId, request.getStatus());
