@@ -87,6 +87,9 @@ public class ReservationAdminController {
                 // 빈 문자열이면 기존 값 유지
             } else {
                 // 단순히 그대로 대입
+                if(!statusValue.equals("CONFIRMED") && !statusValue.equals("CANCELED")) {
+                    throw new IllegalArgumentException("Invalid status value: " + statusValue);
+                }
                 reservation.setStatus(statusValue);
             }
         }

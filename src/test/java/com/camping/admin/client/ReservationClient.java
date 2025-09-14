@@ -34,6 +34,16 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
+    public ExtractableResponse<Response> updateStatusRaw(Long reservationId, String status) {
+        return given().log().all()
+            .spec(CommonContext.requestSpec)
+            .when().log().all()
+            .body(Map.of("status", status))
+            .patch("admin/reservations/" + reservationId + "/status")
+            .then().log().all()
+            .extract();
+    }
+
     public ReservationResponse getReservation(Long reservationId) {
         ExtractableResponse<Response> ex = given()
             .spec(CommonContext.requestSpec)

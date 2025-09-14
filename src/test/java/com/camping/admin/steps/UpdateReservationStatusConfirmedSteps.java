@@ -9,18 +9,19 @@ import io.cucumber.java.en.When;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class UpdateReservationStatusCompletedSteps {
+public class UpdateReservationStatusConfirmedSteps {
     private final ReservationClient reservationClient = new ReservationClient();
 
     @When("관리자가 예약 상태를 완료했다")
     public void 관리자가예약상태를완료했다() {
-        reservationClient.updateStatus(CommonContext.reservationId, "COMPLETED");
+        reservationClient.updateStatus(CommonContext.reservationId, "CONFIRMED");
     }
 
     @Then("예약 상태는 완료 상태이다")
     public void 예약상태는완료상태이다() {
         ReservationResponse reservation = reservationClient.getReservation(CommonContext.reservationId);
-        assertThat(reservation.getStatus()).isEqualTo("COMPLETED");
+        System.out.println("##### reservation: " + reservation);
+        assertThat(reservation.getStatus()).isEqualTo("CONFIRMED");
     }
 
     @And("완료된 예약은 재예약이 불가능하다")
