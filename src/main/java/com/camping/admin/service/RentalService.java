@@ -36,10 +36,6 @@ public class RentalService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Cannot find product with id: " + productId));
 
-        if (product.getProductType() != ProductType.RENTAL) {
-            throw new ProductNotRentalException("Product is not a rental item.");
-        }
-
         productService.decreaseStock(productId, quantity);
 
         Reservation reservation = null;
@@ -48,9 +44,7 @@ public class RentalService {
                     .orElseThrow(() -> new ReservationNotFoundException("Cannot find reservation with id: " + reservationId));
         }
 
-        RentalRecord rentalRecord = new RentalRecord(reservation, product, quantity);
-        RentalRecord savedRentalRecord = rentalRecordRepository.save(rentalRecord);
-
+        RentalRecord savedRentalRecord = rentalRecordRepository.save(new RentalRecord(reservation, product, quantity));
         return RentalResponse.from(savedRentalRecord);
     }
 

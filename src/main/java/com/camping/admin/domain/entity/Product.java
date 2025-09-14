@@ -1,12 +1,15 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.exception.InsufficientStockException;
+import com.camping.admin.exception.ProductNotRentalException;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -39,4 +42,17 @@ public class Product {
         this.productType = productType;
     }
 
+    public void decreaseStock(Integer quantity) {
+        validateDecreaseStock(quantity);
+        this.stockQuantity -= quantity;
+    }
+
+    private void validateDecreaseStock(Integer quantity) {
+        if (productType != ProductType.RENTAL) {
+            throw new ProductNotRentalException("Product is not a rental item.");
+        }
+        if (stockQuantity < quantity) {
+            throw new InsufficientStockException("Not enough stock for product " + this.name);
+        }
+    }
 }
