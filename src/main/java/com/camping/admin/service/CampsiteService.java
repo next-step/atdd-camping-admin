@@ -15,6 +15,26 @@ public class CampsiteService {
 
     private final CampsiteRepository campsiteRepository;
 
+
+    @Transactional
+    public Campsite createCampsite(CampsiteCreateRequest request) {
+        String siteNumber = request.getSiteNumber();
+        String description = request.getDescription();
+        int maxPeople = request.getMaxPeople();
+
+        checkSiteExists(siteNumber);
+
+        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
+        return campsiteRepository.save(newCampsite);
+    }
+
+    private void checkSiteExists(String siteNumber) {
+        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
+            throw new DuplicateSiteNumberException(siteNumber);
+        }
+    }
+
+
     public List<CampsiteResponse> findAll() {
         return campsiteRepository.findAll().stream()
                 .map(CampsiteResponse::from)

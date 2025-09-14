@@ -36,68 +36,9 @@ public class CampsiteAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        String siteNumber;
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v == null) {
-                siteNumber = null;
-            } else {
-                siteNumber = v.toString();
-            }
-        } else {
-            siteNumber = null;
-        }
-
-        String description;
-        if (body.containsKey("description")) {
-            Object d = body.get("description");
-            description = d == null ? "" : d.toString();
-        } else {
-            description = "";
-        }
-
-        Integer maxPeople;
-        if (body.containsKey("maxPeople")) {
-            Object m = body.get("maxPeople");
-            if (m == null) {
-                maxPeople = null;
-            } else if (m instanceof Number) {
-                maxPeople = ((Number) m).intValue();
-            } else {
-                try {
-                    maxPeople = Integer.valueOf(m.toString());
-                } catch (Exception e) {
-                    maxPeople = null;
-                }
-            }
-        } else {
-            maxPeople = null;
-        }
-
-        if (siteNumber == null || siteNumber.trim().isEmpty()) {
-            throw new IllegalArgumentException("사이트 번호는 필수입니다.");
-        }
-
-        if (description == null || description.trim().isEmpty()) {
-            throw new IllegalArgumentException("설명은 필수입니다.");
-        }
-
-        if (maxPeople == null || maxPeople <= 0) {
-            throw new IllegalArgumentException("최대 인원은 1명 이상이어야 합니다.");
-        }
-
-        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
-            throw new DuplicateSiteNumberException(siteNumber);
-        }
-
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        }
+    public ResponseEntity<CampsiteResponse> createCampsite(@RequestBody @Valid CampsiteCreateRequest request) {
+        Campsite newCampsite = campsiteService.createCampsite(request);
+        return new ResponseEntity<>(CampsiteResponse.from(newCampsite), HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
