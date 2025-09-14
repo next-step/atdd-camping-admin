@@ -2,12 +2,13 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.service.ReservationCodeGenerator;
+import com.camping.admin.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -25,6 +25,7 @@ public class ReservationAdminController {
 
     private final ReservationRepository reservationRepository;
     private final CampsiteRepository campsiteRepository;
+    private final ReservationService reservationService;
 
     @PostMapping
     public ResponseEntity<ReservationResponse> createReservation(@RequestBody CreateReservationRequest request) {
@@ -70,32 +71,10 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody Map<String, Object> body) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+            @RequestBody UpdateReservationStatusRequest request) {
+        request.validate();
 
-        if (body == null || body.isEmpty()) {
-            return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
-        }
-
-        Object statusObj = body.get("status");
-        if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
-        } else {
-            String statusValue = statusObj.toString();
-            ReservationStatus reservationStatus = ReservationStatus.from(statusValue);
-            if(reservationStatus == ReservationStatus.NONE) {
-                throw new IllegalArgumentException("Invalid reservation status: " + statusValue);
-            }
-
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
-            } else {
-                reservation.setStatus(reservationStatus);
-            }
-        }
-
-        reservationRepository.save(reservation);
+        Reservation reservation = reservationService.update(reservationId, request.getStatus());
         return ResponseEntity.ok(ReservationResponse.from(reservation));
     }
 }

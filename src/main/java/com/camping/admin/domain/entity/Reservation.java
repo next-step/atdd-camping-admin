@@ -54,6 +54,11 @@ public class Reservation {
             this.status = ReservationStatus.CONFIRMED;
         }
     }
+
+    public Reservation updateStatus(ReservationStatus status) {
+        this.status = status;
+        return this;
+    }
     
     public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite) {
         this.customerName = customerName;

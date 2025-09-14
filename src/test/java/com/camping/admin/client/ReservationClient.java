@@ -4,11 +4,11 @@ import com.camping.admin.CommonContext;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
@@ -28,7 +28,7 @@ public class ReservationClient {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
-            .body(Map.of("status", status))
+            .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
             .then().log().all()
             .statusCode(200)
@@ -39,7 +39,7 @@ public class ReservationClient {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
-            .body(Map.of("status", status))
+            .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
             .then().log().all()
             .extract();
