@@ -4,6 +4,8 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.camping.admin.support.CommonContext;
+import com.camping.admin.support.RequestSpecFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -15,12 +17,10 @@ import java.util.Map;
 public class ReservationStepDefs {
 
     private Long reservationId;
-    private String adminToken;
 
     @Given("관리자가 로그인했다")
     public void 관리자가로그인했다() {
-        adminToken = given()
-                .contentType("application/json")
+        CommonContext.adminToken = given().spec(CommonContext.requestSpec)
                 .body(Map.of("username", "admin", "password", "admin123"))
                 .when().post("/auth/login")
                 .then().log().all()
@@ -33,9 +33,8 @@ public class ReservationStepDefs {
         reservationId = 1L;
 
         Map<String, Object> body = Map.of("status", "CONFIRMED");
-        given().log().all()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + adminToken)
+        given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body(body)
                 .when()
                 .patch("/admin/reservations/{reservationId}/status", reservationId)
@@ -48,9 +47,8 @@ public class ReservationStepDefs {
     public void 관리자가예약을취소했다() {
 
         Map<String, Object> body = Map.of("status", "CANCELLED");
-        given().log().all()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + adminToken)
+        given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body(body)
                 .when()
                 .patch("/admin/reservations/{reservationId}/status", reservationId)
@@ -62,7 +60,7 @@ public class ReservationStepDefs {
     @Then("예약은 취소 상태다")
     public void 예약은취소상태다() {
         ExtractableResponse<Response> reservationsResponse = given()
-                .cookie("AUTH_TOKEN", adminToken)
+                .cookie("AUTH_TOKEN", CommonContext.adminToken)
                 .when()
                 .get("/admin/reservations")
                 .then().statusCode(200)
@@ -77,9 +75,8 @@ public class ReservationStepDefs {
     public void 관리자가예약을체크인상태로변경을요청한다() {
 
         Map<String, Object> body = Map.of("status", "CHECKED_IN");
-        given().log().all()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + adminToken)
+        given().spec(CommonContext.requestSpec)
+                .header("Authorization", "Bearer " + CommonContext.adminToken)
                 .body(body)
                 .when()
                 .patch("/admin/reservations/{reservationId}/status", reservationId)
@@ -91,7 +88,7 @@ public class ReservationStepDefs {
     @Then("예약은 체크인 상태다")
     public void 예약은체크인상태다() {
         ExtractableResponse<Response> reservationsResponse = given()
-                .cookie("AUTH_TOKEN", adminToken)
+                .cookie("AUTH_TOKEN", CommonContext.adminToken)
                 .when()
                 .get("/admin/reservations")
                 .then().statusCode(200)
