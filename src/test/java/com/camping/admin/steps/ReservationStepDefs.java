@@ -32,14 +32,6 @@ public class ReservationStepDefs {
                 .then().statusCode(200);
     }
 
-    @When("관리자가 예약을 취소했다")
-    public void 관리자가예약을취소했다() {
-        String url = String.format("/admin/reservations/%d/status", reservationId);
-        Map<String, Object> body = Map.of("status", "CANCELLED");
-
-        ApiHelper.request(HttpMethod.PATCH, url, body);
-    }
-
     @Then("예약은 취소 상태다")
     public void 예약은취소상태다() {
         String url = "/admin/reservations";
@@ -66,9 +58,9 @@ public class ReservationStepDefs {
         assertThat(status).isEqualTo("CHECKED_IN");
     }
 
-    @When("관리자가 예약을 체크인 상태로 변경한다")
-    public void 관리자가예약을체크인상태로변경한다() {
-        Map<String, Object> body = Map.of("status", "CHECKED_IN");
+    @When("관리자가 예약을 {string} 상태로 변경한다")
+    public void 관리자가예약을상태로변경한다(String statusValue) {
+        Map<String, Object> body = Map.of("status", statusValue);
         String url = String.format("/admin/reservations/%d/status", reservationId);
 
         CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, body);
