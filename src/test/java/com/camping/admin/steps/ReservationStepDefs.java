@@ -23,12 +23,12 @@ public class ReservationStepDefs {
 
     @Given("관리자가 로그인했다")
     public void 관리자가로그인했다() {
-        CommonContext.adminToken = given().spec(CommonContext.requestSpec)
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when().post("/auth/login")
+        String url = "/auth/login";
+        Map<String, String> body = Map.of("username", "admin", "password", "admin123");
+
+        CommonContext.adminToken = ApiHelper.request(HttpMethod.POST, url, body)
                 .then().log().all()
-                .extract()
-                .cookie("AUTH_TOKEN");
+                .extract().cookie("AUTH_TOKEN");
     }
 
     @Given("사용자가 예약을 했다")
