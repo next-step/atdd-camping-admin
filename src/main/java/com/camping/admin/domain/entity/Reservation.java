@@ -60,7 +60,18 @@ public class Reservation {
         this.campsite = campsite;
     }
 
-    public void changeStatus(ReservationStatus status) {
-        this.status = status;
+    public void checkIn() {
+        this.status = this.status.checkIn(this);
+    }
+
+    public void checkOut() {
+        this.status = this.status.checkOut(this);
+    }
+
+    public void changeStatus(ReservationStatus newStatus) {
+        if (this.status != null) {
+            this.status.validateTransition(newStatus);
+        }
+        this.status = newStatus;
     }
 }
