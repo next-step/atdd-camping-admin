@@ -32,8 +32,8 @@ public class ReservationStepDefs {
                 .then().statusCode(200);
     }
 
-    @Then("예약은 취소 상태다")
-    public void 예약은취소상태다() {
+    @Then("예약은 {string} 상태다")
+    public void 예약은상태다(String statusValue) {
         String url = "/admin/reservations";
 
         ExtractableResponse<Response> reservationsResponse = ApiHelper.request(HttpMethod.GET, url, null)
@@ -42,20 +42,7 @@ public class ReservationStepDefs {
 
         String status = reservationsResponse.jsonPath().getString(String.format("find {it.id == %d}.status", reservationId));
         assertNotNull(status, "취소 예약 대상을 조회하지 못했습니다.");
-        assertThat(status).isEqualTo("CANCELLED");
-    }
-
-    @Then("예약은 체크인 상태다")
-    public void 예약은체크인상태다() {
-        String url = "/admin/reservations";
-
-        ExtractableResponse<Response> reservationsResponse = ApiHelper.request(HttpMethod.GET, url, null)
-                .then().statusCode(200)
-                .extract();
-
-        String status = reservationsResponse.jsonPath().getString(String.format("find {it.id == %d}.status", reservationId));
-        assertNotNull(status, "취소 예약 대상을 조회하지 못했습니다.");
-        assertThat(status).isEqualTo("CHECKED_IN");
+        assertThat(status).isEqualTo(statusValue);
     }
 
     @When("관리자가 예약을 {string} 상태로 변경한다")
