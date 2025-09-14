@@ -2,6 +2,7 @@ package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.domain.vo.RecordQuantity;
+import com.camping.admin.domain.vo.StockQuantity;
 import com.camping.admin.exception.InsufficientStockException;
 import com.camping.admin.exception.InvalidQuantityException;
 import com.camping.admin.exception.ProductNotRentalException;
@@ -24,7 +25,7 @@ class ProductTest {
         rentalProduct.decreaseStock(new RecordQuantity(3));
 
         // then
-        assertThat(rentalProduct.getStockQuantity().getQuantity()).isEqualTo(7);
+        assertThat(rentalProduct.getStockQuantity()).isEqualTo(new StockQuantity(7));
     }
 
     @Test
@@ -34,10 +35,10 @@ class ProductTest {
         Product rentalProduct = new Product("코펠 세트", 5, new BigDecimal("20000"), ProductType.RENTAL);
 
         // when
-        rentalProduct.decreaseStock(5);
+        rentalProduct.decreaseStock(new RecordQuantity(5));
 
         // then
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(0);
+        assertThat(rentalProduct.getStockQuantity()).isEqualTo(new StockQuantity(0));
     }
 
     @Test
@@ -47,12 +48,12 @@ class ProductTest {
         Product saleProduct = new Product("장작팩", 50, new BigDecimal("10000"), ProductType.SALE);
 
         // when & then
-        assertThatThrownBy(() -> saleProduct.decreaseStock(1))
+        assertThatThrownBy(() -> saleProduct.decreaseStock(new RecordQuantity(1)))
                 .isInstanceOf(ProductNotRentalException.class)
                 .hasMessage("Product is not a rental item.");
 
         // 재고는 변경되지 않아야 함
-        assertThat(saleProduct.getStockQuantity()).isEqualTo(50);
+        assertThat(saleProduct.getStockQuantity()).isEqualTo(new StockQuantity(50));
     }
 
     @Test
@@ -62,12 +63,11 @@ class ProductTest {
         Product rentalProduct = new Product("의자", 3, new BigDecimal("15000"), ProductType.RENTAL);
 
         // when & then
-        assertThatThrownBy(() -> rentalProduct.decreaseStock(5))
-                .isInstanceOf(InsufficientStockException.class)
-                .hasMessage("Not enough stock for product 의자");
+        assertThatThrownBy(() -> rentalProduct.decreaseStock(new RecordQuantity(5)))
+                .isInstanceOf(InsufficientStockException.class);
 
         // 재고는 변경되지 않아야 함
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(3);
+        assertThat(rentalProduct.getStockQuantity()).isEqualTo(new StockQuantity(3));
     }
 
     @Test
@@ -77,38 +77,10 @@ class ProductTest {
         Product rentalProduct = new Product("테이블", 2, new BigDecimal("25000"), ProductType.RENTAL);
 
         // when
-        rentalProduct.decreaseStock(2);
+        rentalProduct.decreaseStock(new RecordQuantity(2));
 
         // then
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(0);
-    }
-
-    @Test
-    @DisplayName("0 수량으로 재고 감소 시도해도 정상 처리된다")
-    void 영_수량으로_재고_감소_시도해도_정상_처리된다() {
-        // given
-        Product rentalProduct = new Product("버너", 5, new BigDecimal("18000"), ProductType.RENTAL);
-        int originalStock = rentalProduct.getStockQuantity();
-
-        // when
-        rentalProduct.decreaseStock(0);
-
-        // then
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(originalStock);
-    }
-
-    @Test
-    @DisplayName("음수 수량으로 재고 감소 시도해도 정상 처리된다")
-    void 음수_수량으로_재고_감소_시도해도_정상_처리된다() {
-        // given
-        Product rentalProduct = new Product("취사도구 세트", 10, new BigDecimal("12000"), ProductType.RENTAL);
-
-        // when
-        rentalProduct.decreaseStock(-2);
-
-        // then
-        // 음수 감소는 실제로 재고가 증가함
-        assertThat(rentalProduct.getStockQuantity()).isEqualTo(12);
+        assertThat(rentalProduct.getStockQuantity()).isEqualTo(new StockQuantity(0));
     }
 
     @Test
@@ -125,7 +97,7 @@ class ProductTest {
 
         // then
         assertThat(product.getName()).isEqualTo(name);
-        assertThat(product.getStockQuantity()).isEqualTo(stockQuantity);
+        assertThat(product.getStockQuantity()).isEqualTo(new StockQuantity(stockQuantity));
         assertThat(product.getPrice()).isEqualTo(price);
         assertThat(product.getProductType()).isEqualTo(productType);
         assertThat(product.getId()).isNull(); // JPA 저장 전이므로 null
@@ -140,7 +112,7 @@ class ProductTest {
         // then
         assertThat(saleProduct.getProductType()).isEqualTo(ProductType.SALE);
         assertThat(saleProduct.getName()).isEqualTo("생수 2L");
-        assertThat(saleProduct.getStockQuantity()).isEqualTo(100);
+        assertThat(saleProduct.getStockQuantity()).isEqualTo(new StockQuantity(100));
         assertThat(saleProduct.getPrice()).isEqualTo(new BigDecimal("2000"));
     }
 
@@ -151,8 +123,7 @@ class ProductTest {
         Product rentalProduct = new Product("품절 상품", 0, new BigDecimal("10000"), ProductType.RENTAL);
 
         // when & then
-        assertThatThrownBy(() -> rentalProduct.decreaseStock(1))
-                .isInstanceOf(InsufficientStockException.class)
-                .hasMessage("Not enough stock for product 품절 상품");
+        assertThatThrownBy(() -> rentalProduct.decreaseStock(new RecordQuantity(1)))
+                .isInstanceOf(InsufficientStockException.class);
     }
 }

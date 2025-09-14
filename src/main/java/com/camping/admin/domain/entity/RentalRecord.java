@@ -50,7 +50,7 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
         this.isReturned = false;
         this.createdAt = LocalDateTime.now();
 
-        registerEvent(new ProductStockDecreasedEvent(product.getId(), this.quantity));
+        registerEvent(new ProductStockDecreasedEvent(product.getId(), this.quantity.getQuantity()));
     }
 
     public void returnProduct() {
@@ -59,7 +59,7 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
         }
         this.isReturned = true;
 
-        registerEvent(new ProductStockIncreasedEvent(product.getId(), this.quantity));
+        registerEvent(new ProductStockIncreasedEvent(product.getId(), this.quantity.getQuantity()));
     }
 
     public Collection<Object> getDomainEvents() {

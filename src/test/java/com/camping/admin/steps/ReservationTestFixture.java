@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.helper.HttpMethod;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;

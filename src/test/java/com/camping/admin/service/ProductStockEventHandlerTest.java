@@ -26,14 +26,14 @@ class ProductStockEventHandlerTest {
     void 재고_감소_이벤트_처리_시_ProductService의_decreaseStock이_호출된다() {
         // given
         Long productId = 1L;
-        RecordQuantity quantity = new RecordQuantity(2);
+        Integer quantity = 2;
         ProductStockDecreasedEvent event = new ProductStockDecreasedEvent(productId, quantity);
 
         // when
         productStockEventHandler.handleProductStockDecreased(event);
 
         // then
-        then(productService).should().decreaseStock(productId, quantity);
+        then(productService).should().decreaseStock(productId, new RecordQuantity(quantity));
     }
 
     @Test
@@ -41,14 +41,14 @@ class ProductStockEventHandlerTest {
     void 재고_증가_이벤트_처리_시_ProductService의_increaseStock이_호출된다() {
         // given
         Long productId = 2L;
-        RecordQuantity quantity = new RecordQuantity(1);
+        Integer quantity = 1;
         ProductStockIncreasedEvent event = new ProductStockIncreasedEvent(productId, quantity);
 
         // when
         productStockEventHandler.handleProductStockIncreased(event);
 
         // then
-        then(productService).should().increaseStock(productId, quantity);
+        then(productService).should().increaseStock(productId, new RecordQuantity(quantity));
     }
 
     @Test
@@ -56,14 +56,14 @@ class ProductStockEventHandlerTest {
     void 최소_수량의_재고_감소_이벤트도_정상_처리된다() {
         // given
         Long productId = 3L;
-        RecordQuantity quantity = new RecordQuantity(1);
+        Integer quantity = 1;
         ProductStockDecreasedEvent event = new ProductStockDecreasedEvent(productId, quantity);
 
         // when
         productStockEventHandler.handleProductStockDecreased(event);
 
         // then
-        then(productService).should().decreaseStock(productId, quantity);
+        then(productService).should().decreaseStock(productId, new RecordQuantity(quantity));
     }
 
     @Test
@@ -71,13 +71,13 @@ class ProductStockEventHandlerTest {
     void 대량_수량의_재고_증가_이벤트도_정상_처리된다() {
         // given
         Long productId = 4L;
-        RecordQuantity quantity = new RecordQuantity(100);
+        Integer quantity = 100;
         ProductStockIncreasedEvent event = new ProductStockIncreasedEvent(productId, quantity);
 
         // when
         productStockEventHandler.handleProductStockIncreased(event);
 
         // then
-        then(productService).should().increaseStock(productId, quantity);
+        then(productService).should().increaseStock(productId, new RecordQuantity(quantity));
     }
 }

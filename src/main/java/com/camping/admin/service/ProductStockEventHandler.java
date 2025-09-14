@@ -2,6 +2,7 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.event.ProductStockDecreasedEvent;
 import com.camping.admin.domain.event.ProductStockIncreasedEvent;
+import com.camping.admin.domain.vo.RecordQuantity;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
@@ -19,9 +20,9 @@ public class ProductStockEventHandler {
     @Transactional
     public void handleProductStockDecreased(ProductStockDecreasedEvent event) {
         log.info("Processing ProductStockDecreasedEvent: productId={}, quantity={}",
-                event.getProductId(), event.getQuantity().getQuantity());
+                event.getProductId(), event.getQuantity());
 
-        productService.decreaseStock(event.getProductId(), event.getQuantity());
+        productService.decreaseStock(event.getProductId(), new RecordQuantity(event.getQuantity()));
 
         log.info("Successfully decreased stock for product {}", event.getProductId());
     }
@@ -30,9 +31,9 @@ public class ProductStockEventHandler {
     @Transactional
     public void handleProductStockIncreased(ProductStockIncreasedEvent event) {
         log.info("Processing ProductStockIncreasedEvent: productId={}, quantity={}",
-                event.getProductId(), event.getQuantity().getQuantity());
+                event.getProductId(), event.getQuantity());
 
-        productService.increaseStock(event.getProductId(), event.getQuantity());
+        productService.increaseStock(event.getProductId(), new RecordQuantity(event.getQuantity()));
 
         log.info("Successfully increased stock for product {}", event.getProductId());
     }

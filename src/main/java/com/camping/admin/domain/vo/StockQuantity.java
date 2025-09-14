@@ -6,6 +6,8 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Embeddable
 @Getter
 @NoArgsConstructor
@@ -13,6 +15,11 @@ public class StockQuantity {
     private int quantity;
 
     public StockQuantity(int quantity) {
+        validateStockQuantity(quantity);
+        this.quantity = quantity;
+    }
+
+    public StockQuantity(Integer quantity) {
         validateStockQuantity(quantity);
         this.quantity = quantity;
     }
@@ -62,5 +69,17 @@ public class StockQuantity {
 
     public boolean isLessThan(StockQuantity other) {
         return this.quantity < other.quantity;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        StockQuantity that = (StockQuantity) o;
+        return quantity == that.quantity;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(quantity);
     }
 }

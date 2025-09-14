@@ -2,6 +2,7 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.domain.vo.StockQuantity;
 import com.camping.admin.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -120,10 +121,10 @@ public class ProductAdminController {
             if (body.containsKey("stockQuantity")) {
                 Object v = body.get("stockQuantity");
                 if (v instanceof Number) {
-                    product.setStockQuantity(((Number) v).intValue());
+                    product.setStockQuantity(new StockQuantity(((Number) v).intValue()));
                 } else if (v != null) {
                     try {
-                        product.setStockQuantity(Integer.valueOf(v.toString()));
+                        product.setStockQuantity(new StockQuantity(Integer.valueOf(v.toString())));
                     } catch (Exception ignore) {
                     }
                 }

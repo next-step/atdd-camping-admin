@@ -2,6 +2,7 @@ package com.camping.admin.web;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.domain.vo.StockQuantity;
 import com.camping.admin.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -83,7 +84,7 @@ public class ConsoleProductController {
         }
         if (params.containsKey("stockQuantity")) {
             try {
-                product.setStockQuantity(Integer.valueOf(params.get("stockQuantity")));
+                product.setStockQuantity(new StockQuantity(Integer.valueOf(params.get("stockQuantity"))));
             } catch (Exception ignore) {}
         }
         if (params.containsKey("price")) {

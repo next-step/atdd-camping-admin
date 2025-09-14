@@ -5,6 +5,8 @@ import jakarta.persistence.Embeddable;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.Objects;
+
 @Embeddable
 @Getter
 @NoArgsConstructor
@@ -36,5 +38,17 @@ public class RecordQuantity {
 
     public RecordQuantity subtract(RecordQuantity other) {
         return new RecordQuantity(this.quantity - other.quantity);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        RecordQuantity that = (RecordQuantity) o;
+        return quantity == that.quantity;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(quantity);
     }
 }
