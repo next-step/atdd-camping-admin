@@ -3,9 +3,13 @@ package com.camping.admin.dto;
 import com.camping.admin.domain.entity.Reservation;
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ReservationResponse {
     private Long id;
     private String customerName;
