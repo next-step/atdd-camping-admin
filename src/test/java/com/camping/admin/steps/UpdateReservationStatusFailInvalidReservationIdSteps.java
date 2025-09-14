@@ -2,6 +2,7 @@ package com.camping.admin.steps;
 
 import com.camping.admin.CommonContext;
 import com.camping.admin.client.ReservationClient;
+import com.camping.admin.domain.enums.ReservationStatus;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -16,7 +17,7 @@ public class UpdateReservationStatusFailInvalidReservationIdSteps {
 
         CommonContext.lastResponse = reservationClient.updateStatusRaw(
             CommonContext.invalidReservationId,
-            "CANCELED"
+            ReservationStatus.CANCELLED
         );
     }
 

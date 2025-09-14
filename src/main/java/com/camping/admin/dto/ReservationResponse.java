@@ -3,6 +3,7 @@ package com.camping.admin.dto;
 import com.camping.admin.domain.entity.Reservation;
 import java.time.LocalDate;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +21,7 @@ public class ReservationResponse {
 
     @JsonIgnore
     public boolean isReservable() {
-        return "CANCELED".equals(this.status);
+        return ReservationStatus.isCancelled(this.status);
     }
 
     public static ReservationResponse from(Reservation reservation) {
@@ -32,7 +33,7 @@ public class ReservationResponse {
         this.customerName = reservation.getCustomerName();
         this.startDate = reservation.getStartDate();
         this.endDate = reservation.getEndDate();
-        this.status = reservation.getStatus();
+        this.status = reservation.getStatus().name();
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
     }

@@ -1,6 +1,7 @@
 package com.camping.admin.client;
 
 import com.camping.admin.CommonContext;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
 import io.restassured.response.ExtractableResponse;
@@ -23,7 +24,7 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ReservationResponse updateStatus(Long reservationId, String status) {
+    public ReservationResponse updateStatus(Long reservationId, ReservationStatus status) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
@@ -34,7 +35,7 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ExtractableResponse<Response> updateStatusRaw(Long reservationId, String status) {
+    public ExtractableResponse<Response> updateStatusRaw(Long reservationId, ReservationStatus status) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()

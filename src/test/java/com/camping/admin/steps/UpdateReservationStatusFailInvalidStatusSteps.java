@@ -2,6 +2,7 @@ package com.camping.admin.steps;
 
 import com.camping.admin.CommonContext;
 import com.camping.admin.client.ReservationClient;
+import com.camping.admin.domain.enums.ReservationStatus;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
@@ -9,11 +10,11 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 public class UpdateReservationStatusFailInvalidStatusSteps {
     private final ReservationClient reservationClient = new ReservationClient();
-    String invalidStatus;
+    ReservationStatus invalidStatus;
 
     @When("관리자가 잘못된 상태값을 사용해서 상태값을 변경한다")
     public void 관리자가잘못된상태값을사용해서상태값을변경한다() {
-        invalidStatus = "INVALID_STATUS";
+        invalidStatus = ReservationStatus.NONE;
 
         CommonContext.lastResponse = reservationClient.updateStatusRaw(
             CommonContext.reservationId,
