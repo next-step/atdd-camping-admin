@@ -3,6 +3,7 @@ package com.camping.admin.dto;
 import com.camping.admin.domain.entity.Reservation;
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,6 +18,7 @@ public class ReservationResponse {
     private String campsiteSiteNumber;
     private LocalDate reservationDate;
 
+    @JsonIgnore
     public boolean isReservable() {
         return "CANCELED".equals(this.status);
     }

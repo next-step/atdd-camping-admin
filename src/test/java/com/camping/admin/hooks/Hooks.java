@@ -15,7 +15,7 @@ public class Hooks {
         }
     }
 
-    @Before(value = "@관리자가_로그인을_한다", order = 1)
+    @Before(order = 1)
     public void adminLogin() {
         if (CommonContext.accessToken == null) {
             CommonContext.accessToken = authClient.login("admin", "admin123");
