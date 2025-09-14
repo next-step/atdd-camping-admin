@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -20,16 +19,6 @@ import java.util.Map;
 public class ReservationStepDefs {
 
     private Long reservationId;
-
-    @Given("관리자가 로그인했다")
-    public void 관리자가로그인했다() {
-        String url = "/auth/login";
-        Map<String, String> body = Map.of("username", "admin", "password", "admin123");
-
-        CommonContext.adminToken = ApiHelper.request(HttpMethod.POST, url, body)
-                .then().log().all()
-                .extract().cookie("AUTH_TOKEN");
-    }
 
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {

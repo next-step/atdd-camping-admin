@@ -1,8 +1,5 @@
 Feature: 관리자 예약 관리 기능
 
-  Background:
-    Given 관리자가 로그인했다
-
   Scenario: 사용자가 예약한 건을 관리자가 취소할 수 있다.
     Given 사용자가 예약을 했다
     When 관리자가 예약을 취소했다
