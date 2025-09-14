@@ -19,3 +19,18 @@ Feature: 예약 관리
     Given 예약 상태가 "CONFIRMED" 인 예약이 있다.
     When 관리자가 예약 상태를 동일 상태로 변경한다.
     Then 예약 상태가 유지된다.
+
+  Scenario: 관리자가 잘못된 예약 상태로 변경하려고 하면 실패한다.
+    Given 예약 상태가 "CONFIRMED" 인 예약이 있다.
+    When 관리자가 잘못된 예약 상태로 변경한다.
+    Then 예약 상태 변경이 실패한다.
+
+  Scenario: 예약을 PENDING에서 CONFIRMED로 변경할 수 있다.
+    Given 예약 상태가 "PENDING" 인 예약이 있다.
+    When 관리자가 예약 상태를 "CONFIRMED" 로 변경한다.
+    Then 예약 상태가 "CONFIRMED" 로 변경된다.
+
+  Scenario: 예약을 CONFIRMED에서 CANCELLED로 변경할 수 있다.
+    Given 예약 상태가 "CONFIRMED" 인 예약이 있다.
+    When 관리자가 예약 상태를 "CANCELLED" 로 변경한다.
+    Then 예약 상태가 "CANCELLED" 로 변경된다.

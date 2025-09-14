@@ -80,4 +80,11 @@ public class ReservationSteps {
         assertThat(statusCode).isEqualTo(200);
         assertThat(reservationListResponse.jsonPath().getList(".")).isNotEmpty();
     }
+
+    @When("관리자가 잘못된 예약 상태로 변경한다.")
+    public void 관리자가잘못된예약상태로변경한다() {
+        Map<String, String> body = Map.of("status", "INVALID_STATUS");
+        ExtractableResponse<Response> response = 예약_상태_변경(reservationId, body);
+        statusCode = response.statusCode();
+    }
 }
