@@ -35,3 +35,41 @@ Feature: 대여 관리
     Then 대여에 실패한다.
     And 대여 기록이 생성되지 않는다.
       | productId | 2 |
+
+  Scenario: 워크인 고객도 대여 기록을 작성할 수 있다.
+    When 관리자는 워크인 고객의 대여 기록을 작성한다.
+      | productId | 1 |
+      | quantity  | 1 |
+    Then 대여 기록이 생성된다.
+    And 예약 정보가 없는 대여 기록이 생성된다.
+
+  Scenario: 이미 반납된 대여 기록을 다시 반납하려고 하면 실패한다.
+    Given 이미 반납된 대여 기록이 존재한다.
+    When 관리자가 이미 반납된 대여 기록을 반납 처리한다.
+    Then 대여 반납이 실패한다.
+
+  Scenario: 존재하지 않는 대여 기록을 반납하려고 하면 실패한다.
+    Given 존재하지 않는 대여 기록이 있다.
+    When 관리자가 존재하지 않는 대여 기록을 반납 처리한다.
+    Then 대여 반납이 실패한다.
+
+  Scenario: 음수 수량으로 대여 기록을 작성하려고 하면 실패한다.
+    When 관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.
+      | reservationId | 1 |
+      | productId     | 1 |
+      | quantity      | -1 |
+    Then 대여에 실패한다.
+
+  Scenario: 0 수량으로 대여 기록을 작성하려고 하면 실패한다.
+    When 관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.
+      | reservationId | 1 |
+      | productId     | 1 |
+      | quantity      | 0 |
+    Then 대여에 실패한다.
+
+  Scenario: 존재하지 않는 예약으로 대여 기록을 작성하려고 하면 실패한다.
+    When 관리자는 특정 상품의 수량 만큼 대여 기록을 작성한다.
+      | reservationId | 999 |
+      | productId     | 1 |
+      | quantity      | 1 |
+    Then 대여에 실패한다.

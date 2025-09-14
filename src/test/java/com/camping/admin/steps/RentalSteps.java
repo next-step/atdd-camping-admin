@@ -122,4 +122,68 @@ public class RentalSteps {
         Map<String, Object> rental = 특정_대여_기록_조회(rentalId);
         assertThat(rental.get("isReturned")).isEqualTo(true);
     }
+
+    @When("관리자는 워크인 고객의 대여 기록을 작성한다.")
+    public void 관리자는워크인고객의대여기록을작성한다(DataTable dataTable) {
+        Map<String, String> data = dataTable.asMap(String.class, String.class);
+        Map<String, Object> walkinRentalData = Map.of(
+                "productId", Integer.parseInt(data.get("productId")),
+                "quantity", Integer.parseInt(data.get("quantity"))
+                // reservationId는 의도적으로 제외 (null)
+        );
+        ExtractableResponse<Response> response = 대여_기록_작성_요청(walkinRentalData);
+        if (response.statusCode() == 201) {
+            rentalId = response.jsonPath().getLong("id");
+        }
+        statusCode = response.statusCode();
+    }
+
+    @And("예약 정보가 없는 대여 기록이 생성된다.")
+    public void 예약정보가없는대여기록이생성된다() {
+        Map<String, Object> rental = 특정_대여_기록_조회(rentalId);
+        assertThat(rental.get("reservationId")).isNull();
+    }
+
+    @Given("이미 반납된 대여 기록이 존재한다.")
+    public void 이미반납된대여기록이존재한다() {
+        // 대여 기록 생성
+        Map<String, Integer> rentalData = Map.of(
+                "reservationId", 1,
+                "productId", 1,
+                "quantity", 1
+        );
+        ExtractableResponse<Response> response = 대여_기록_작성_요청(rentalData);
+        assertThat(response.statusCode()).isEqualTo(201);
+        rentalId = response.jsonPath().getLong("id");
+
+        // 반납 처리
+        ExtractableResponse<Response> returnResponse = 대여_반납_처리(rentalId);
+        assertThat(returnResponse.statusCode()).isEqualTo(200);
+
+        // 반납 확인
+        Map<String, Object> rental = 특정_대여_기록_조회(rentalId);
+        assertThat(rental.get("isReturned")).isEqualTo(true);
+    }
+
+    @When("관리자가 이미 반납된 대여 기록을 반납 처리한다.")
+    public void 관리자가이미반납된대여기록을반납처리한다() {
+        ExtractableResponse<Response> response = 대여_반납_처리(rentalId);
+        statusCode = response.statusCode();
+    }
+
+    @Then("대여 반납이 실패한다.")
+    public void 대여반납이실패한다() {
+        assertThat(statusCode).isEqualTo(400);
+    }
+
+    @Given("존재하지 않는 대여 기록이 있다.")
+    public void 존재하지않는대여기록이있다() {
+        rentalId = 999L; // 존재하지 않는 ID
+    }
+
+    @When("관리자가 존재하지 않는 대여 기록을 반납 처리한다.")
+    public void 관리자가존재하지않는대여기록을반납처리한다() {
+        ExtractableResponse<Response> response = 대여_반납_처리(rentalId);
+        statusCode = response.statusCode();
+    }
 }
