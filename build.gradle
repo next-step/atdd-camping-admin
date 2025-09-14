@@ -65,3 +65,50 @@ tasks.named('test') {
 test {
     systemProperty "cucumber.junit-platform.naming-strategy", "long"
 }
+
+task isolatedCucumberTest(type: Test) {
+    description = '완전 격리된 Cucumber 테스트 (각 시나리오마다 새로운 JVM으로 실행)'
+    group = 'verification'
+
+    useJUnitPlatform()
+
+    // 완전한 격리를 위해 각 테스트마다 새 JVM으로 실행
+    forkEvery = 1
+
+    // JVM 시스템 프로퍼티 설정
+    systemProperty "cucumber.junit-platform.naming-strategy", "long"
+    systemProperty "spring.profiles.active", "test"
+    systemProperty "spring.jpa.hibernate.ddl-auto", "create-drop"
+    systemProperty "spring.sql.init.mode", "always"
+
+    // Cucumber 테스트만 실행
+    include '**/CucumberTestRunner.class'
+
+    // 병렬 실행 비활성화
+    maxParallelForks = 1
+
+    doFirst {
+        println "격리된 Cucumber 테스트 시작 - 각 시나리오마다 새로운 JVM으로 실행"
+        println "data.sql이 각 시나리오마다 자동으로 재실행됩니다"
+    }
+
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        showStackTraces = true
+        exceptionFormat = "full"
+    }
+}
+
+task unitTest(type: Test) {
+    description = '단위 테스트만 실행 (Cucumber 제외)'
+    group = 'verification'
+    
+    useJUnitPlatform()
+    exclude '**/CucumberTestRunner.class'
+    exclude '**/steps/**'
+    
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}

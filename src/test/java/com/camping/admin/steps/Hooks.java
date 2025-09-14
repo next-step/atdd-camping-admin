@@ -1,6 +1,7 @@
 package com.camping.admin.steps;
 
-import io.cucumber.java.BeforeStep;
+import io.cucumber.java.Before;
+import io.cucumber.java.BeforeAll;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
@@ -12,8 +13,13 @@ import java.util.Map;
 public class Hooks {
     private static final Logger log = LoggerFactory.getLogger(Hooks.class);
 
-    @BeforeStep
-    public void initAccessToken() {
+    @Before
+    public void beforeScenario() {
+        StepContext.setSpec();
+    }
+
+    @BeforeAll
+    public static void initAccessToken() {
         log.info("로그인 시도중...");
         Map<String, String> params = Map.of("username", "admin", "password", "admin123");
 
