@@ -55,4 +55,8 @@ public class Product {
             throw new InsufficientStockException("Not enough stock for product " + this.name);
         }
     }
+
+    public void increaseStock(Integer quantity) {
+        this.stockQuantity += quantity;
+    }
 }

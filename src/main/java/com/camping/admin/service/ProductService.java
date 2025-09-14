@@ -1,10 +1,7 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.exception.InsufficientStockException;
 import com.camping.admin.exception.ProductNotFoundException;
-import com.camping.admin.exception.ProductNotRentalException;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,7 +23,7 @@ public class ProductService {
     @Transactional
     public void increaseStock(Long productId, Integer quantity) {
         Product product = findById(productId);
-        product.setStockQuantity(product.getStockQuantity() + quantity);
+        product.increaseStock(quantity);
     }
 
     private Product findById(Long productId) {
