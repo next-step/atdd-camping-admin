@@ -2,6 +2,7 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.event.ProductStockDecreasedEvent;
 import com.camping.admin.domain.event.ProductStockIncreasedEvent;
+import com.camping.admin.domain.vo.RecordQuantity;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,7 @@ class ProductStockEventHandlerTest {
     void 재고_감소_이벤트_처리_시_ProductService의_decreaseStock이_호출된다() {
         // given
         Long productId = 1L;
-        Integer quantity = 2;
+        RecordQuantity quantity = new RecordQuantity(2);
         ProductStockDecreasedEvent event = new ProductStockDecreasedEvent(productId, quantity);
 
         // when
@@ -40,7 +41,7 @@ class ProductStockEventHandlerTest {
     void 재고_증가_이벤트_처리_시_ProductService의_increaseStock이_호출된다() {
         // given
         Long productId = 2L;
-        Integer quantity = 1;
+        RecordQuantity quantity = new RecordQuantity(1);
         ProductStockIncreasedEvent event = new ProductStockIncreasedEvent(productId, quantity);
 
         // when
@@ -51,11 +52,11 @@ class ProductStockEventHandlerTest {
     }
 
     @Test
-    @DisplayName("0 수량의 재고 감소 이벤트도 정상 처리된다")
-    void 영_수량의_재고_감소_이벤트도_정상_처리된다() {
+    @DisplayName("최소 수량(1)의 재고 감소 이벤트도 정상 처리된다")
+    void 최소_수량의_재고_감소_이벤트도_정상_처리된다() {
         // given
         Long productId = 3L;
-        Integer quantity = 0;
+        RecordQuantity quantity = new RecordQuantity(1);
         ProductStockDecreasedEvent event = new ProductStockDecreasedEvent(productId, quantity);
 
         // when
@@ -70,7 +71,7 @@ class ProductStockEventHandlerTest {
     void 대량_수량의_재고_증가_이벤트도_정상_처리된다() {
         // given
         Long productId = 4L;
-        Integer quantity = 100;
+        RecordQuantity quantity = new RecordQuantity(100);
         ProductStockIncreasedEvent event = new ProductStockIncreasedEvent(productId, quantity);
 
         // when

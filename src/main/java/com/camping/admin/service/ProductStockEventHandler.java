@@ -19,7 +19,7 @@ public class ProductStockEventHandler {
     @Transactional
     public void handleProductStockDecreased(ProductStockDecreasedEvent event) {
         log.info("Processing ProductStockDecreasedEvent: productId={}, quantity={}",
-                event.getProductId(), event.getQuantity());
+                event.getProductId(), event.getQuantity().getQuantity());
 
         productService.decreaseStock(event.getProductId(), event.getQuantity());
 
@@ -30,7 +30,7 @@ public class ProductStockEventHandler {
     @Transactional
     public void handleProductStockIncreased(ProductStockIncreasedEvent event) {
         log.info("Processing ProductStockIncreasedEvent: productId={}, quantity={}",
-                event.getProductId(), event.getQuantity());
+                event.getProductId(), event.getQuantity().getQuantity());
 
         productService.increaseStock(event.getProductId(), event.getQuantity());
 

@@ -33,7 +33,7 @@ class RentalRecordTest {
 
         ProductStockDecreasedEvent event = (ProductStockDecreasedEvent) rentalRecord.getDomainEvents().iterator().next();
         assertThat(event.getProductId()).isEqualTo(1L);
-        assertThat(event.getQuantity()).isEqualTo(2);
+        assertThat(event.getQuantity().getQuantity()).isEqualTo(2);
         assertThat(event.getOccurredOn()).isNotNull();
     }
 
@@ -58,7 +58,7 @@ class RentalRecordTest {
 
         ProductStockIncreasedEvent event = (ProductStockIncreasedEvent) rentalRecord.getDomainEvents().iterator().next();
         assertThat(event.getProductId()).isEqualTo(2L);
-        assertThat(event.getQuantity()).isEqualTo(1);
+        assertThat(event.getQuantity().getQuantity()).isEqualTo(1);
         assertThat(event.getOccurredOn()).isNotNull();
     }
 
@@ -96,7 +96,7 @@ class RentalRecordTest {
 
         ProductStockDecreasedEvent event = (ProductStockDecreasedEvent) walkinRental.getDomainEvents().iterator().next();
         assertThat(event.getProductId()).isEqualTo(3L);
-        assertThat(event.getQuantity()).isEqualTo(1);
+        assertThat(event.getQuantity().getQuantity()).isEqualTo(1);
     }
 
     @Test
@@ -119,14 +119,14 @@ class RentalRecordTest {
                 .isInstanceOf(ProductStockDecreasedEvent.class);
         ProductStockDecreasedEvent decreaseEvent = (ProductStockDecreasedEvent) rentalRecord.getDomainEventsList().get(0);
         assertThat(decreaseEvent.getProductId()).isEqualTo(4L);
-        assertThat(decreaseEvent.getQuantity()).isEqualTo(2);
+        assertThat(decreaseEvent.getQuantity().getQuantity()).isEqualTo(2);
 
         // 두 번째: 재고 증가 이벤트 (반납 시)
         assertThat(rentalRecord.getDomainEventsList().get(1))
                 .isInstanceOf(ProductStockIncreasedEvent.class);
         ProductStockIncreasedEvent increaseEvent = (ProductStockIncreasedEvent) rentalRecord.getDomainEventsList().get(1);
         assertThat(increaseEvent.getProductId()).isEqualTo(4L);
-        assertThat(increaseEvent.getQuantity()).isEqualTo(2);
+        assertThat(increaseEvent.getQuantity().getQuantity()).isEqualTo(2);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.domain.vo.RecordQuantity;
 import com.camping.admin.exception.ProductNotFoundException;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,15 +16,15 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
+    public void decreaseStock(Long productId, RecordQuantity quantity) {
         Product product = findById(productId);
-        product.decreaseStock(quantity);
+        product.decreaseStock(quantity.getQuantity());
     }
 
     @Transactional
-    public void increaseStock(Long productId, Integer quantity) {
+    public void increaseStock(Long productId, RecordQuantity quantity) {
         Product product = findById(productId);
-        product.increaseStock(quantity);
+        product.increaseStock(quantity.getQuantity());
     }
 
     private Product findById(Long productId) {

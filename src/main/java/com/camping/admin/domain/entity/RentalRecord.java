@@ -8,7 +8,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.jpa.domain.AbstractAggregateRoot;
+import org.springframework.data.domain.AbstractAggregateRoot;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,7 +50,7 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
         this.isReturned = false;
         this.createdAt = LocalDateTime.now();
 
-        registerEvent(new ProductStockDecreasedEvent(product.getId(), quantity));
+        registerEvent(new ProductStockDecreasedEvent(product.getId(), this.quantity));
     }
 
     public void returnProduct() {
@@ -59,7 +59,7 @@ public class RentalRecord extends AbstractAggregateRoot<RentalRecord> {
         }
         this.isReturned = true;
 
-        registerEvent(new ProductStockIncreasedEvent(product.getId(), quantity.getQuantity()));
+        registerEvent(new ProductStockIncreasedEvent(product.getId(), this.quantity));
     }
 
     public Collection<Object> getDomainEvents() {
