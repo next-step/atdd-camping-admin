@@ -37,4 +37,58 @@ public class ReservationTestFixture {
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다."));
     }
+
+    // 체크인/체크아웃 관련 헬퍼 메서드들
+    public static ExtractableResponse<Response> 예약_체크인_처리(long reservationId) {
+        return createExtractableResponseWithAuthorization(HttpMethod.PATCH, "/admin/reservations/" + reservationId + "/check-in");
+    }
+
+    public static ExtractableResponse<Response> 예약_체크아웃_처리(long reservationId) {
+        return createExtractableResponseWithAuthorization(HttpMethod.PATCH, "/admin/reservations/" + reservationId + "/check-out");
+    }
+
+    public static Map<String, Object> 오늘_체크인_날짜인_예약_조회() {
+        // 현재 날짜에 체크인 가능한 CONFIRMED 상태 예약 조회
+        return 예약_목록_조회().jsonPath()
+                .<Map<String, Object>>getList("$").stream()
+                .filter(r -> "CONFIRMED".equals(r.get("status")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("체크인 가능한 예약을 찾을 수 없습니다."));
+    }
+
+    public static Map<String, Object> 체크인_날짜가_아직_되지_않은_예약_조회() {
+        // 체크인 날짜가 아직 되지 않은 CONFIRMED 상태 예약 조회
+        return 예약_목록_조회().jsonPath()
+                .<Map<String, Object>>getList("$").stream()
+                .filter(r -> "CONFIRMED".equals(r.get("status")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("체크인 날짜가 되지 않은 예약을 찾을 수 없습니다."));
+    }
+
+    public static Map<String, Object> 이미_체크인된_예약_조회() {
+        // 이미 체크인된 예약 조회
+        return 예약_목록_조회().jsonPath()
+                .<Map<String, Object>>getList("$").stream()
+                .filter(r -> "CHECKED_IN".equals(r.get("status")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("체크인된 예약을 찾을 수 없습니다."));
+    }
+
+    public static Map<String, Object> 체크인된_예약_조회() {
+        // 체크인된 상태의 예약 조회 (체크아웃 가능)
+        return 예약_목록_조회().jsonPath()
+                .<Map<String, Object>>getList("$").stream()
+                .filter(r -> "CHECKED_IN".equals(r.get("status")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("체크인된 예약을 찾을 수 없습니다."));
+    }
+
+    public static Map<String, Object> 체크인하지_않은_예약_조회() {
+        // 체크인하지 않은 CONFIRMED 상태 예약 조회
+        return 예약_목록_조회().jsonPath()
+                .<Map<String, Object>>getList("$").stream()
+                .filter(r -> "CONFIRMED".equals(r.get("status")))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("체크인하지 않은 예약을 찾을 수 없습니다."));
+    }
 }
