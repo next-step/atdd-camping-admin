@@ -48,15 +48,11 @@ public class ReservationClient {
     public ReservationResponse getReservation(Long reservationId) {
         ExtractableResponse<Response> ex = given()
             .spec(CommonContext.requestSpec)
-            .when().get("admin/reservations")
+            .when().get("admin/reservations/" + reservationId)
             .then().statusCode(200)
             .extract();
 
-        List<ReservationResponse> list = ex.body().jsonPath().getList("", ReservationResponse.class);
-        return list.stream()
-            .filter(r -> r.getId().equals(reservationId))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("예약이 존재하지 않습니다."));
+        return ex.body().as(ReservationResponse.class);
     }
 
     public List<ReservationResponse> getReservations() {

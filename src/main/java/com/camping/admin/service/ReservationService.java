@@ -21,6 +21,11 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    public Reservation get(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+    }
+
     public List<Reservation> getAll() {
         return reservationRepository.findAll(); // [Note] 여기서만 간편히 .findAll()을 사용해서 구현
     }
