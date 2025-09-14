@@ -38,7 +38,7 @@ public class ReservationSteps {
 
     @When("관리자가 예약 상태를 동일 상태로 변경한다.")
     public void 관리자가예약상태를동일상태로변경한다() {
-        reservationId = 12;
+        // 이미 Given에서 설정된 reservationId 사용
         reservationStatus = "CONFIRMED";
         Map<String, String> body = Map.of("status", reservationStatus);
         ExtractableResponse<Response> response = 예약_상태_변경(reservationId, body);
