@@ -1,30 +1,17 @@
 package com.camping.admin.steps.hooks;
 
-import static io.restassured.RestAssured.given;
-
+import com.camping.admin.config.RequestSpecFactory;
+import com.camping.admin.context.CommonContext;
+import com.camping.admin.helper.TestApiHelper;
 import io.cucumber.java.Before;
-import io.restassured.specification.RequestSpecification;
-import java.util.Map;
 
 public class Hooks {
-    public static RequestSpecification authenticatedRequest;
 
     @Before
     public void setUp() {
-        String adminToken = given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when()
-                .post("/auth/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .cookie("AUTH_TOKEN");
-
-        authenticatedRequest = given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType("application/json")
-                .accept("application/json");
+        CommonContext.setRequestSpec(RequestSpecFactory.create());
+        String adminToken = TestApiHelper.authenticateAndGetToken();
+        CommonContext.setAdminToken(adminToken);
+        TestApiHelper.cleanupDatabase(adminToken);
     }
-
 }
