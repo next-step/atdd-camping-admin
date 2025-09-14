@@ -32,4 +32,16 @@ public class ReservationAdminController {
         ReservationResponse response = reservationService.updateReservationStatus(reservationId, request);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @PatchMapping("/{reservationId}/check-in")
+    public ResponseEntity<ReservationResponse> checkIn(@PathVariable Long reservationId) {
+        ReservationResponse response = reservationService.checkIn(reservationId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PatchMapping("/{reservationId}/check-out")
+    public ResponseEntity<ReservationResponse> checkOut(@PathVariable Long reservationId) {
+        ReservationResponse response = reservationService.checkOut(reservationId);
+        return ResponseEntity.ok(response);
+    }
 }
