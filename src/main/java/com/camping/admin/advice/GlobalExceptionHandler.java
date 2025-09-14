@@ -1,26 +1,42 @@
 package com.camping.admin.advice;
 
 import com.camping.admin.exception.DuplicateSiteNumberException;
-import java.util.HashMap;
-import java.util.Map;
+import com.camping.admin.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    public static final String INVALID_INPUT = "잘못된 입력값입니다";
+
     @ExceptionHandler(DuplicateSiteNumberException.class)
-    public ResponseEntity<Map<String, String>> handleDuplicateSiteNumber(DuplicateSiteNumberException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.CONFLICT);
+    public ResponseEntity<ErrorResponse> handleDuplicateSiteNumber(DuplicateSiteNumberException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(e.getMessage()));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<Map<String, String>> handleIllegalArgument(IllegalArgumentException e) {
-        Map<String, String> response = new HashMap<>();
-        response.put("message", e.getMessage());
-        return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException e) {
+        FieldError fieldError = e.getBindingResult().getFieldError();
+        String message = fieldError != null
+                ? String.format("%s: %s", fieldError.getField(), fieldError.getDefaultMessage())
+                : INVALID_INPUT;
+
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(message));
     }
 }
