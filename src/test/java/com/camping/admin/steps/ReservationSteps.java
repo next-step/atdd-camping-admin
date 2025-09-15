@@ -144,7 +144,7 @@ public class ReservationSteps {
 
     @Given("체크인된 예약이 있다.")
     public void 체크인된예약이있다() {
-        Map<String, Object> reservation = 체크인된_예약_조회();
+        Map<String, Object> reservation = 이미_체크인된_예약_조회();
         reservationId = (int) reservation.get("id");
     }
 

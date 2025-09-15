@@ -1,10 +1,12 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.helper.HttpMethod;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 import static com.camping.admin.helper.ApiHelper.createExtractableResponseWithAuthorization;
@@ -48,10 +50,16 @@ public class ReservationTestFixture {
     }
 
     public static Map<String, Object> 오늘_체크인_날짜인_예약_조회() {
+        // 오늘 날짜를 "yyyy-MM-dd" 형식의 문자열로 준비
+        String todayString = LocalDate.now().format(DateTimeFormatter.ISO_LOCAL_DATE); // "2025-09-15"
+
         // 현재 날짜에 체크인 가능한 CONFIRMED 상태 예약 조회
-        return 예약_목록_조회().jsonPath()
+        JsonPath jsonPath = 예약_목록_조회().jsonPath();
+        return jsonPath
                 .<Map<String, Object>>getList("$").stream()
                 .filter(r -> "CONFIRMED".equals(r.get("status")))
+                // startDate(String)를 오늘 날짜(String)와 비교
+                .filter(r -> r.get("startDate").equals(todayString))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("체크인 가능한 예약을 찾을 수 없습니다."));
     }
@@ -61,22 +69,25 @@ public class ReservationTestFixture {
         return 예약_목록_조회().jsonPath()
                 .<Map<String, Object>>getList("$").stream()
                 .filter(r -> "CONFIRMED".equals(r.get("status")))
-                .findFirst()
+                .filter(r -> {
+                    Object startDateObj = r.get("startDate");
+                    LocalDate startDate;
+                    if (startDateObj instanceof LocalDate) {
+                        startDate = (LocalDate) startDateObj;
+                    } else if (startDateObj instanceof String) {
+                        startDate = LocalDate.parse((String) startDateObj);
+                    } else {
+                        return false;
+                    }
+                    return startDate.isAfter(LocalDate.now());
+                }).findFirst()
                 .orElseThrow(() -> new AssertionError("체크인 날짜가 되지 않은 예약을 찾을 수 없습니다."));
     }
 
     public static Map<String, Object> 이미_체크인된_예약_조회() {
         // 이미 체크인된 예약 조회
-        return 예약_목록_조회().jsonPath()
-                .<Map<String, Object>>getList("$").stream()
-                .filter(r -> "CHECKED_IN".equals(r.get("status")))
-                .findFirst()
-                .orElseThrow(() -> new AssertionError("체크인된 예약을 찾을 수 없습니다."));
-    }
-
-    public static Map<String, Object> 체크인된_예약_조회() {
-        // 체크인된 상태의 예약 조회 (체크아웃 가능)
-        return 예약_목록_조회().jsonPath()
+        JsonPath jsonPath = 예약_목록_조회().jsonPath();
+        return jsonPath
                 .<Map<String, Object>>getList("$").stream()
                 .filter(r -> "CHECKED_IN".equals(r.get("status")))
                 .findFirst()
