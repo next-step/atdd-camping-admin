@@ -45,6 +45,13 @@ public class ReservationService {
         return reservationRepository.save(reservation);
     }
 
+    public Reservation updateConfirmCode(Long reservationId, String confirmCode) {
+        Reservation reservation = reservationRepository.findById(reservationId)
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+        reservation.setConfirmationCode(confirmCode);
+        return reservationRepository.save(reservation);
+    }
+
     public Reservation get(Long reservationId) {
         return reservationRepository.findById(reservationId)
             .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));

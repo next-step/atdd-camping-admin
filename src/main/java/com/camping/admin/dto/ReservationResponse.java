@@ -18,6 +18,7 @@ public class ReservationResponse {
     private String status;
     private String campsiteSiteNumber;
     private LocalDate reservationDate;
+    private String confirmationCode;
 
     @JsonIgnore
     public boolean isReservable() {
@@ -36,5 +37,6 @@ public class ReservationResponse {
         this.status = reservation.getStatus().name();
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
+        this.confirmationCode = reservation.getConfirmationCode();
     }
 }

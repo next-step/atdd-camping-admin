@@ -5,6 +5,7 @@ import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
+import com.camping.admin.dto.UpdateReservationConfirmCodeRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.service.ReservationService;
@@ -20,7 +21,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ReservationAdminController {
 
-    private final ReservationRepository reservationRepository;
     private final CampsiteRepository campsiteRepository;
     private final ReservationService reservationService;
 
@@ -61,6 +61,15 @@ public class ReservationAdminController {
         request.validate();
 
         Reservation reservation = reservationService.update(reservationId, request.getStatus());
+        return ResponseEntity.ok(ReservationResponse.from(reservation));
+    }
+
+    @PatchMapping("/{reservationId}/confirmCode")
+    public ResponseEntity<ReservationResponse> updateReservationConfirmCode(
+        @PathVariable Long reservationId,
+        @RequestBody UpdateReservationConfirmCodeRequest request) {
+        request.validate();
+        Reservation reservation = reservationService.updateConfirmCode(reservationId, request.getConfirmCode());
         return ResponseEntity.ok(ReservationResponse.from(reservation));
     }
 }
