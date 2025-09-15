@@ -59,6 +59,13 @@ public class CampsiteSteps {
                 .body("message", notNullValue());
     }
 
+    @Then("캠프사이트가 성공적으로 생성된다")
+    public void assertSuccessfulCreation() {
+        commonContext.getResponse().then()
+                .statusCode(201)
+                .body(notNullValue());
+    }
+
     @Then("캠프사이트 정보가 성공적으로 수정된다")
     public void assertSuccessfulUpdate() {
         commonContext.getResponse().then().statusCode(200);
