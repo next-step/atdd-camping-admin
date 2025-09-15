@@ -5,6 +5,7 @@ import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
+import com.camping.admin.dto.UpdateReservationConfirmCodeRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -41,6 +42,27 @@ public class ReservationClient {
             .when().log().all()
             .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
+            .then().log().all()
+            .extract();
+    }
+
+    public ReservationResponse updateConfirmCode(Long reservationId, String confirmCode) {
+        return given().log().all()
+            .spec(CommonContext.requestSpec)
+            .when().log().all()
+            .body(new UpdateReservationConfirmCodeRequest(confirmCode))
+            .patch("admin/reservations/" + reservationId + "/confirmCode")
+            .then().log().all()
+            .statusCode(200)
+            .extract().body().as(ReservationResponse.class);
+    }
+
+    public ExtractableResponse<Response> updateConfirmCodeRaw(Long reservationId, String confirmCode) {
+        return given().log().all()
+            .spec(CommonContext.requestSpec)
+            .when().log().all()
+            .body(new UpdateReservationConfirmCodeRequest(confirmCode))
+            .patch("admin/reservations/" + reservationId + "/confirmCode")
             .then().log().all()
             .extract();
     }
