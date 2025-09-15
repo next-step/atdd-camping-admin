@@ -39,8 +39,7 @@ public class CampsiteService {
 
     @Transactional
     public CampsiteResponse updateCampsite(Long campsiteId, CampsiteUpdateRequest request) {
-        Campsite campsite = campsiteRepository.findById(campsiteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
+        Campsite campsite = getById(campsiteId);
 
         if (campsite.isNotSameSiteNumber(request.getSiteNumber())) {
             checkSiteExists(request.getSiteNumber());
@@ -57,11 +56,24 @@ public class CampsiteService {
                 .toList();
     }
 
-    public CampsiteResponse getById(Long campsiteId) {
-        Campsite campsite = campsiteRepository.findById(campsiteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
+    public void deleteCampsite(Long campsiteId) {
+        Campsite campsite = getById(campsiteId);
+
+        campsite.checkReservation();
+
+        campsiteRepository.delete(campsite);
+    }
+
+    public CampsiteResponse getCampsiteResponse(Long campsiteId) {
+        Campsite campsite = getById(campsiteId);
 
         return CampsiteResponse.from(campsite);
     }
+
+    private Campsite getById(Long campsiteId) {
+        return campsiteRepository.findById(campsiteId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
+    }
+
 
 }

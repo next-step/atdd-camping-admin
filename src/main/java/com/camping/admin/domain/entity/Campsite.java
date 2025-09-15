@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.exception.HasReservationException;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,5 +54,11 @@ public class Campsite {
 
     public boolean isNotSameSiteNumber(String siteNumber) {
         return !isSameSiteNumber(siteNumber);
+    }
+
+    public void checkReservation() {
+        if (!reservations.isEmpty()) {
+            throw new HasReservationException("예약이 있는 캠프사이트는 삭제할 수 없습니다.");
+        }
     }
 }
