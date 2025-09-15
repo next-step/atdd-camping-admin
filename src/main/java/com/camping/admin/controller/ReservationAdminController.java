@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
@@ -60,6 +61,9 @@ public class ReservationAdminController {
             if (statusValue.isBlank()) {
                 // 빈 문자열이면 기존 값 유지
             } else {
+                if (reservation.isCanceled() && statusValue.equals(ReservationStatus.CHECKED_IN.name())) {
+                    return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
+                }
                 // 단순히 그대로 대입
                 reservation.setStatus(statusValue);
             }
