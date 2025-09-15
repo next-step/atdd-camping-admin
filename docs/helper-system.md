@@ -206,6 +206,98 @@ public static ExtractableResponse<Response> 예약_상태_변경(long reservatio
 
 ---
 
+## 🧹 DatabaseCleaner - 데이터베이스 초기화
+
+### 목적
+
+각 Cucumber 시나리오 완료 후 **자동으로 데이터베이스를 초기화**하여 테스트 간 격리를 보장합니다.
+
+### 위치 및 구조
+
+```
+src/test/java/com/camping/admin/helper/DatabaseCleaner.java  # 실제 DB 정리 로직
+src/main/java/com/camping/admin/controller/DatabaseAdminController.java  # HTTP API 엔드포인트
+src/test/java/com/camping/admin/steps/Hooks.java  # @After Hook에서 API 호출
+```
+
+### 동작 메커니즘
+
+1. **@After Hook 실행**: 각 Cucumber 시나리오 완료 후 자동 실행
+2. **HTTP API 호출**: `/admin/database/reset` 엔드포인트로 POST 요청
+3. **JWT 인증**: 관리자 토큰을 사용하여 안전한 초기화
+4. **완전한 초기화**: 모든 테이블 TRUNCATE + data.sql 재실행
+
+### Hooks.java 구현
+
+```java
+@After
+public void afterScenario() {
+    try {
+        log.info("🧹 시나리오 완료 - HTTP API를 통해 데이터베이스 초기화 시작");
+
+        ExtractableResponse<Response> response = RestAssured.given()
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer " + StepContext.getAccessToken())
+                .body("{}")
+                .when()
+                .post("http://localhost:8081/admin/database/reset")
+                .then()
+                .extract();
+
+        if (response.statusCode() == 200) {
+            log.info("✅ 데이터베이스 초기화 완료 - 다음 시나리오 준비됨");
+        } else {
+            log.warn("⚠️ 데이터베이스 초기화 실패 - 상태코드: {}", response.statusCode());
+        }
+    } catch (Exception e) {
+        log.error("❌ 데이터베이스 초기화 중 오류 발생: {}", e.getMessage());
+    }
+}
+```
+
+### DatabaseCleaner Bean
+
+```java
+@Component
+public class DatabaseCleaner {
+    @Autowired private JdbcTemplate jdbcTemplate;
+    @Autowired private DataSource dataSource;
+
+    public void clean() {
+        // 1. 외래키 제약 조건 비활성화
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY FALSE");
+
+        // 2. 모든 테이블 TRUNCATE + ID 시퀀스 리셋
+        List<String> tableNames = jdbcTemplate.queryForList(
+            "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'PUBLIC'",
+            String.class
+        );
+
+        for (String tableName : tableNames) {
+            jdbcTemplate.execute("TRUNCATE TABLE " + tableName);
+            jdbcTemplate.execute("ALTER TABLE " + tableName + " ALTER COLUMN ID RESTART WITH 1");
+        }
+
+        // 3. 외래키 제약 조건 재활성화
+        jdbcTemplate.execute("SET REFERENTIAL_INTEGRITY TRUE");
+
+        // 4. data.sql 재실행으로 초기 데이터 복원
+        try (Connection connection = dataSource.getConnection()) {
+            ScriptUtils.executeSqlScript(connection, new ClassPathResource("data.sql"));
+        }
+    }
+}
+```
+
+### 장점
+
+- **자동화**: 개발자가 수동으로 DB를 초기화할 필요 없음
+- **안전성**: JWT 인증을 통한 보안 확보
+- **효율성**: 애플리케이션 재시작 없이 빠른 초기화
+- **격리성**: 각 시나리오가 완전히 독립적으로 실행
+
+---
+
 ## 🔍 고급 활용법
 
 ### 1. 커스텀 검증이 필요한 경우

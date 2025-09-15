@@ -4,8 +4,23 @@
 
 우리 프로젝트는 **Acceptance Test Driven Development** 방식을 따릅니다.
 
-### 📋 전체 프로세스 개요
+> **참고**: 이 문서는 기본 ATDD 프로세스를 설명합니다. 상황별 상세 가이드는 다음을 참고하세요:
+> - 🆕 **새로운 API 개발**: [신규 API ATDD 가이드](./new-api-atdd-guide.md)
+> - 🔄 **레거시 코드 개선**: [레거시 ATDD 가이드](./legacy-atdd-guide.md)
 
+### 📋 프로세스 종류별 개요
+
+#### 🆕 신규 API 개발
+```
+1️⃣ PRD 작성 → 2️⃣ Gherkin 시나리오 → 3️⃣ Mock Controller → 4️⃣ HTTP 파일 → 5️⃣ Cucumber → 6️⃣ TDD 구현 → 7️⃣ API 스펙 최신화
+```
+
+#### 🔄 레거시 API 개선
+```
+1️⃣ HTTP 파일 작성 → 2️⃣ API 스펙 명시 → 3️⃣ Gherkin 시나리오 → 4️⃣ Cucumber → 5️⃣ 내부 리팩토링 + TDD
+```
+
+#### 📚 기본 ATDD 프로세스 (이 문서에서 설명)
 ```
 1️⃣ HTTP 파일 작성 → 2️⃣ Gherkin 시나리오 → 3️⃣ Cucumber Steps → 4️⃣ TestFixture → 5️⃣ 커밋
 ```
