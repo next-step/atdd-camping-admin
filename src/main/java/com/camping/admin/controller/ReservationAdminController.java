@@ -1,17 +1,28 @@
 package com.camping.admin.controller;
 
+import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.dto.ReservationCreateRequest;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/admin/reservations")
@@ -19,6 +30,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReservationAdminController {
 
     private final ReservationRepository reservationRepository;
+    private final CampsiteRepository campsiteRepository;
 
     @GetMapping
     public ResponseEntity<List<ReservationResponse>> getAllReservations() {
@@ -40,6 +52,27 @@ public class ReservationAdminController {
         }
         return ResponseEntity.ok(result);
     }
+
+
+    @PostMapping
+    @Transactional
+    public ResponseEntity<Long> createReservation(@RequestBody @Valid ReservationCreateRequest request) {
+        Campsite campsite = campsiteRepository.findById(request.getCampsiteId())
+                .orElseThrow(() -> new EntityNotFoundException("해당 ID의 캠프사이트가 존재하지 않습니다: " + request.getCampsiteId()));
+
+        Reservation reservation = new Reservation(
+                request.getCustomerName(),
+                request.getCheckInDate(),
+                request.getCheckOutDate(),
+                campsite
+        );
+
+        reservation.setPhoneNumber(request.getCustomerPhone());
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+        return new ResponseEntity<>(savedReservation.getId(), HttpStatus.CREATED);
+    }
+
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(

@@ -2,6 +2,7 @@ package com.camping.admin.advice;
 
 import com.camping.admin.exception.DuplicateSiteNumberException;
 import com.camping.admin.exception.ErrorResponse;
+import com.camping.admin.exception.HasReservationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -16,6 +17,13 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DuplicateSiteNumberException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateSiteNumber(DuplicateSiteNumberException e) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(e.getMessage()));
+    }
+
+    @ExceptionHandler(HasReservationException.class)
+    public ResponseEntity<ErrorResponse> hasReservationException(HasReservationException e) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of(e.getMessage()));
