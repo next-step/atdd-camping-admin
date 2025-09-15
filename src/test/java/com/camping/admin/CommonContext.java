@@ -1,6 +1,5 @@
 package com.camping.admin;
 
-import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 
@@ -10,5 +9,5 @@ public class CommonContext {
     public static String accessToken;
     public static Long reservationId;
     public static Long invalidReservationId;
-    public static ExtractableResponse<Response> lastResponse;
+    public static Response lastResponse;
 }

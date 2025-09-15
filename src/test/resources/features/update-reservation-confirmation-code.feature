@@ -11,7 +11,7 @@ Feature: 관리자가 예약 확인코드를 변경한다
   Scenario Outline: 관리자가 잘못된 확인코드로 변경하면 실패한다
     Given 사용자가 예약을 했다
     When 관리자가 잘못된 확인코드 <code> 로 변경한다
-    Then 예약 확인코드를 변경하면 실패한다
+    Then 예약 확인코드를 변경하면 실패한다2
 
     Examples:
       | code      |

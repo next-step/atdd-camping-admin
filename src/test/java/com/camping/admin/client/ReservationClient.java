@@ -36,14 +36,14 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ExtractableResponse<Response> updateStatusRaw(Long reservationId, ReservationStatus status) {
+    public Response updateStatusRaw(Long reservationId, ReservationStatus status) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
             .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
             .then().log().all()
-            .extract();
+            .extract().response();
     }
 
     public ReservationResponse updateConfirmCode(Long reservationId, String confirmCode) {
@@ -57,14 +57,14 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ExtractableResponse<Response> updateConfirmCodeRaw(Long reservationId, String confirmCode) {
+    public Response updateConfirmCodeRaw(Long reservationId, String confirmCode) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
             .body(new UpdateReservationConfirmCodeRequest(confirmCode))
             .patch("admin/reservations/" + reservationId + "/confirmCode")
             .then().log().all()
-            .extract();
+            .extract().response();
     }
 
     public ReservationResponse getReservation(Long reservationId) {
