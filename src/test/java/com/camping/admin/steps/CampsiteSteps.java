@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
@@ -36,6 +35,15 @@ public class CampsiteSteps {
         );
     }
 
+    @When("{string} 사이트를 {string} 사이트 번호로 변경 요청한다")
+    public void requestCampsiteSiteNumberUpdate(String oldSiteNumber, String newSiteNumber) {
+        Long campsiteId = TestApiHelper.findCampsiteIdBySiteNumber(oldSiteNumber);
+
+        commonContext.setResponse(
+                TestApiHelper.sendCampsiteUpdateRequest(campsiteId, newSiteNumber, "수정된 설명", 4)
+        );
+    }
+
     @Then("캠프사이트가 성공적으로 생성된다")
     public void assertSuccessfulCreation() {
         commonContext.getResponse().then()
@@ -43,19 +51,16 @@ public class CampsiteSteps {
                 .body(notNullValue());
     }
 
-    @Then("캠프사이트 생성에 실패하고 오류 메시지를 받는다")
-    public void assertFailedCreation() {
+    @Then("요청이 실패하고 오류 메시지를 받는다")
+    public void assertFailedRequest() {
         commonContext.getResponse().then()
                 .statusCode(greaterThanOrEqualTo(400))
                 .statusCode(lessThan(500))
                 .body("message", notNullValue());
     }
 
-    @And("생성된 캠프사이트의 상세 정보는 사이트 번호 {string}, 설명 {string}, 최대 인원 {int}명이다")
-    public void assertCampsiteDetails(String siteNumber, String description, int maxPeople) {
-        commonContext.getResponse().then()
-                .body("siteNumber", equalTo(siteNumber))
-                .body("description", equalTo(description))
-                .body("maxPeople", equalTo(maxPeople));
+    @Then("캠프사이트 정보가 성공적으로 수정된다")
+    public void assertSuccessfulUpdate() {
+        commonContext.getResponse().then().statusCode(200);
     }
 }
