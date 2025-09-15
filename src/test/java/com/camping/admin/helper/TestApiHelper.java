@@ -39,8 +39,8 @@ public class TestApiHelper {
         return campsite;
     }
 
-    public static Response sendCampsiteCreationRequest(String siteNumber, String description, int maxPeople) {
-        Map<String, Object> campsiteDetails = createCampsiteData(siteNumber, description, maxPeople);
+    public static Response sendCampsiteCreationRequest(String siteNumber) {
+        Map<String, Object> campsiteDetails = createCampsiteData(siteNumber, "default description", 4);
         return given()
             .spec(getRequestSpec())
             .header("Authorization", "Bearer " + CommonContext.getAdminToken())
