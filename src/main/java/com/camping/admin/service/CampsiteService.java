@@ -1,10 +1,9 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Campsite;
-import com.camping.admin.domain.enums.CampsiteStatus;
 import com.camping.admin.dto.CampsiteCreateRequest;
 import com.camping.admin.dto.CampsiteResponse;
-import com.camping.admin.dto.UpdateCampsiteRequest;
+import com.camping.admin.dto.CampsiteUpdateRequest;
 import com.camping.admin.exception.DuplicateSiteNumberException;
 import com.camping.admin.repository.CampsiteRepository;
 import java.util.List;
@@ -39,23 +38,17 @@ public class CampsiteService {
     }
 
     @Transactional
-    public Campsite updateCampsite(Long campsiteId, String siteNumber, String description, Integer maxPeople) {
+    public CampsiteResponse updateCampsite(Long campsiteId, CampsiteUpdateRequest request) {
         Campsite campsite = campsiteRepository.findById(campsiteId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
 
-        if (siteNumber != null) {
-            campsite.setSiteNumber(siteNumber);
+        if (campsite.isNotSameSiteNumber(request.getSiteNumber())) {
+            checkSiteExists(request.getSiteNumber());
         }
 
-        if (description != null) {
-            campsite.setDescription(description);
-        }
+        campsite.updateSite(request.getSiteNumber(), request.getDescription(), request.getMaxPeople());
 
-        if (maxPeople != null) {
-            campsite.setMaxPeople(maxPeople);
-        }
-
-        return campsite;
+        return CampsiteResponse.from(campsite);
     }
 
     public List<CampsiteResponse> findAll() {
