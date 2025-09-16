@@ -99,4 +99,28 @@ public class ReservationSteps {
                 .extract().response();
         testContext.setResponse(response);
     }
+
+    @When("관리자가 {string} 상태인 예약 목록을 조회 한다.")
+    public void getReservationsByStatus(String status) {
+        var response = RestAssured.given()
+            .contentType("application/json")
+            .header("Authorization", "Bearer " + testContext.getAdminToken())
+            .queryParam("status", status)
+            .when().get("/admin/reservations")
+            .then().log().all()
+            .extract().response();
+
+        testContext.setResponse(response);
+    }
+
+    @Then("예약 상태가 {string} 인 예약만 조회 된다.")
+    public void checkReservationsByStatus(String expectedStatus) {
+        var response = testContext.getResponse();
+        var reservations = response.jsonPath().getList("$");
+
+        for (int i = 0; i < reservations.size(); i++) {
+            String actualStatus = response.jsonPath().getString("[" + i + "].status");
+            assertThat(actualStatus).isEqualTo(expectedStatus);
+        }
+    }
 }

@@ -28,7 +28,6 @@ public class TestDataController {
             executeSqlStatements(sql);
             return ResponseEntity.ok(Map.of("message", "데이터 초기화 완료"));
         } catch (Exception e) {
-            e.printStackTrace(); // 디버깅용 로그
             return ResponseEntity.internalServerError()
                     .body(Map.of("error", "데이터 초기화 실패: " + e.getMessage()));
         }

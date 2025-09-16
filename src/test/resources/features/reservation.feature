@@ -3,13 +3,13 @@ Feature: 관리자의 예약 기능
   Background:
     Given 사용자가 예약을 한다.
 
-  Scenario Outline: 관리자가 예약 상태를 <target> 으로 변경한다.
-    When 관리자가 예약을 '<target>' 한다.
+  Scenario Outline: 관리자가 예약 상태를 <status> 으로 변경한다.
+    When 관리자가 예약을 '<status>' 한다.
     Then 예약 상태 변경이 성공 된다.
-    And 예약이 '<target>' 된다.
+    And 예약이 '<status>' 된다.
 
-  Examples:
-    | target     |
+    Examples:
+    | status     |
     | CANCELLED  |
     | CHECKED_IN |
 
@@ -39,3 +39,13 @@ Feature: 관리자의 예약 기능
     When 관리자가 예약 목록을 조회 한다.
     Then 예약 목록 조회가 성공 된다.
     And 예약 목록이 0개 조회 된다.
+
+  Scenario Outline: 관리자는 <status> 예약 상태의 예약 목록을 조회할 수 있다.
+    When 관리자가 '<status>' 상태인 예약 목록을 조회 한다.
+    Then 예약 목록 조회가 성공 된다.
+    And 예약 상태가 '<status>' 인 예약만 조회 된다.
+
+    Examples:
+      | status    |
+      | CONFIRMED |
+      | CANCELLED |

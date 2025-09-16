@@ -15,8 +15,13 @@ import java.util.List;
 public class ReservationService {
     private final ReservationRepository reservationRepository;
 
-    public List<ReservationResponse> readAll() {
-        List<Reservation> reservations = reservationRepository.findAll();
+    public List<ReservationResponse> readAll(ReservationStatus status) {
+        List<Reservation> reservations;
+        if (status == null) {
+            reservations = reservationRepository.findAll();
+        } else {
+            reservations = reservationRepository.findAllByStatus(status);
+        }
 
         if (reservations.isEmpty()) {
             return new ArrayList<>();
