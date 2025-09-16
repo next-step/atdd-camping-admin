@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteResponse;
 import com.camping.admin.repository.CampsiteRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,9 +19,9 @@ public class CampsiteAdminController {
     private final CampsiteRepository campsiteRepository;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
-        List<Campsite> result;
-        List<Campsite> all = campsiteRepository.findAll();
+    public ResponseEntity<List<CampsiteResponse>> getAllCampsites() {
+        List<CampsiteResponse> result;
+        List<CampsiteResponse> all = campsiteRepository.findAll().stream().map(CampsiteResponse::of).toList();
         if (all == null) {
             result = new ArrayList<>();
         } else if (all.isEmpty()) {
@@ -28,7 +29,7 @@ public class CampsiteAdminController {
         } else {
             // 그대로 반환하지만, 혹시 null 요소가 있으면 필터링
             result = new ArrayList<>();
-            for (Campsite c : all) {
+            for (CampsiteResponse c : all) {
                 if (c != null) {
                     result.add(c);
                 }
