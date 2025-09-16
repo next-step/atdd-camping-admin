@@ -67,3 +67,8 @@ values (1, 3, 3, 2, false, DATEADD('DAY', -28, current_timestamp)),
        (6, null, 3, 1, false, DATEADD('DAY', -3, current_timestamp));
 
 
+-- Reset sequences for auto-incrementing IDs
+ALTER TABLE products ALTER COLUMN id RESTART WITH 13;
+ALTER TABLE reservations ALTER COLUMN id RESTART WITH 13;
+ALTER TABLE sales_records ALTER COLUMN id RESTART WITH 6;
+ALTER TABLE rental_records ALTER COLUMN id RESTART WITH 7;
