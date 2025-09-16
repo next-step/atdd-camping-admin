@@ -1,27 +1,29 @@
-# 🔄 Gradle 기반 데이터 격리 가이드
+# 🔄 테스트 데이터 격리 가이드
 
 ## 📋 개요
 
-SpringBootTest를 사용하지 않으면서도 각 Cucumber 시나리오마다 완전한 데이터 격리를 보장하는 Gradle 기반 솔루션입니다.
+SpringBootTest를 사용하지 않으면서도 각 Cucumber 시나리오마다 완전한 데이터 격리를 보장하는 **HTTP API 기반** 솔루션입니다.
 
-## 🎯 핵심 개념
+## 🎯 현재 구현된 격리 메커니즘
 
-### data.sql 자동 재실행 메커니즘
-```yml
-# application.yml
-spring:
-  jpa:
-    hibernate:
-      ddl-auto: create-drop  # 각 시나리오마다 스키마 재생성
-  sql:
-    init:
-      mode: always          # data.sql 항상 실행
-```
+### 🔄 HTTP API 기반 자동 초기화 (현재 방식)
 
-### TestSets 플러그인을 통한 완전 격리
-- 각 시나리오마다 **새로운 JVM** 실행
-- 각 시나리오마다 **새로운 Spring 컨텍스트** 생성
-- data.sql **자동 재실행** 보장
+- **@After Hook 자동화**: 각 시나리오 완료 후 HTTP API로 DB 초기화
+- **애플리케이션 1회 시작**: 테스트 중 애플리케이션을 재시작하지 않아 빠름
+- **완전한 데이터 격리**: 각 시나리오가 독립적으로 실행됨
+
+### 핵심 구현 요소
+
+1. **Hooks.java** - @After에서 HTTP API 호출
+2. **DatabaseAdminController** - `/admin/database/reset` 엔드포인트 제공
+3. **DatabaseCleaner Bean** - 실제 DB 초기화 로직
+
+### ⚡ 성능 비교
+
+| 방식 | 애플리케이션 시작 | 격리 수준 | 테스트 속도 | 상태 |
+|-----|----------------|-----------|------------|------|
+| HTTP API 기반 | 1회 | 완전 격리 | 빠름 ⚡ | **현재 방식** |
+| JVM 격리 방식 | 시나리오마다 | 완전 격리 | 느림 | 레거시 |
 
 ## 🚀 사용법
 
@@ -37,46 +39,95 @@ spring:
 ./gradlew cucumberTest
 ```
 
-## 📊 동작 원리
+## 📊 HTTP API 기반 동작 원리
 
-### 1️⃣ 시나리오 시작 전
+### 1️⃣ 테스트 시작 시 (1회만)
 ```
-🔄 새로운 JVM 시작
-🗄️ Spring 애플리케이션 컨텍스트 생성
-🏗️ H2 메모리 DB 스키마 생성 (create-drop)
+🚀 Spring Boot 애플리케이션 시작 (1회)
+🗄️ H2 메모리 DB 스키마 생성 (create-drop)
 📋 data.sql 실행 (초기 데이터 로드)
+🔑 JWT 토큰 생성 및 컨텍스트에 저장
 ```
 
-### 2️⃣ 시나리오 실행 중
+### 2️⃣ 각 시나리오 실행 중
 ```
 🧪 순수 RestAssured로 HTTP API 호출
 📝 데이터 변경 (대여 기록 생성, 예약 추가 등)
 ✅ 테스트 검증
 ```
 
-### 3️⃣ 시나리오 완료 후
+### 3️⃣ 각 시나리오 완료 후 (@After Hook)
 ```
-🧹 JVM 종료 (모든 메모리 데이터 자동 소멸)
-♻️ 다음 시나리오를 위한 새로운 JVM 시작
+🧹 HTTP POST /admin/database/reset 호출
+🔑 JWT 토큰으로 인증
+🗑️ 모든 테이블 TRUNCATE
+🔢 ID 시퀀스 1로 리셋
+📋 data.sql 재실행으로 초기 데이터 복원
+✅ 다음 시나리오 준비 완료
 ```
+
+### 💡 장점
+
+- **빠른 실행**: 애플리케이션을 매번 재시작하지 않음
+- **완전한 격리**: 각 시나리오가 독립적으로 실행
+- **안전한 초기화**: JWT 인증을 통한 보안 확보
+- **자동화**: 개발자가 수동 개입할 필요 없음
 
 ## 🔧 핵심 설정
 
-### build.gradle의 주요 설정
-```gradle
+### build.gradle.kts의 현재 설정
+
+```kotlin
 // TestSets 플러그인으로 격리된 테스트 환경 구성
 testSets {
-    isolatedCucumber
+    create("isolatedCucumber") {
+        dirName = "test"
+    }
 }
 
-// 각 시나리오마다 새 JVM으로 실행
-task isolatedCucumberTest(type: Test) {
-    forkEvery = 1  // 핵심 설정!
+// 격리된 Cucumber 테스트 태스크
+tasks.register<Test>("isolatedCucumberTest") {
+    group = "verification"
+    description = "격리된 Cucumber 테스트 실행 - 각 시나리오마다 @After Hook으로 DB 자동 초기화"
 
-    systemProperty "spring.jpa.hibernate.ddl-auto", "create-drop"
-    systemProperty "spring.sql.init.mode", "always"
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+
+    // 각 시나리오마다 새 JVM으로 완전 격리
+    forkEvery = 1
+
+    // JVM 옵션 최적화
+    jvmArgs = listOf(
+        "-XX:TieredStopAtLevel=1",  // C1 컴파일러만 사용
+        "-XX:+UseParallelGC"        // 병렬 GC 사용
+    )
+
+    // Spring 설정 - data.sql 자동 재실행 보장
+    systemProperty("spring.jpa.hibernate.ddl-auto", "create-drop")
+    systemProperty("spring.sql.init.mode", "always")
+
+    systemProperty("cucumber.junit-platform.naming-strategy", "long")
+}
+
+// 기존 방식 Cucumber 테스트 (호환성 유지)
+tasks.register<Test>("cucumberTest") {
+    group = "verification"
+    description = "기존 방식 Cucumber 테스트 - @After Hook으로 DB 자동 초기화"
+
+    useJUnitPlatform()
+    testClassesDirs = sourceSets.test.get().output.classesDirs
+    classpath = sourceSets.test.get().runtimeClasspath
+
+    systemProperty("cucumber.junit-platform.naming-strategy", "long")
 }
 ```
+
+### 🔑 핵심 포인트
+
+- **`forkEvery = 1`**: 각 시나리오마다 새로운 JVM 실행 (선택사항)
+- **HTTP API 기반**: 실제 데이터 초기화는 `@After` Hook에서 HTTP API 호출
+- **두 가지 옵션**: JVM 격리 vs 단일 JVM에서 HTTP API 초기화
 
 ## 📈 성능 최적화 팁
 

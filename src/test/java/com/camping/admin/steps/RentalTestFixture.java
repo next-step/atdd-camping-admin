@@ -27,4 +27,8 @@ public class RentalTestFixture {
     public static ExtractableResponse<Response> 대여_기록_작성_요청(Map<String, Integer> body) {
         return createExtractableResponseWithAuthorization(HttpMethod.POST, "/admin/rentals", body);
     }
+
+    public static ExtractableResponse<Response> 대여_반납_처리(long rentalId) {
+        return createExtractableResponseWithAuthorization(HttpMethod.PATCH, "/admin/rentals/" + rentalId + "/return");
+    }
 }

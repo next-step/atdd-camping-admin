@@ -38,3 +38,35 @@ Authorization: Bearer {{authToken}}
 {
   "status": "CANCELLED"
 }
+
+###
+
+### 🏨 체크인/체크아웃 관리
+
+### 5️⃣ 예약 체크인 (예약 ID를 실제 값으로 변경하세요)
+PATCH http://localhost:8081/admin/reservations/1/check-in
+Authorization: Bearer {{authToken}}
+
+###
+
+### 6️⃣ 예약 체크아웃 (예약 ID를 실제 값으로 변경하세요)
+PATCH http://localhost:8081/admin/reservations/1/check-out
+Authorization: Bearer {{authToken}}
+
+###
+
+### 7️⃣ 체크인 날짜 이전 체크인 시도 (실패 케이스)
+PATCH http://localhost:8081/admin/reservations/2/check-in
+Authorization: Bearer {{authToken}}
+
+###
+
+### 8️⃣ 이미 체크인된 예약 재체크인 시도 (실패 케이스)
+PATCH http://localhost:8081/admin/reservations/1/check-in
+Authorization: Bearer {{authToken}}
+
+###
+
+### 9️⃣ 체크인하지 않은 예약 체크아웃 시도 (실패 케이스)
+PATCH http://localhost:8081/admin/reservations/2/check-out
+Authorization: Bearer {{authToken}}
