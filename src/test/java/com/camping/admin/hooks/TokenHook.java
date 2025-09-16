@@ -1,6 +1,7 @@
 package com.camping.admin.hooks;
 
-import com.camping.admin.support.TestContext;
+import com.camping.admin.support.Context;
+import com.camping.admin.support.Role;
 import io.cucumber.java.BeforeAll;
 import io.restassured.RestAssured;
 
@@ -8,16 +9,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class TokenHook {
-    public static TestContext testContext;
+    public static Context context;
 
     @BeforeAll
     public static void initTokens() {
-        testContext = new TestContext();
+        context = new Context();
 
-        login("관리자");
+        login(Role.관리자);
     }
 
-    public static void login(String role) {
+    public static void login(Role role) {
         String token = RestAssured.given()
                 .contentType("application/json")
                 .body(makeLoginRequest(role))
@@ -26,12 +27,12 @@ public class TokenHook {
                 .extract()
                 .cookie("AUTH_TOKEN");
 
-        testContext.setTokenByRole(role, token);
+        context.setToken(role, token);
     }
 
-    private static Map<String, String> makeLoginRequest(String role) {
+    private static Map<String, String> makeLoginRequest(Role role) {
         Map<String, String> loginRequest = new HashMap<>();
-        if (role.equals("관리자")) {
+        if (role.isAdmin()) {
             loginRequest.put("username", "admin");
             loginRequest.put("password", "admin123");
             return loginRequest;
