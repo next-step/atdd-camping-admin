@@ -7,10 +7,22 @@ import com.camping.admin.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
     private final ReservationRepository reservationRepository;
+
+    public List<ReservationResponse> readAll() {
+        List<Reservation> reservations = reservationRepository.findAll();
+
+        if (reservations.isEmpty()) {
+            return new ArrayList<>();
+        }
+        return reservations.stream().map(ReservationResponse::from).toList();
+    }
 
     public ReservationResponse updateReservation(Long id, String statusValue) {
         Reservation reservation = findReservationById(id);
