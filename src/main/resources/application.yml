@@ -25,10 +25,10 @@ spring:
   sql:
     init:
       mode: always
-        
+
 server:
   port: 8080
-  
+
 logging:
   level:
     com.camping.admin: DEBUG

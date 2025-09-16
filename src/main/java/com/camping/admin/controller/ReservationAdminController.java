@@ -45,7 +45,8 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody ReservationUpdateRequest request) {
+            @RequestBody ReservationUpdateRequest request
+    ) {
         var response = reservationService.updateReservation(reservationId, request.status());
         return ResponseEntity.ok(response);
     }
