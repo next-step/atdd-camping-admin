@@ -1,13 +1,15 @@
 package com.camping.admin.client;
 
 import com.camping.admin.CommonContext;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.CreateReservationRequest;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
+import com.camping.admin.dto.UpdateReservationConfirmCodeRequest;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
 import java.util.List;
-import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
@@ -23,39 +25,56 @@ public class ReservationClient {
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ReservationResponse updateStatus(Long reservationId, String status) {
+    public ReservationResponse updateStatus(Long reservationId, ReservationStatus status) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
-            .body(Map.of("status", status))
+            .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
             .then().log().all()
             .statusCode(200)
             .extract().body().as(ReservationResponse.class);
     }
 
-    public ExtractableResponse<Response> updateStatusRaw(Long reservationId, String status) {
+    public Response updateStatusRaw(Long reservationId, ReservationStatus status) {
         return given().log().all()
             .spec(CommonContext.requestSpec)
             .when().log().all()
-            .body(Map.of("status", status))
+            .body(UpdateReservationStatusRequest.from(status))
             .patch("admin/reservations/" + reservationId + "/status")
             .then().log().all()
-            .extract();
+            .extract().response();
+    }
+
+    public ReservationResponse updateConfirmCode(Long reservationId, String confirmCode) {
+        return given().log().all()
+            .spec(CommonContext.requestSpec)
+            .when().log().all()
+            .body(new UpdateReservationConfirmCodeRequest(confirmCode))
+            .patch("admin/reservations/" + reservationId + "/confirmCode")
+            .then().log().all()
+            .statusCode(200)
+            .extract().body().as(ReservationResponse.class);
+    }
+
+    public Response updateConfirmCodeRaw(Long reservationId, String confirmCode) {
+        return given().log().all()
+            .spec(CommonContext.requestSpec)
+            .when().log().all()
+            .body(new UpdateReservationConfirmCodeRequest(confirmCode))
+            .patch("admin/reservations/" + reservationId + "/confirmCode")
+            .then().log().all()
+            .extract().response();
     }
 
     public ReservationResponse getReservation(Long reservationId) {
         ExtractableResponse<Response> ex = given()
             .spec(CommonContext.requestSpec)
-            .when().get("admin/reservations")
+            .when().get("admin/reservations/" + reservationId)
             .then().statusCode(200)
             .extract();
 
-        List<ReservationResponse> list = ex.body().jsonPath().getList("", ReservationResponse.class);
-        return list.stream()
-            .filter(r -> r.getId().equals(reservationId))
-            .findFirst()
-            .orElseThrow(() -> new IllegalStateException("예약이 존재하지 않습니다."));
+        return ex.body().as(ReservationResponse.class);
     }
 
     public List<ReservationResponse> getReservations() {
