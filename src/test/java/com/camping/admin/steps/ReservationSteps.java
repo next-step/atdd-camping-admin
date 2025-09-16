@@ -54,12 +54,6 @@ public class ReservationSteps {
         assertThat(response.statusCode()).isEqualTo(400);
     }
 
-    @Then("{string} 메시지가 응답 된다.")
-    public void checkErrorMessage(String expectedMessage) {
-        var response = context.getResponse();
-        assertThat(response.jsonPath().getString("message")).isEqualTo(expectedMessage);
-    }
-
     @Then("변경할 수 없는 예약 상태 변경이 실패 된다.")
     public void conflictReservation() {
         var response = context.getResponse();
