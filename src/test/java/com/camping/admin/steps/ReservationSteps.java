@@ -34,9 +34,27 @@ public class ReservationSteps {
         testContext.setResponse(response);
     }
 
+    @Then("예약 상태 변경이 성공한다.")
+    public void success() {
+        var response = testContext.getResponse();
+        assertThat(response.statusCode()).isEqualTo(200);
+    }
+
     @Then("예약이 {string} 된다.")
-    public void canceledReservation(String status) {
+    public void successUpdateReservation(String status) {
         var response = testContext.getResponse();
         assertThat(response.jsonPath().getString("status")).isEqualTo(status);
+    }
+
+    @Then("존재하지 않는 예약 상태 변경을 실패한다.")
+    public void badRequestReservation() {
+        var response = testContext.getResponse();
+        assertThat(response.statusCode()).isEqualTo(400);
+    }
+
+    @Then("변경할 수 없는 예약 상태 변경을 실패한다.")
+    public void conflictReservation() {
+        var response = testContext.getResponse();
+        assertThat(response.statusCode()).isEqualTo(409);
     }
 }
