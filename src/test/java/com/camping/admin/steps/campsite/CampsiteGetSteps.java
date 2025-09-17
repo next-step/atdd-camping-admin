@@ -20,7 +20,7 @@ public class CampsiteGetSteps {
     }
 
     public void 전체_캠프사이트를_조회한다() {
-        var 전체_캠프사이트_조회_응답 = CampsiteClient.전체_캠프사이트_조회_요청을_한다(TestContext.auth.인증_토큰());
+        var 전체_캠프사이트_조회_응답 = CampsiteClient.전체_캠프사이트_조회_요청을_한다();
         TestContext.campsite.전체_캠프사이트_조회_응답(전체_캠프사이트_조회_응답);
     }
 

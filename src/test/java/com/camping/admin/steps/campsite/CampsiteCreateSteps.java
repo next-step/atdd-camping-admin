@@ -20,7 +20,6 @@ public class CampsiteCreateSteps {
     @When("사이트번호가 null인 캠프사이트를 생성한다")
     public void 사이트번호가_null인_캠프사이트를_생성한다() {
         var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트_생성_요청을_한다(
-            TestContext.auth.인증_토큰(),
             null,
             "테스트 캠프사이트",
             4
@@ -32,7 +31,6 @@ public class CampsiteCreateSteps {
     @When("사이트번호가 {string}인 캠프사이트를 생성한다")
     public void 사이트번호가_XX인_캠프사이트를_생성한다(String siteNumber) {
         var 캠프사이트_생성_응답 = CampsiteClient.캠프사이트_생성_요청을_한다(
-            TestContext.auth.인증_토큰(),
             siteNumber,
             "테스트 캠프사이트",
             4

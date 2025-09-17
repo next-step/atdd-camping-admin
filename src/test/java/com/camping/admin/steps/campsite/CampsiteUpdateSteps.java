@@ -17,7 +17,6 @@ public class CampsiteUpdateSteps {
     public void 사이트번호가_XX인_캠프사이트의_사이트번호를_YY로_수정한다(String oldSiteNumber, String newSiteNumber) {
         var campsiteDetail = 사이트번호로_캠프사이트를_조회한다(oldSiteNumber);
         var 캠프사이트_수정_응답 = CampsiteClient.캠프사이트_수정_요청을_한다(
-            TestContext.auth.인증_토큰(),
             campsiteDetail.id(),
             newSiteNumber,
             campsiteDetail.description(),
@@ -27,7 +26,7 @@ public class CampsiteUpdateSteps {
     }
 
     private static CampsiteDetail 사이트번호로_캠프사이트를_조회한다(String siteNumber) {
-        var 전체_캠프사이트_조회_응답 = CampsiteClient.전체_캠프사이트_조회_요청을_한다(TestContext.auth.인증_토큰());
+        var 전체_캠프사이트_조회_응답 = CampsiteClient.전체_캠프사이트_조회_요청을_한다();
         var 전체_캠프사이트 = 전체_캠프사이트_조회_응답.as(new TypeRef<List<CampsiteDetail>>() {
         });
 
