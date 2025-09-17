@@ -6,3 +6,6 @@ CLAUDE.md
 .gradle/
 .idea/
 build/
+
+# H2 database files
+testdb.*.db
