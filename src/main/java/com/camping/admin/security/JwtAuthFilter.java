@@ -79,6 +79,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                pathMatcher.match("/webjars/**", path) ||
                pathMatcher.match("/favicon.ico", path) ||
                pathMatcher.match("/h2-console/**", path) ||
+               pathMatcher.match("/test-api/**", path) ||
                path.equals("/");
     }
 

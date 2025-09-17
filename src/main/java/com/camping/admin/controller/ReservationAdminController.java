@@ -1,13 +1,12 @@
 package com.camping.admin.controller;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.ReservationUpdateRequest;
-import com.camping.admin.repository.ReservationRepository;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.camping.admin.service.ReservationService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,36 +15,19 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/admin/reservations")
 @RequiredArgsConstructor
 public class ReservationAdminController {
-
-    private final ReservationRepository reservationRepository;
-
     private final ReservationService reservationService;
 
     @GetMapping
-    public ResponseEntity<List<ReservationResponse>> getAllReservations() {
-        List<ReservationResponse> all = reservationRepository.findAll().stream()
-                .map(ReservationResponse::from)
-                .collect(Collectors.toList());
-
-        List<ReservationResponse> result = new ArrayList<>();
-        if (all == null) {
-            // null이면 빈 리스트 반환
-        } else if (all.isEmpty()) {
-            // 그대로 빈 리스트 반환
-        } else {
-            for (ReservationResponse r : all) {
-                if (r != null) {
-                    result.add(r);
-                }
-            }
-        }
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<ReservationResponse>> getAllReservations(@RequestParam @Nullable ReservationStatus status) {
+        List<ReservationResponse> response = reservationService.readAll(status);
+        return ResponseEntity.ok(response);
     }
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody ReservationUpdateRequest request) {
+            @RequestBody ReservationUpdateRequest request
+    ) {
         var response = reservationService.updateReservation(reservationId, request.status());
         return ResponseEntity.ok(response);
     }

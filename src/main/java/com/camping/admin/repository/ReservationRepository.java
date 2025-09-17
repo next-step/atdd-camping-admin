@@ -1,6 +1,7 @@
 package com.camping.admin.repository;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,4 +26,5 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByStartDateBetween(LocalDate startDate, LocalDate endDate);
 
+    List<Reservation> findAllByStatus(ReservationStatus status);
 }
