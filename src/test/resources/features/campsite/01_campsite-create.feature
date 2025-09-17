@@ -2,7 +2,6 @@ Feature: 캠프사이트 생성 기능
 
   Background:
     Given 어드민으로 로그인하였다
-    And 사이트번호가 'A-01'인 캠프사이트가 없다
 
   Scenario: 캠프사이트를 생성한다
     When 사이트번호가 'A-01'인 캠프사이트를 생성한다
