@@ -4,9 +4,9 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
 
+import static com.camping.admin.helper.CommonContext.lastResponse;
 import static com.camping.admin.helper.RequestFactory.createRentalRequest;
 import static com.camping.admin.helper.RequestSender.get;
 import static com.camping.admin.helper.RequestSender.post;
@@ -20,7 +20,6 @@ public class RentalSteps {
 
     Long reservationId;
     Long productId;
-    Response lastResponse;
 
     @Given("사용자가 예약을 했다.")
     public void 예약이_있다() {
