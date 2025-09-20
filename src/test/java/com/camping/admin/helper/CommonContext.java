@@ -1,6 +1,5 @@
 package com.camping.admin.helper;
 
-import com.camping.admin.dto.LoginRequest;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.specification.RequestSpecification;
 

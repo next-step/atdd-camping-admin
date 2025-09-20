@@ -90,7 +90,7 @@ public class RentalSteps {
                 .statusCode(200);
     }
 
-    @And("대여 ID가 생성된다.")
+    @And("대여 ID가 생성된다")
     public void 대여_ID가_생성된다() {
         lastResponse.then()
                 .body("id", notNullValue());

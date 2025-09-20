@@ -1,7 +1,4 @@
 Feature: 대여 생성
-
-  Background: 대여 가능한 상품이 등록되어 있다.
-
   Scenario: 예약이 있는 고객의 대여 생성
     Given 예약이 있다
     And 제품의 재고가 10개 있다
