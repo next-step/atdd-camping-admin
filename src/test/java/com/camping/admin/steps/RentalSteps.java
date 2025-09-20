@@ -122,4 +122,9 @@ public class RentalSteps {
         lastResponse.then()
                 .body("reservationId", equalTo(null));
     }
+
+    @When("제품 ID {long}는 존재하지 않는다.")
+    public void 제품ID는존재하지않는다(Long productId) {
+        this.productId = productId;
+    }
 }
