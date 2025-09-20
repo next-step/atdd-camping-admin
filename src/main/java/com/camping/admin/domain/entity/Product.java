@@ -2,11 +2,14 @@ package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+import static com.camping.admin.domain.enums.ProductType.RENTAL;
 
 @Getter
 @Setter
@@ -37,6 +40,15 @@ public class Product {
         this.stockQuantity = stockQuantity;
         this.price = price;
         this.productType = productType;
+    }
+
+    /**
+     * 대여용 상품인지 유효성 검증한다.
+     */
+    public void validateRentalType() {
+        if (productType != RENTAL) {
+            throw new IllegalArgumentException("Product is not a rental item.");
+        }
     }
 
 }
