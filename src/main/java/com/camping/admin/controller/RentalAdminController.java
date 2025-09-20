@@ -3,11 +3,12 @@ package com.camping.admin.controller;
 import com.camping.admin.dto.CreateRentalRequest;
 import com.camping.admin.dto.RentalResponse;
 import com.camping.admin.service.RentalService;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/rentals")
@@ -24,11 +25,7 @@ public class RentalAdminController {
 
     @PostMapping
     public ResponseEntity<RentalResponse> createRental(@RequestBody CreateRentalRequest request) {
-        RentalResponse createdRental = rentalService.createRental(
-                request.getProductId(),
-                request.getQuantity(),
-                request.getReservationId()
-        );
+        RentalResponse createdRental = rentalService.createRental(request);
         return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
     }
 
