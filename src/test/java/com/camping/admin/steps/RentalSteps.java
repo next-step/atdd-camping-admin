@@ -19,6 +19,7 @@ import static org.springframework.http.HttpStatus.*;
 @DisplayName("대여 생성 테스트")
 public class RentalSteps {
 
+    public static final String PATH = "/admin/rentals";
     Long reservationId;
     Long productId;
 
@@ -92,15 +93,9 @@ public class RentalSteps {
                 .statusCode(CONFLICT.value());
     }
 
-    @And("판매용 제품이 있다.")
+    @And("판매용 제품이 있다")
     public void 판매용_제품이_있다() {
         productId = 2L; // data.sql의 판매용 제품 (장작팩)
-    }
-
-    @When("사용자가 판매용 제품을 대여 요청한다")
-    public void 사용자가_판매용_제품을_대여_요청한다() {
-        lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, productId, 1));
     }
 
     @And("예약 ID가 null이다")
