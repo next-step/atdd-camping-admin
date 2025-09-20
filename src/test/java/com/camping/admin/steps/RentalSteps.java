@@ -83,13 +83,6 @@ public class RentalSteps {
                 .statusCode(500); // IllegalArgumentException은 500으로 처리됨
     }
 
-    @And("에러 메시지가 {string}를 포함한다")
-    public void 에러_메시지가_포함한다(String expectedMessage) {
-        lastResponse.then()
-                .log().all();
-        // 실제 에러 응답 구조에 따라 조정 필요
-    }
-
     // 대여용이 아닌 제품으로 대여 요청 시나리오
     @And("판매용 제품이 있다.")
     public void 판매용_제품이_있다() {
