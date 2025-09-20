@@ -127,4 +127,9 @@ public class RentalSteps {
     public void 제품ID는존재하지않는다(Long productId) {
         this.productId = productId;
     }
+
+    @When("예약 ID {long}는 존재하지 않는다.")
+    public void 예약ID는존재하지않는다(Long reservationId) {
+        this.reservationId = reservationId;
+    }
 }
