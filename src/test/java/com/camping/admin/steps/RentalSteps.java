@@ -80,13 +80,6 @@ public class RentalSteps {
         assertThat(actualStockQuantity).isEqualTo(quantity);
     }
 
-    @When("사용자가 존재하지 않는 제품을 대여 요청한다")
-    public void 사용자가_존재하지_않는_제품을_대여_요청한다() {
-        Long nonExistentProductId = 999L;
-        lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, nonExistentProductId, 1));
-    }
-
     @Then("대여 요청이 실패한다")
     public void 대여_요청이_실패한다() {
         lastResponse.then()
