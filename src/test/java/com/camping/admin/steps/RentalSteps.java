@@ -121,4 +121,17 @@ public class RentalSteps {
         lastResponse = post("/admin/rentals",
                 createRentalRequest(nonExistentReservationId, productId, 1L));
     }
+
+    // 예약 없이 대여 요청 (워크인 고객) 시나리오
+    @When("사용자가 예약 없이 제품을 대여 요청한다")
+    public void 사용자가_예약_없이_제품을_대여_요청한다() {
+        lastResponse = post("/admin/rentals",
+                createRentalRequest(null, productId, 1L)); // reservationId를 null로 설정
+    }
+
+    @And("예약 ID가 null이다")
+    public void 예약_ID가_null이다() {
+        lastResponse.then()
+                .body("reservationId", equalTo(null));
+    }
 }
