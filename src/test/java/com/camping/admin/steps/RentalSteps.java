@@ -14,7 +14,7 @@ import static com.camping.admin.helper.RequestSender.post;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpStatus.CREATED;
+import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("대여 생성 테스트")
 public class RentalSteps {
@@ -87,7 +87,13 @@ public class RentalSteps {
     @Then("대여 요청이 실패한다")
     public void 대여_요청이_실패한다() {
         lastResponse.then()
-                .statusCode(500); // IllegalArgumentException은 500으로 처리됨
+                .statusCode(BAD_REQUEST.value()); // IllegalArgumentException은 400으로 처리됨
+    }
+
+    @Then("재고 부족으로 대여 요청이 실패한다")
+    public void 재고_부족으로_대여_요청이_실패한다() {
+        lastResponse.then()
+                .statusCode(CONFLICT.value()); // IllegalStateException은 409로 처리됨
     }
 
     // 대여용이 아닌 제품으로 대여 요청 시나리오
