@@ -7,6 +7,7 @@ import io.cucumber.java.en.When;
 import org.junit.jupiter.api.DisplayName;
 
 import static com.camping.admin.helper.CommonContext.lastResponse;
+import static com.camping.admin.helper.ProductFactory.productOf;
 import static com.camping.admin.helper.RequestFactory.createRentalRequest;
 import static com.camping.admin.helper.RequestSender.get;
 import static com.camping.admin.helper.RequestSender.post;
@@ -21,20 +22,26 @@ public class RentalSteps {
     Long reservationId;
     Long productId;
 
-    @Given("사용자가 예약을 했다.")
+    @Given("사용자가 예약을 했다")
     public void 예약이_있다() {
         reservationId = 1L; // data.sql의 예약 데이터 사용
     }
 
-    @And("제품의 재고가 있다.")
-    public void 제품의_재고가_있다() {
+    @And("제품의 재고가 {int}개 있다")
+    public void 제품의_재고가_있다(Integer stockQuantity) {
+        var product = productOf(stockQuantity);
+        productId = product.getId();
+    }
+
+    @And("제품이 있다")
+    public void 제품이_있다() {
         productId = 1L; // data.sql의 상품 데이터 사용
     }
 
-    @When("사용자가 제품을 대여한다")
-    public void 사용자가_제품을_대여한다() {
+    @When("사용자가 제품을 {int}개 대여한다")
+    public void 사용자가_제품을_대여한다(Integer quantity) {
         lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, productId, 1L));
+                createRentalRequest(reservationId, productId, quantity));
     }
 
     @Then("대여에 성공했다")
@@ -55,8 +62,8 @@ public class RentalSteps {
                 .body("isReturned", equalTo(false));
     }
 
-    @And("대여된 제품의 재고가 감소했다")
-    public void 제품_재고가_감소된다() {
+    @And("대여된 제품의 재고가 {int}개로 감소했다")
+    public void 제품_재고가_감소된다(Integer quantity) {
         var products = get("/admin/products")
                 .then()
                 .log().all()
@@ -66,7 +73,7 @@ public class RentalSteps {
         var actualStockQuantity = products.jsonPath()
                 .getInt("find { it.id == " + productId + " }.stockQuantity");
 
-        assertThat(actualStockQuantity).isEqualTo(19);
+        assertThat(actualStockQuantity).isEqualTo(quantity);
     }
 
     // 존재하지 않는 제품으로 대여 요청 시나리오
@@ -74,7 +81,7 @@ public class RentalSteps {
     public void 사용자가_존재하지_않는_제품을_대여_요청한다() {
         Long nonExistentProductId = 999L;
         lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, nonExistentProductId, 1L));
+                createRentalRequest(reservationId, nonExistentProductId, 1));
     }
 
     @Then("대여 요청이 실패한다")
@@ -92,7 +99,7 @@ public class RentalSteps {
     @When("사용자가 판매용 제품을 대여 요청한다")
     public void 사용자가_판매용_제품을_대여_요청한다() {
         lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, productId, 1L));
+                createRentalRequest(reservationId, productId, 1));
     }
 
     // 재고가 부족한 제품으로 대여 요청 시나리오
@@ -104,7 +111,7 @@ public class RentalSteps {
     @When("사용자가 재고보다 많은 수량을 대여 요청한다")
     public void 사용자가_재고보다_많은_수량을_대여_요청한다() {
         lastResponse = post("/admin/rentals",
-                createRentalRequest(reservationId, productId, 15L)); // 재고 10개보다 많은 15개 요청
+                createRentalRequest(reservationId, productId, 999)); // 재고 10개보다 많은 999개 요청
     }
 
     // 존재하지 않는 예약으로 대여 요청 시나리오
@@ -112,14 +119,14 @@ public class RentalSteps {
     public void 사용자가_존재하지_않는_예약으로_제품을_대여_요청한다() {
         Long nonExistentReservationId = 999L;
         lastResponse = post("/admin/rentals",
-                createRentalRequest(nonExistentReservationId, productId, 1L));
+                createRentalRequest(nonExistentReservationId, productId, 1));
     }
 
     // 예약 없이 대여 요청 (워크인 고객) 시나리오
-    @When("사용자가 예약 없이 제품을 대여 요청한다")
-    public void 사용자가_예약_없이_제품을_대여_요청한다() {
+    @When("사용자가 예약 없이 제품을 {int}개 대여 요청한다")
+    public void 사용자가_예약_없이_제품을_대여_요청한다(Integer quantity) {
         lastResponse = post("/admin/rentals",
-                createRentalRequest(null, productId, 1L)); // reservationId를 null로 설정
+                createRentalRequest(null, productId, quantity)); // reservationId를 null로 설정
     }
 
     @And("예약 ID가 null이다")
