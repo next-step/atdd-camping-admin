@@ -38,6 +38,10 @@ public class RentalSteps {
         productId = 1L; // data.sql의 상품 데이터 사용
     }
 
+    @When("사용자가 예약을 하지 않았다")
+    public void 사용자가_예약을_하지_않았다() {
+        reservationId = null;
+    }
     @When("사용자가 제품을 {int}개 대여한다")
     public void 사용자가_제품을_대여한다(Integer quantity) {
         lastResponse = post("/admin/rentals",
@@ -76,7 +80,6 @@ public class RentalSteps {
         assertThat(actualStockQuantity).isEqualTo(quantity);
     }
 
-    // 존재하지 않는 제품으로 대여 요청 시나리오
     @When("사용자가 존재하지 않는 제품을 대여 요청한다")
     public void 사용자가_존재하지_않는_제품을_대여_요청한다() {
         Long nonExistentProductId = 999L;
@@ -87,16 +90,15 @@ public class RentalSteps {
     @Then("대여 요청이 실패한다")
     public void 대여_요청이_실패한다() {
         lastResponse.then()
-                .statusCode(BAD_REQUEST.value()); // IllegalArgumentException은 400으로 처리됨
+                .statusCode(BAD_REQUEST.value());
     }
 
     @Then("재고 부족으로 대여 요청이 실패한다")
     public void 재고_부족으로_대여_요청이_실패한다() {
         lastResponse.then()
-                .statusCode(CONFLICT.value()); // IllegalStateException은 409로 처리됨
+                .statusCode(CONFLICT.value());
     }
 
-    // 대여용이 아닌 제품으로 대여 요청 시나리오
     @And("판매용 제품이 있다.")
     public void 판매용_제품이_있다() {
         productId = 2L; // data.sql의 판매용 제품 (장작팩)
@@ -120,19 +122,11 @@ public class RentalSteps {
                 createRentalRequest(reservationId, productId, 999)); // 재고 10개보다 많은 999개 요청
     }
 
-    // 존재하지 않는 예약으로 대여 요청 시나리오
     @When("사용자가 존재하지 않는 예약으로 제품을 대여 요청한다")
     public void 사용자가_존재하지_않는_예약으로_제품을_대여_요청한다() {
         Long nonExistentReservationId = 999L;
         lastResponse = post("/admin/rentals",
                 createRentalRequest(nonExistentReservationId, productId, 1));
-    }
-
-    // 예약 없이 대여 요청 (워크인 고객) 시나리오
-    @When("사용자가 예약 없이 제품을 {int}개 대여 요청한다")
-    public void 사용자가_예약_없이_제품을_대여_요청한다(Integer quantity) {
-        lastResponse = post("/admin/rentals",
-                createRentalRequest(null, productId, quantity)); // reservationId를 null로 설정
     }
 
     @And("예약 ID가 null이다")
