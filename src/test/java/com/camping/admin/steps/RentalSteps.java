@@ -101,4 +101,16 @@ public class RentalSteps {
         lastResponse = post("/admin/rentals",
                 createRentalRequest(reservationId, productId, 1L));
     }
+
+    // 재고가 부족한 제품으로 대여 요청 시나리오
+    @And("재고가 부족한 대여 제품이 있다.")
+    public void 재고가_부족한_대여_제품이_있다() {
+        productId = 5L; // data.sql의 테이블 (재고 10개)
+    }
+
+    @When("사용자가 재고보다 많은 수량을 대여 요청한다")
+    public void 사용자가_재고보다_많은_수량을_대여_요청한다() {
+        lastResponse = post("/admin/rentals",
+                createRentalRequest(reservationId, productId, 15L)); // 재고 10개보다 많은 15개 요청
+    }
 }
