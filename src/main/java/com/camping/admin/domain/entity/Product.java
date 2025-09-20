@@ -51,4 +51,14 @@ public class Product {
         }
     }
 
+    public void decreaseStockQuantity(Integer quantity) {
+        if (hasStockQuantityLessThan(quantity)) {
+            throw new IllegalStateException("Not enough stock for product " + name);
+        }
+        stockQuantity -= quantity;
+    }
+
+    private boolean hasStockQuantityLessThan(Integer quantity) {
+        return stockQuantity < quantity;
+    }
 }

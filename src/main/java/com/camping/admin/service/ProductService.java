@@ -16,10 +16,7 @@ public class ProductService {
     @Transactional
     public void decreaseStock(Long productId, Integer quantity) {
         Product product = findById(productId);
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalStateException("Not enough stock for product " + product.getName());
-        }
-        product.setStockQuantity(product.getStockQuantity() - quantity);
+        product.decreaseStockQuantity(quantity);
     }
 
     @Transactional
