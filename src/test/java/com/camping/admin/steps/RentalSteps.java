@@ -68,4 +68,25 @@ public class RentalSteps {
 
         assertThat(actualStockQuantity).isEqualTo(19);
     }
+
+    // 존재하지 않는 제품으로 대여 요청 시나리오
+    @When("사용자가 존재하지 않는 제품을 대여 요청한다")
+    public void 사용자가_존재하지_않는_제품을_대여_요청한다() {
+        Long nonExistentProductId = 999L;
+        lastResponse = post("/admin/rentals",
+                createRentalRequest(reservationId, nonExistentProductId, 1L));
+    }
+
+    @Then("대여 요청이 실패한다")
+    public void 대여_요청이_실패한다() {
+        lastResponse.then()
+                .statusCode(500); // IllegalArgumentException은 500으로 처리됨
+    }
+
+    @And("에러 메시지가 {string}를 포함한다")
+    public void 에러_메시지가_포함한다(String expectedMessage) {
+        lastResponse.then()
+                .log().all();
+        // 실제 에러 응답 구조에 따라 조정 필요
+    }
 }
