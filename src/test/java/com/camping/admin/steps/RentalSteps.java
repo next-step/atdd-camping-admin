@@ -103,13 +103,6 @@ public class RentalSteps {
                 createRentalRequest(reservationId, productId, 1));
     }
 
-    @When("사용자가 존재하지 않는 예약으로 제품을 대여 요청한다")
-    public void 사용자가_존재하지_않는_예약으로_제품을_대여_요청한다() {
-        Long nonExistentReservationId = 999L;
-        lastResponse = post("/admin/rentals",
-                createRentalRequest(nonExistentReservationId, productId, 1));
-    }
-
     @And("예약 ID가 null이다")
     public void 예약_ID가_null이다() {
         lastResponse.then()
