@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +28,7 @@ public class Campsite {
     private Integer maxPeople;
     
     @OneToMany(mappedBy = "campsite", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
     
     public Campsite(String siteNumber, String description, Integer maxPeople) {
