@@ -1,17 +1,16 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.helper.CommonContext;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.DisplayName;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 
 import static com.camping.admin.helper.CommonContext.adminToken;
+import static com.camping.admin.helper.CommonContext.requestSpec;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,7 +42,7 @@ public class RentalSteps {
         request.put("productId", productId);
         request.put("quantity", 1L);
 
-        lastResponse = given().spec(CommonContext.getRequestSpec())
+        lastResponse = given().spec(requestSpec)
                 .contentType(JSON)
                 .header("Authorization", "Bearer " + adminToken)
                 .body(request)
