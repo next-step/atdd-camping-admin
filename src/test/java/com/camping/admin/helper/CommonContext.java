@@ -1,6 +1,9 @@
 package com.camping.admin.helper;
 
+import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
+import io.restassured.filter.log.LogDetail;
+import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 import java.util.Map;
@@ -13,6 +16,9 @@ public class CommonContext {
         return new RequestSpecBuilder()
                 .setBaseUri("http://localhost")
                 .setPort(8080)
+                .setAccept(JSON)
+                .setContentType(JSON)
+                .log(LogDetail.ALL)
                 .build();
     }
 
@@ -25,6 +31,7 @@ public class CommonContext {
                 .then()
                 .log().all()
                 .extract()
-                .cookie("AUTH_TOKEN");
+                .jsonPath()
+                .getString("accessToken");
     }
 }
