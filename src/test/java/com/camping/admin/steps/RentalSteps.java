@@ -113,4 +113,12 @@ public class RentalSteps {
         lastResponse = post("/admin/rentals",
                 createRentalRequest(reservationId, productId, 15L)); // 재고 10개보다 많은 15개 요청
     }
+
+    // 존재하지 않는 예약으로 대여 요청 시나리오
+    @When("사용자가 존재하지 않는 예약으로 제품을 대여 요청한다")
+    public void 사용자가_존재하지_않는_예약으로_제품을_대여_요청한다() {
+        Long nonExistentReservationId = 999L;
+        lastResponse = post("/admin/rentals",
+                createRentalRequest(nonExistentReservationId, productId, 1L));
+    }
 }
