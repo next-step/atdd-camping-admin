@@ -11,7 +11,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 import java.util.HashMap;
 
-import static com.camping.admin.helper.CommonContext.getAdminToken;
+import static com.camping.admin.helper.CommonContext.adminToken;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -45,7 +45,7 @@ public class RentalSteps {
 
         lastResponse = given().spec(CommonContext.getRequestSpec())
                 .contentType(JSON)
-                .header("Authorization", "Bearer " + getAdminToken())
+                .header("Authorization", "Bearer " + adminToken)
                 .body(request)
                 .when()
                 .post("/admin/rentals");
@@ -68,7 +68,7 @@ public class RentalSteps {
     public void 제품_재고가_감소된다() {
         var response = given()
                 .contentType(JSON)
-                .header("Authorization", "Bearer " + getAdminToken())
+                .header("Authorization", "Bearer " + adminToken)
                 .when()
                 .get("/admin/products")
                 .then()
