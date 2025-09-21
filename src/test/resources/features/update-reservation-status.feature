@@ -16,6 +16,7 @@ Feature: 예약 상태 업데이트
       | CHECKED_OUT |
       | CANCELLED   |
 
+    ## TODO Scenario 로 대체. (존재하지 않는 예약 ID)
   Scenario Outline: 잘못된 예약 ID로 상태 업데이트를 시도하면 실패한다
     When 관리자가 예약 ID <reservationId>로 상태 업데이트를 시도한다
     Then 예약 상태 업데이트가 실패한다
