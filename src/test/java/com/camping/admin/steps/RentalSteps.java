@@ -19,7 +19,9 @@ import static org.springframework.http.HttpStatus.*;
 @DisplayName("대여 생성 테스트")
 public class RentalSteps {
 
-    public static final String PATH = "/admin/rentals";
+    public static final String API_PATH_CREATE_RENTAL = "/admin/rentals";
+    public static final int DEFAULT_RENTAL_QUANTITY = 1;
+
     Long reservationId;
     Long productId;
 
@@ -46,8 +48,15 @@ public class RentalSteps {
 
     @When("사용자가 제품을 {int}개 대여한다")
     public void 사용자가_제품을_대여한다(Integer quantity) {
-        lastResponse = post("/admin/rentals",
+        lastResponse = post(API_PATH_CREATE_RENTAL,
                 createRentalRequest(reservationId, productId, quantity));
+    }
+
+    @When("사용자가 존재하지 않는 예약 정보로 제품을 대여한다")
+    public void 사용자가_존재하지_않는_예약_정보로_제품을_대여한다() {
+        reservationId = 999L;
+        lastResponse = post(API_PATH_CREATE_RENTAL,
+                createRentalRequest(reservationId, productId, DEFAULT_RENTAL_QUANTITY));
     }
 
     @When("사용자가 재고가 부족한 제품을 대여한다")
@@ -55,7 +64,7 @@ public class RentalSteps {
         var product = productOf(20);
         productId = product.getId();
 
-        lastResponse = post("/admin/rentals",
+        lastResponse = post(API_PATH_CREATE_RENTAL,
                 createRentalRequest(reservationId, productId, 21)); // 현재 재고보다 1개 더 요청
     }
 
@@ -63,12 +72,6 @@ public class RentalSteps {
     public void 대여에_성공했다() {
         lastResponse.then()
                 .statusCode(CREATED.value());
-    }
-
-    @And("대여 ID가 생성된다")
-    public void 대여_ID가_생성된다() {
-        lastResponse.then()
-                .body("id", notNullValue());
     }
 
     @And("대여 상태가 '대여중'이다") // TODO: 3단계 리팩터링에서 대여중과 false를 매핑시키는 enum 추가하기
@@ -103,24 +106,29 @@ public class RentalSteps {
                 .statusCode(CONFLICT.value());
     }
 
-    @And("판매용 제품이 있다")
-    public void 판매용_제품이_있다() {
-        productId = 2L; // data.sql의 판매용 제품 (장작팩)
-    }
-
-    @And("예약 ID가 null이다")
-    public void 예약_ID가_null이다() {
+    @And("대여 조회시 예약 정보가 존재하지 않는다")
+    public void 대여_조회시_예약_정보가_존재하지_않는다() {
         lastResponse.then()
                 .body("reservationId", equalTo(null));
     }
 
-    @When("제품 ID {long}는 존재하지 않는다.")
-    public void 제품ID는존재하지않는다(Long productId) {
-        this.productId = productId;
+    @And("대여 조회시 예약 정보가 존재한다")
+    public void 대여_조회시_예약_정보가_존재한다() {
+        lastResponse.then()
+                .body("id", notNullValue());
     }
 
-    @When("예약 ID {long}는 존재하지 않는다.")
-    public void 예약ID는존재하지않는다(Long reservationId) {
-        this.reservationId = reservationId;
+    @When("사용자가 존재하지 않는 제품을 대여한다")
+    public void 사용자가존재하지않는제품을대여한다() {
+        productId = 999L;
+        lastResponse = post(API_PATH_CREATE_RENTAL,
+                createRentalRequest(reservationId, productId, DEFAULT_RENTAL_QUANTITY));
+    }
+
+    @When("사용자가 판매용 상품을 대여한다")
+    public void 사용자가판매용상품을대여한다() {
+        productId = 2L;
+        lastResponse = post(API_PATH_CREATE_RENTAL,
+                createRentalRequest(reservationId, productId, DEFAULT_RENTAL_QUANTITY));
     }
 }
