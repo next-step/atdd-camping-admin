@@ -31,4 +31,17 @@ public class RequestSender {
                 .when()
                 .get(url);
     }
+
+    public static Response patch(String url, Object request) {
+        return commonRequest()
+                .body(request)
+                .when()
+                .patch(url);
+    }
+
+    public static Response patch(String url) {
+        return commonRequest()
+                .when()
+                .patch(url);
+    }
 }
