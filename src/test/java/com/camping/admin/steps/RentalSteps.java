@@ -7,10 +7,10 @@ import io.cucumber.java.en.When;
 import org.junit.jupiter.api.DisplayName;
 
 import static com.camping.admin.helper.CommonContext.lastResponse;
-import static com.camping.admin.helper.ProductFactory.productOf;
-import static com.camping.admin.helper.RequestFactory.createRentalRequest;
 import static com.camping.admin.helper.RequestSender.get;
 import static com.camping.admin.helper.RequestSender.post;
+import static com.camping.admin.helper.factory.ProductFactory.productOf;
+import static com.camping.admin.helper.factory.RequestFactory.createRentalRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;

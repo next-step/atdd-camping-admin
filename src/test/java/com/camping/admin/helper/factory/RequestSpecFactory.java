@@ -1,4 +1,4 @@
-package com.camping.admin.helper;
+package com.camping.admin.helper.factory;
 
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
