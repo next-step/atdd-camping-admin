@@ -28,12 +28,10 @@ Feature: 예약 상태 업데이트
     Then 예약 상태 업데이트가 실패한다
 
   ## TODO: 상태값이 유효하지 않을 경우 fail 처리하도록 정책 수정 필요
-  Scenario Outline: 상태값을 빈문자열 혹은 공백으로 지정후 업데이를 시도하면 기존 상태를 유지한다
+  Scenario Outline: 상태값을 빈문자열 혹은 공백으로 지정하여 상태값 변경 시도시, 실패한다.
     Given 예약이 존재한다
-    And 예약의 현재 상태가 'CONFIRMED'이다
     When 관리자가 '<statusType>' 상태값으로 업데이트를 시도한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'CONFIRMED'로 유지되었다
+    Then 예약 상태 업데이트가 실패한다
 
     Examples:
       | statusType | description |
