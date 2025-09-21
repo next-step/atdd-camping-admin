@@ -9,6 +9,7 @@ import org.junit.jupiter.api.DisplayName;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.camping.admin.domain.enums.ReservationStatus.CONFIRMED;
 import static com.camping.admin.helper.CommonContext.lastResponse;
 import static com.camping.admin.helper.RequestSender.patch;
 import static org.hamcrest.Matchers.equalTo;
@@ -105,5 +106,18 @@ public class UpdateReservationSteps {
     public void 예약_상태가_유지되었다(String expectedStatus) {
         lastResponse.then()
                 .body("status", equalTo(expectedStatus));
+    }
+
+    @Given("예약이 존재하지 않는다.")
+    public void 예약이_존재하지_않는다() {
+        reservationId = 999L;
+    }
+
+    @When("관리자가 예약 상태를 변경한다")
+    public void 관리자가_예약상태를_변경한다() {
+        Map<String, Object> request = new HashMap<>();
+        request.put("status", CONFIRMED);
+
+        lastResponse = patch(RESERVATIONS_PATH + "/" + reservationId + "/status", request);
     }
 }
