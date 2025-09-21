@@ -1,9 +1,9 @@
 package com.camping.admin.controller;
 
-import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.service.ReservationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ReservationAdminController {
 
+    private final ReservationService reservationService;
     private final ReservationRepository reservationRepository;
 
     @GetMapping
@@ -41,17 +42,19 @@ public class ReservationAdminController {
         return ResponseEntity.ok(result);
     }
 
+    /**
+     * 예약 상태 수정한다.
+     *
+     * @param reservationId 예약 ID
+     * @param request       요청 (예약상태)
+     * @return 수정된 예약
+     */
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
             @Valid @RequestBody UpdateReservationStatusRequest request) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
 
-        // DTO에서 이미 유효성 검사가 완료된 enum 값을 사용
-        reservation.updateStatus(request.status());
-
-        reservationRepository.save(reservation);
+        var reservation = reservationService.updateReservationStatus(reservationId, request);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
     }
 }
