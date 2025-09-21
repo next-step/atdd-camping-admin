@@ -16,17 +16,10 @@ Feature: 예약 상태 업데이트
       | CHECKED_OUT |
       | CANCELLED   |
 
-    ## TODO Scenario 로 대체. (존재하지 않는 예약 ID)
-  Scenario Outline: 잘못된 예약 ID로 상태 업데이트를 시도하면 실패한다
-    When 관리자가 예약 ID <reservationId>로 상태 업데이트를 시도한다
+  Scenario: 존재하지 않는 예약 ID로 상태 업데이트를 시도하면 실패한다
+    Given 예약이 존재하지 않는다.
+    When 관리자가 예약 상태를 변경한다
     Then 예약 상태 업데이트가 실패한다
-
-    Examples:
-      | reservationId | description   |
-      | 999           | 존재하지 않는 예약 ID |
-      | null          | null 예약 ID    |
-      | -1            | 음수 예약 ID      |
-      | 0             | 0 예약 ID       |
 
   ## TODO 상태값이 유효하지 않은 경우에 테스트 통합하기 (로직도 제거)
   Scenario: 빈 요청 본문으로 예약 상태 업데이트를 시도하면 실패한다
