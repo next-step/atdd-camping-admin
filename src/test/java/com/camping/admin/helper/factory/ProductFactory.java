@@ -1,4 +1,4 @@
-package com.camping.admin.helper;
+package com.camping.admin.helper.factory;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
