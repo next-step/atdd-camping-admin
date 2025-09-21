@@ -3,9 +3,9 @@ package com.camping.admin.helper.factory;
 import java.util.HashMap;
 
 /**
- * api 호출용 request 모음
+ * 대여(rental) api 호출용 request 모음
  */
-public class RequestFactory {
+public class RentalRequestFactory {
 
     public static HashMap<String, Object> createRentalRequest(Long reservationId,
                                                               Long productId,
