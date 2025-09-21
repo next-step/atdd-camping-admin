@@ -35,21 +35,6 @@ public class UpdateReservationSteps {
         lastResponse = patch(RESERVATIONS_PATH + "/" + reservationId + "/status", request);
     }
 
-    @When("관리자가 {string} 상태값으로 업데이트를 시도한다")
-    public void 관리자가_특정_상태값으로_업데이트를_시도한다(String statusType) {
-        Map<String, Object> request = new HashMap<>();
-        
-        if ("\"\"".equals(statusType) || "".equals(statusType)) {
-            request.put("status", "");
-        } else if ("null".equals(statusType)) {
-            request.put("status", null);
-        } else {
-            request.put("status", statusType);
-        }
-        
-        lastResponse = patch(RESERVATIONS_PATH + "/" + reservationId + "/status", request);
-    }
-
     @Then("예약 상태 업데이트에 성공했다")
     public void 예약_상태_업데이트에_성공했다() {
         lastResponse.then()
