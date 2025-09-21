@@ -38,10 +38,4 @@ public class RequestSender {
                 .when()
                 .patch(url);
     }
-
-    public static Response patch(String url) {
-        return commonRequest()
-                .when()
-                .patch(url);
-    }
 }
