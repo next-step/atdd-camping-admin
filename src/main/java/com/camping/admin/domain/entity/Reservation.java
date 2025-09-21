@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,9 @@ public class Reservation {
     
     private String phoneNumber;
     
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
     
     @Column(length = 6)
     private String confirmationCode;
@@ -47,7 +50,7 @@ public class Reservation {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "CONFIRMED";
+            this.status = ReservationStatus.CONFIRMED;
         }
     }
     
