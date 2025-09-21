@@ -50,7 +50,7 @@ public class ReservationAdminController {
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
 
         // DTO에서 이미 유효성 검사가 완료된 enum 값을 사용
-        reservation.setStatus(request.getStatus().name());
+        reservation.setStatus(request.getStatus());
 
         reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
