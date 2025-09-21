@@ -1,6 +1,5 @@
 Feature: 예약 상태 업데이트
 
-# TODO: parameterizedTest 적용 필요
   Scenario Outline: 예약 상태를 성공적으로 업데이트한다
     Given 예약이 존재한다
     When 관리자가 예약 상태를 '<status>'로 변경한다
@@ -17,10 +16,16 @@ Feature: 예약 상태 업데이트
       | CHECKED_OUT |
       | CANCELLED   |
 
-  Scenario: 존재하지 않는 예약의 상태 업데이트를 시도하면 실패한다.
-    When 예약 ID 999는 존재하지 않는다
-    And 관리자가 예약 상태를 변경한다
+  Scenario Outline: 잘못된 예약 ID로 상태 업데이트를 시도하면 실패한다
+    When 관리자가 예약 ID <reservationId>로 상태 업데이트를 시도한다
     Then 예약 상태 업데이트가 실패한다
+
+    Examples:
+      | reservationId | description   |
+      | 999           | 존재하지 않는 예약 ID |
+      | null          | null 예약 ID    |
+      | -1            | 음수 예약 ID      |
+      | 0             | 0 예약 ID       |
 
   Scenario: 빈 요청 본문으로 상태 업데이트를 시도하면 실패한다.
     Given 예약이 존재한다
@@ -42,25 +47,6 @@ Feature: 예약 상태 업데이트
     When 관리자가 빈 문자열 상태값으로 업데이트를 시도한다
     Then 예약 상태 업데이트에 성공했다
     And 예약 상태가 'CONFIRMED'로 유지되었다
-
-  Scenario: null 예약 ID로 상태 업데이트를 시도하면 실패한다.
-    When 관리자가 null 예약 ID로 상태 업데이트를 시도한다
-    Then 예약 상태 업데이트가 실패한다
-
-  ## TODO: 겹침 with 존재하지 않는 예약의 상태 업데이트를 시도하면 실패한다.
-  Scenario: 음수 예약 ID로 상태 업데이트를 시도하면 실패한다.
-    When 관리자가 예약 ID -1로 상태 업데이트를 시도한다
-    Then 예약 상태 업데이트가 실패한다
-
-    ## TODO: 겹침 with 존재하지 않는 예약의 상태 업데이트를 시도하면 실패한다.
-  Scenario: 0 예약 ID로 상태 업데이트를 시도하면 실패한다.
-    When 관리자가 예약 ID 0으로 상태 업데이트를 시도한다
-    Then 예약 상태 업데이트가 실패한다
-
-    ## TODO: 겹침 with 존재하지 않는 예약의 상태 업데이트를 시도하면 실패한다.
-  Scenario: 매우 큰 예약 ID로 상태 업데이트를 시도하면 실패한다.
-    When 관리자가 예약 ID 9999999999로 상태 업데이트를 시도한다
-    Then 예약 상태 업데이트가 실패한다
 
     ## TODO: 겹침 with 빈 요청 본문으로 상태 업데이트를 시도하면 실패한다.
   Scenario: null 요청 본문으로 상태 업데이트를 시도하면 실패한다.
