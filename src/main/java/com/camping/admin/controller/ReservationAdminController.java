@@ -2,6 +2,7 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,26 +45,12 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody Map<String, Object> body) {
+            @RequestBody UpdateReservationStatusRequest request) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
 
-        if (body == null || body.isEmpty()) {
-            return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
-        }
-
-        Object statusObj = body.get("status");
-        if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
-        } else {
-            String statusValue = statusObj.toString();
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
-            } else {
-                // 단순히 그대로 대입
-                reservation.setStatus(statusValue);
-            }
-        }
+        // DTO에서 이미 유효성 검사가 완료된 enum 값을 사용
+        reservation.setStatus(request.getStatus().name());
 
         reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
