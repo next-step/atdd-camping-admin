@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.camping.admin.helper.CommonContext.lastResponse;
-import static com.camping.admin.helper.RequestSender.get;
 import static com.camping.admin.helper.RequestSender.patch;
 import static org.hamcrest.Matchers.equalTo;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.OK;
 
 @DisplayName("예약 상태 업데이트 테스트")
 public class UpdateReservationSteps {
@@ -91,12 +91,8 @@ public class UpdateReservationSteps {
 
     @Then("예약 상태 업데이트가 실패한다")
     public void 예약_상태_업데이트가_실패한다() {
-        // BAD_REQUEST(400) 또는 INTERNAL_SERVER_ERROR(500) 허용
-        // null ID의 경우 Spring에서 500을 반환할 수 있음
-        int statusCode = lastResponse.getStatusCode();
-        if (statusCode != BAD_REQUEST.value() && statusCode != INTERNAL_SERVER_ERROR.value()) {
-            throw new AssertionError("Expected status code 400 or 500, but was " + statusCode);
-        }
+        lastResponse.then()
+                .statusCode(BAD_REQUEST.value());
     }
 
     @And("예약 상태가 {string}로 변경되었다")
