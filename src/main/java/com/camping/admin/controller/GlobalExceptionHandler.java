@@ -2,7 +2,10 @@ package com.camping.admin.controller;
 
 import com.camping.admin.dto.ErrorResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -35,5 +38,24 @@ public class GlobalExceptionHandler {
         log.error("Unexpected exception occurred: {}", e.getMessage(), e);
         var errorResponse = new ErrorResponse("Internal server error", INTERNAL_SERVER_ERROR.value());
         return ResponseEntity.status(INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
+        log.warn("MethodArgumentNotValidException occurred: {}", e.getMessage());
+        var message = e.getBindingResult().getFieldErrors().stream()
+                .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                .findFirst()
+                .orElse("유효하지 않은 요청입니다.");
+        var errorResponse = new ErrorResponse(message, BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.warn("HttpMessageNotReadableException occurred: {}", e.getMessage());
+        var message = "잘못된 요청 형식입니다.";
+        var errorResponse = new ErrorResponse(message, BAD_REQUEST.value());
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }
