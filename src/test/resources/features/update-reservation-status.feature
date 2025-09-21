@@ -50,11 +50,3 @@ Feature: 예약 상태 업데이트
     Given 예약이 존재한다
     When 관리자가 null 요청 본문으로 상태 업데이트를 시도한다
     Then 예약 상태 업데이트가 실패한다
-
-     ## TODO: 지워야하는 테스트
-  Scenario: 여러 키가 있는 요청에서 status만 처리한다.
-    Given 예약이 존재한다
-    When 관리자가 여러 키가 포함된 요청으로 상태를 'CANCELLED'로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'CANCELLED'로 변경되었다
-    And 다른 필드는 변경되지 않았다
