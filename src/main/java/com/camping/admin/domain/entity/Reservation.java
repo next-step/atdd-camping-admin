@@ -62,11 +62,4 @@ public class Reservation {
     public void updateStatus(ReservationStatus status) {
         this.status = status;
     }
-
-    public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite) {
-        this.customerName = customerName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.campsite = campsite;
-    }
 }
