@@ -81,10 +81,7 @@ public class RentalSteps {
 
     @And("대여된 제품의 재고가 {int}개로 감소했다")
     public void 제품_재고가_감소된다(Integer quantity) {
-        var products = get("/admin/products")
-                .then()
-                .log().all()
-                .extract();
+        var products = get("/admin/products");
 
         // productId에 해당하는 제품의 stockQuantity 확인
         var actualStockQuantity = products.jsonPath()
