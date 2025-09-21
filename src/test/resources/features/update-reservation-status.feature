@@ -1,11 +1,21 @@
 Feature: 예약 상태 업데이트
 
 # TODO: parameterizedTest 적용 필요
-  Scenario: 존재하는 예약의 상태를 성공적으로 업데이트한다.
+  Scenario Outline: 예약 상태를 성공적으로 업데이트한다
     Given 예약이 존재한다
-    When 관리자가 예약 상태를 'CHECKED_IN'으로 변경한다
+    When 관리자가 예약 상태를 '<status>'로 변경한다
     Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'CHECKED_IN'으로 변경되었다
+    And 예약 상태가 '<status>'로 변경되었다
+
+    Examples:
+      | status      |
+      | WAITING     |
+      | PENDING     |
+      | CONFIRMED   |
+      | REJECTED    |
+      | CHECKED_IN  |
+      | CHECKED_OUT |
+      | CANCELLED   |
 
   Scenario: 존재하지 않는 예약의 상태 업데이트를 시도하면 실패한다.
     When 예약 ID 999는 존재하지 않는다
@@ -32,28 +42,6 @@ Feature: 예약 상태 업데이트
     When 관리자가 빈 문자열 상태값으로 업데이트를 시도한다
     Then 예약 상태 업데이트에 성공했다
     And 예약 상태가 'CONFIRMED'로 유지되었다
-
-  ## TODO: '존재하는 예약의 상태를 성공적으로 업데이트한다.' 와 겹침
-  Scenario: 예약 상태를 CANCELLED로 변경한다.
-    Given 예약이 존재한다
-    When 관리자가 예약 상태를 'CANCELLED'로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'CANCELLED'로 변경되었다
-
-  ## TODO: '존재하는 예약의 상태를 성공적으로 업데이트한다.' 와 겹침
-  Scenario: 예약 상태를 CHECKED_OUT으로 변경한다.
-    Given 예약이 존재한다
-    When 관리자가 예약 상태를 'CHECKED_OUT'으로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'CHECKED_OUT'로 변경되었다
-
-    ## TODO: '존재하는 예약의 상태를 성공적으로 업데이트한다.' 와 겹침
-  Scenario: 예약 상태를 REJECTED로 변경한다.
-    Given 예약이 존재한다
-    When 관리자가 예약 상태를 'REJECTED'로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'REJECTED'로 변경되었다
-
 
   Scenario: null 예약 ID로 상태 업데이트를 시도하면 실패한다.
     When 관리자가 null 예약 ID로 상태 업데이트를 시도한다
@@ -106,7 +94,6 @@ Feature: 예약 상태 업데이트
     When 관리자가 개행 문자만 있는 상태값으로 업데이트를 시도한다
     Then 예약 상태 업데이트에 성공했다
     And 예약 상태가 'CONFIRMED'로 유지되었다
-
 
      ## TODO: 유효하지 않은 값 : 실패
   Scenario: status 키가 존재하지만 값이 null인 경우 기존 상태를 유지한다.
@@ -164,18 +151,7 @@ Feature: 예약 상태 업데이트
     When 관리자가 유니코드 문자가 포함된 상태값으로 업데이트를 시도한다
     Then 예약 상태 업데이트에 성공했다
     And 예약 상태가 유니코드 문자가 포함된 값으로 변경되었다
- ## TODO: '존재하는 예약의 상태를 성공적으로 업데이트한다.' 와 겹침
-  Scenario: 예약 상태를 WAITING으로 변경한다.
-    Given 예약이 존재한다
-    When 관리자가 예약 상태를 'WAITING'으로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'WAITING'으로 변경되었다
- ## TODO: '존재하는 예약의 상태를 성공적으로 업데이트한다.' 와 겹침
-  Scenario: 예약 상태를 PENDING으로 변경한다.
-    Given 예약이 존재한다
-    When 관리자가 예약 상태를 'PENDING'으로 변경한다
-    Then 예약 상태 업데이트에 성공했다
-    And 예약 상태가 'PENDING'으로 변경되었다
+
      ## TODO: 지워야하는 테스트
   Scenario: 여러 키가 있는 요청에서 status만 처리한다.
     Given 예약이 존재한다
