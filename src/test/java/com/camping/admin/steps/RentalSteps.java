@@ -43,10 +43,20 @@ public class RentalSteps {
     public void 사용자가_예약을_하지_않았다() {
         reservationId = null;
     }
+
     @When("사용자가 제품을 {int}개 대여한다")
     public void 사용자가_제품을_대여한다(Integer quantity) {
         lastResponse = post("/admin/rentals",
                 createRentalRequest(reservationId, productId, quantity));
+    }
+
+    @When("사용자가 재고가 부족한 제품을 대여한다")
+    public void 사용자가_재고가_부족한_제품을_대여한다() {
+        var product = productOf(20);
+        productId = product.getId();
+
+        lastResponse = post("/admin/rentals",
+                createRentalRequest(reservationId, productId, 21)); // 현재 재고보다 1개 더 요청
     }
 
     @Then("대여에 성공했다")
