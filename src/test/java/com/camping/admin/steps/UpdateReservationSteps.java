@@ -6,14 +6,12 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.junit.jupiter.api.DisplayName;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import static com.camping.admin.domain.enums.ReservationStatus.CONFIRMED;
 import static com.camping.admin.helper.CommonContext.lastResponse;
 import static com.camping.admin.helper.RequestSender.patch;
 import static com.camping.admin.helper.ResponseValidator.isBadRequest;
 import static com.camping.admin.helper.ResponseValidator.isOk;
+import static com.camping.admin.helper.factory.ReservationRequestFactory.updateRentalRequest;
 import static org.hamcrest.Matchers.equalTo;
 
 @DisplayName("예약 상태 업데이트 테스트")
@@ -29,9 +27,7 @@ public class UpdateReservationSteps {
 
     @When("관리자가 예약 상태를 {string}로 변경한다")
     public void 관리자가_예약_상태를_변경한다(String status) {
-        Map<String, Object> request = new HashMap<>();
-        request.put("status", status);
-        
+        var request = updateRentalRequest(status);
         lastResponse = patch(RESERVATIONS_PATH + "/" + reservationId + "/status", request);
     }
 
@@ -58,9 +54,7 @@ public class UpdateReservationSteps {
 
     @When("관리자가 예약 상태를 변경한다")
     public void 관리자가_예약상태를_변경한다() {
-        Map<String, Object> request = new HashMap<>();
-        request.put("status", CONFIRMED);
-
+        var request = updateRentalRequest(CONFIRMED.name());
         lastResponse = patch(RESERVATIONS_PATH + "/" + reservationId + "/status", request);
     }
 }
