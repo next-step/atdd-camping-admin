@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.support.api.AuthApi;
+import com.camping.admin.support.api.ReservationApi;
 import com.camping.admin.support.context.ReservationWorld;
 import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Given;
@@ -18,6 +19,7 @@ public class ReservationStepDefs {
 
     private final ReservationWorld world;
     private final AuthApi authApi = new AuthApi();
+    private final ReservationApi reservationApi = new ReservationApi();
 
     public ReservationStepDefs(ReservationWorld world) {
         this.world = world;
@@ -35,17 +37,7 @@ public class ReservationStepDefs {
 
     @When("관리자가 WATING 상태인 예약 상태를 PENDING 상태로 변경한다.")
     public void 관리자가WATING상태인예약상태를PENDING상태로변경한다() {
-        var body = Map.of("status", "PENDING");
-        var response = given()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + world.authToken)
-                .body(body)
-                .when()
-                .patch("/admin/reservations/{id}/status", world.reservationId)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
-
+        var response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
         ReservationResponse reservationResponse = response.as(ReservationResponse.class);
         world.status = reservationResponse.getStatus();
     }
@@ -62,15 +54,7 @@ public class ReservationStepDefs {
 
     @When("관리자가 예약 ID 9999 의 상태를 PENDING 상태로 변경한다.")
     public void 관리자가예약ID의상태를PENDING상태로변경한다() {
-        var body = Map.of("status", "PENDING");
-        world.response = given()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + world.authToken)
-                .body(body)
-                .when()
-                .patch("/admin/reservations/{id}/status", world.reservationId)
-                .then().log().all()
-                .extract();
+        world.response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
     }
 
     @Then("에러 응답이 발생한다.")
