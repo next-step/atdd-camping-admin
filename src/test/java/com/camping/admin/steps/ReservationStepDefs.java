@@ -38,8 +38,7 @@ public class ReservationStepDefs {
     @When("관리자가 WAITING 상태인 예약 상태를 PENDING 상태로 변경한다.")
     public void 관리자가WAITING상태인예약상태를PENDING상태로변경한다() {
         var response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
-        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
-        world.status = reservationResponse.getStatus();
+        world.status = response.jsonPath().get("status");
     }
 
     @Then("예약 상태가 PENDING 으로 변경된다.")
@@ -63,4 +62,15 @@ public class ReservationStepDefs {
     }
 
 
+    @When("특정 예약에 대해 공백 상태로 예약 상태를 변경한다.")
+    public void 특정예약에대해공백상태로예약상태를변경한다() {
+        var response = reservationApi.patchStatus(world.authToken, 1, "");
+        world.status = response.jsonPath().get("status");
+    }
+
+
+    @Then("예약 상태가 기존 상태로 유지된다.")
+    public void 예약상태가기존상태로유지된다() {
+        assertThat(world.status).isNotBlank();
+    }
 }
