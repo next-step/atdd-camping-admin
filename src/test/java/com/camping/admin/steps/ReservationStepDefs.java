@@ -30,13 +30,13 @@ public class ReservationStepDefs {
         world.authToken = authApi.loginAndGetCookieToken("admin", "admin123");
     }
 
-    @Given("WATING 상태인 예약이 존재한다.")
+    @Given("WAITING 상태인 예약이 존재한다.")
     public void wating상태인예약이존재한다() {
         world.reservationId = 13L;
     }
 
-    @When("관리자가 WATING 상태인 예약 상태를 PENDING 상태로 변경한다.")
-    public void 관리자가WATING상태인예약상태를PENDING상태로변경한다() {
+    @When("관리자가 WAITING 상태인 예약 상태를 PENDING 상태로 변경한다.")
+    public void 관리자가WAITING상태인예약상태를PENDING상태로변경한다() {
         var response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
         ReservationResponse reservationResponse = response.as(ReservationResponse.class);
         world.status = reservationResponse.getStatus();
