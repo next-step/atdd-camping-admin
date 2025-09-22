@@ -73,7 +73,7 @@ public class RentalSteps {
         isCreated(lastResponse);
     }
 
-    @And("대여 상태가 '대여중'이다") // TODO: 3단계 리팩터링에서 대여중과 false를 매핑시키는 enum 추가하기
+    @And("대여 상태가 '대여중'이다")
     public void 대여상태가_대여중_이다() {
         lastResponse.then()
                 .body("isReturned", equalTo(false));
