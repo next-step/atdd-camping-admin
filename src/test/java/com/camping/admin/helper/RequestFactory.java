@@ -9,7 +9,7 @@ public class RequestFactory {
 
     public static HashMap<String, Object> createRentalRequest(Long reservationId,
                                                               Long productId,
-                                                              Long quantity) {
+                                                              Integer quantity) {
         var request = new HashMap<String, Object>();
         request.put("reservationId", reservationId);
         request.put("productId", productId);
