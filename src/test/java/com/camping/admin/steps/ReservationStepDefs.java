@@ -23,6 +23,11 @@ public class ReservationStepDefs {
         this.world = world;
     }
 
+    @Given("관리자가 로그인을 하였다.")
+    public void 관리자가로그인을하였다() {
+        world.authToken = authApi.loginAndGetCookieToken("admin", "admin123");
+    }
+
     @Given("WATING 상태인 예약이 존재한다.")
     public void wating상태인예약이존재한다() {
         world.reservationId = 13L;
@@ -30,7 +35,6 @@ public class ReservationStepDefs {
 
     @When("관리자가 WATING 상태인 예약 상태를 PENDING 상태로 변경한다.")
     public void 관리자가WATING상태인예약상태를PENDING상태로변경한다() {
-        world.authToken = authApi.loginAndGetCookieToken("admin", "admin123");
         var body = Map.of("status", "PENDING");
         var response = given()
                 .contentType("application/json")
@@ -58,7 +62,6 @@ public class ReservationStepDefs {
 
     @When("관리자가 예약 ID 9999 의 상태를 PENDING 상태로 변경한다.")
     public void 관리자가예약ID의상태를PENDING상태로변경한다() {
-        world.authToken = authApi.loginAndGetCookieToken("admin", "admin123");
         var body = Map.of("status", "PENDING");
         world.response = given()
                 .contentType("application/json")
@@ -74,4 +77,6 @@ public class ReservationStepDefs {
     public void 에러응답이발생한다() {
         assertThat(world.response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
+
+
 }
