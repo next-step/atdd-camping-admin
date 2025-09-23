@@ -1,6 +1,7 @@
 package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.fixture.ReservationFixture;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
 import io.cucumber.java.en.Given;
@@ -30,12 +31,9 @@ public class ReservationSteps extends BaseSteps {
     @Sql
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {
-        var reservation = new Reservation(
-                "홍길동",
-                LocalDate.now(),
-                LocalDate.now().plusDays(2),
-                campsiteRepository.findById(1L).get()
-        );
+        var reservation = ReservationFixture.builder()
+                .campsite(campsiteRepository.findById(1L).get())
+                .build();
         var reservationEntity = reservationRepository.save(reservation);
         this.reservationId = reservationEntity.getId();
     }

@@ -53,6 +53,9 @@ dependencies {
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
     testImplementation "io.rest-assured:spring-mock-mvc:${restAssuredVersion}"
 
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+
     // JWT (jjwt)
     implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
     runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
