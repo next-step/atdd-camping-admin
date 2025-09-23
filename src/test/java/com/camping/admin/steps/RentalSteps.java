@@ -7,14 +7,14 @@ import io.cucumber.java.en.When;
 import org.junit.jupiter.api.DisplayName;
 
 import static com.camping.admin.helper.CommonContext.lastResponse;
-import static com.camping.admin.helper.ProductFactory.productOf;
-import static com.camping.admin.helper.RequestFactory.createRentalRequest;
 import static com.camping.admin.helper.RequestSender.get;
 import static com.camping.admin.helper.RequestSender.post;
+import static com.camping.admin.helper.ResponseValidator.*;
+import static com.camping.admin.helper.factory.ProductFactory.productOf;
+import static com.camping.admin.helper.factory.RentalRequestFactory.createRentalRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.springframework.http.HttpStatus.*;
 
 @DisplayName("대여 생성 테스트")
 public class RentalSteps {
@@ -70,11 +70,10 @@ public class RentalSteps {
 
     @Then("대여에 성공했다")
     public void 대여에_성공했다() {
-        lastResponse.then()
-                .statusCode(CREATED.value());
+        isCreated(lastResponse);
     }
 
-    @And("대여 상태가 '대여중'이다") // TODO: 3단계 리팩터링에서 대여중과 false를 매핑시키는 enum 추가하기
+    @And("대여 상태가 '대여중'이다")
     public void 대여상태가_대여중_이다() {
         lastResponse.then()
                 .body("isReturned", equalTo(false));
@@ -82,10 +81,7 @@ public class RentalSteps {
 
     @And("대여된 제품의 재고가 {int}개로 감소했다")
     public void 제품_재고가_감소된다(Integer quantity) {
-        var products = get("/admin/products")
-                .then()
-                .log().all()
-                .extract();
+        var products = get("/admin/products");
 
         // productId에 해당하는 제품의 stockQuantity 확인
         var actualStockQuantity = products.jsonPath()
@@ -96,14 +92,12 @@ public class RentalSteps {
 
     @Then("대여 요청이 실패한다")
     public void 대여_요청이_실패한다() {
-        lastResponse.then()
-                .statusCode(BAD_REQUEST.value());
+        isBadRequest(lastResponse);
     }
 
     @Then("재고 부족으로 대여 요청이 실패한다")
     public void 재고_부족으로_대여_요청이_실패한다() {
-        lastResponse.then()
-                .statusCode(CONFLICT.value());
+        isConflict(lastResponse);
     }
 
     @And("대여 조회시 예약 정보가 존재하지 않는다")
