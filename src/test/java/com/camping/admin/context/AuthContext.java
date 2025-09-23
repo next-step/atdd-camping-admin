@@ -1,6 +1,6 @@
-package context;
+package com.camping.admin.context;
 
-import hooks.AuthHooks;
+import com.camping.admin.hooks.AuthHooks;
 
 public class AuthContext {
     private static final String accessToken = AuthHooks.getAccessToken();

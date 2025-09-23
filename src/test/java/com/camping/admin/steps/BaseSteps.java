@@ -1,4 +1,4 @@
-package steps;
+package com.camping.admin.steps;
 
 import com.camping.admin.CampingAdminServiceApplication;
 import io.cucumber.spring.CucumberContextConfiguration;

@@ -1,6 +1,5 @@
-package steps;
+package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
@@ -15,8 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 import java.time.LocalDate;
 import java.util.Map;
 
-import static api.ReservationApiClient.sendChangeStatus;
-import static context.AuthContext.getAccessToken;
+import static com.camping.admin.api.ReservationApiClient.sendChangeStatus;
+import static com.camping.admin.context.AuthContext.getAccessToken;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps extends BaseSteps {

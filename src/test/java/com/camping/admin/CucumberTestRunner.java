@@ -1,3 +1,5 @@
+package com.camping.admin;
+
 import org.junit.platform.suite.api.SelectClasspathResource;
 import org.junit.platform.suite.api.Suite;
 

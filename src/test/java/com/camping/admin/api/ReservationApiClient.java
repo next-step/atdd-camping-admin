@@ -1,4 +1,4 @@
-package api;
+package com.camping.admin.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
