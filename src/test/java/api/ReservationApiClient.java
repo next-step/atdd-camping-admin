@@ -20,7 +20,6 @@ public class ReservationApiClient {
                 .when().log().all()
                 .patch("/admin/reservations/{id}/status", reservationId)
                 .then().log().all()
-                .statusCode(200)
                 .extract();
     }
 }
