@@ -37,6 +37,9 @@ values
   (11, '고다빈', DATEADD('DAY', -3, current_date), DATEADD('DAY', -2, current_date), 1, '010-9090-1010', 'CONFIRMED', DATEADD('DAY', -4, current_date), 'R00011', DATEADD('DAY', -4, current_timestamp)),
   (12, '한도윤', DATEADD('DAY', -1, current_date), current_date, 2, '010-2323-4545', 'CONFIRMED', DATEADD('DAY', -2, current_date), 'R00012', DATEADD('DAY', -2, current_timestamp));
 
+ALTER TABLE reservations ALTER COLUMN id RESTART WITH 13;
+
+
 -- Sales Records
 insert into sales_records (id, product_id, quantity, total_price, created_at) values
   (1, 2, 3, 30000.00, DATEADD('DAY', -1, current_timestamp)),

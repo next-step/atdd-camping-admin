@@ -1,25 +1,44 @@
 package steps;
 
+import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.repository.CampsiteRepository;
+import com.camping.admin.repository.ReservationRepository;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.jdbc.Sql;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 import static api.ReservationApiClient.sendChangeStatus;
 import static context.AuthContext.getAccessToken;
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ReservationSteps {
+public class ReservationSteps extends BaseSteps {
     long reservationId;
     ExtractableResponse<Response> response;
 
-    @Given("사용자가 예약을 했다 {long}")
-    public void 사용자가예약을했다(long reservationId) {
-        // 기본 데이터 사용
-        this.reservationId = reservationId;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private CampsiteRepository campsiteRepository;
+
+    @Sql
+    @Given("사용자가 예약을 했다")
+    public void 사용자가예약을했다() {
+        var reservation = new Reservation(
+                "홍길동",
+                LocalDate.now(),
+                LocalDate.now().plusDays(2),
+                campsiteRepository.findById(1L).get()
+        );
+        var reservationEntity = reservationRepository.save(reservation);
+        this.reservationId = reservationEntity.getId();
     }
 
     @When("관리자가 예약을 {string} 상태로 변경한다")
