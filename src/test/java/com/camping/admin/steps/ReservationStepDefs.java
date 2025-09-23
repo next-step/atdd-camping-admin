@@ -4,50 +4,73 @@ import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.support.api.AuthApi;
+import com.camping.admin.support.api.ReservationApi;
+import com.camping.admin.support.context.ReservationWorld;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.response.ExtractableResponse;
 import java.util.Map;
 import org.springframework.http.HttpStatus;
 
 public class ReservationStepDefs {
 
-    private Long reservationId;
-    private String adminToken;
-    private String status;
+    private final ReservationWorld world;
+    private final AuthApi authApi = new AuthApi();
+    private final ReservationApi reservationApi = new ReservationApi();
 
-    @Given("WATING 상태인 예약이 존재한다.")
-    public void wating상태인예약이존재한다() {
-        reservationId = 13L;
+    public ReservationStepDefs(ReservationWorld world) {
+        this.world = world;
     }
 
-    @When("관리자가 WATING 상태인 예약 상태를 PENDING 상태로 변경한다.")
-    public void 관리자가WATING상태인예약상태를PENDING상태로변경한다() {
-        adminToken = given()
-                .contentType("application/json")
-                .body(Map.of("username", "admin", "password", "admin123"))
-                .when().post("/auth/login")
-                .then().log().all()
-                .extract()
-                .cookie("AUTH_TOKEN");
+    @Given("관리자가 로그인을 하였다.")
+    public void 관리자가로그인을하였다() {
+        world.authToken = authApi.loginAndGetCookieToken("admin", "admin123");
+    }
 
-        var body = Map.of("status", "PENDING");
-        var response = given()
-                .contentType("application/json")
-                .header("Authorization", "Bearer " + adminToken)
-                .body(body)
-                .when()
-                .patch("/admin/reservations/{id}/status", reservationId)
-                .then().log().all()
-                .statusCode(HttpStatus.OK.value())
-                .extract();
+    @Given("WAITING 상태인 예약이 존재한다.")
+    public void wating상태인예약이존재한다() {
+        world.reservationId = 13L;
+    }
 
-        ReservationResponse reservationResponse = response.as(ReservationResponse.class);
-        status = reservationResponse.getStatus();
+    @When("관리자가 WAITING 상태인 예약 상태를 PENDING 상태로 변경한다.")
+    public void 관리자가WAITING상태인예약상태를PENDING상태로변경한다() {
+        var response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
+        world.status = response.jsonPath().get("status");
     }
 
     @Then("예약 상태가 PENDING 으로 변경된다.")
     public void 예약상태가PENDING으로변경된다() {
-        assertThat(status).isEqualTo("PENDING");
+        assertThat(world.status).isEqualTo("PENDING");
+    }
+
+    @Given("존재하지 않는 예약 ID 9999 가 있다.")
+    public void 존재하지않는예약ID가있다() {
+        world.reservationId = 9999L;
+    }
+
+    @When("관리자가 예약 ID 9999 의 상태를 PENDING 상태로 변경한다.")
+    public void 관리자가예약ID의상태를PENDING상태로변경한다() {
+        world.response = reservationApi.patchStatus(world.authToken, world.reservationId, "PENDING");
+    }
+
+    @Then("에러 응답이 발생한다.")
+    public void 에러응답이발생한다() {
+        assertThat(world.response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+    }
+
+
+    @When("특정 예약에 대해 공백 상태로 예약 상태를 변경한다.")
+    public void 특정예약에대해공백상태로예약상태를변경한다() {
+        var response = reservationApi.patchStatus(world.authToken, 1, "");
+        world.status = response.jsonPath().get("status");
+    }
+
+
+    @Then("예약 상태가 기존 상태로 유지된다.")
+    public void 예약상태가기존상태로유지된다() {
+        assertThat(world.status).isNotBlank();
     }
 }
