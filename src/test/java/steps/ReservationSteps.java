@@ -8,6 +8,7 @@ import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Map;
@@ -20,10 +21,10 @@ public class ReservationSteps {
     ExtractableResponse<Response> response;
     String accessToken = AuthHooks.getAccessToken();
 
-    @Given("사용자가 예약을 했다")
-    public void 사용자가예약을했다() {
+    @Given("사용자가 예약을 했다 {long}")
+    public void 사용자가예약을했다(long reservationId) {
         // 기본 데이터 사용
-        reservationId = 1;
+        this.reservationId = reservationId;
     }
 
     @When("관리자가 예약을 {string} 상태로 변경한다")
@@ -49,5 +50,16 @@ public class ReservationSteps {
     @Then("변경은 실패한다")
     public void 변경은실패한다() {
         assertThat(response.statusCode()).isEqualTo(500);
+    }
+
+    @When("관리자가 상태값을 입력하지 않고 변경한다")
+    public void 관리자가상태값을입력하지않고변경한다() {
+        response = sendChangeStatus(accessToken, reservationId, Map.of("hasNotStatus", "DUMMY"));
+    }
+
+    @Then("예약 상태는 변경되지 않는다")
+    public void 예약상태는변경되지않는다() {
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.jsonPath().getString("status")).isEqualTo("CONFIRMED");
     }
 }

@@ -1,6 +1,6 @@
 Feature: 예약 상태 변경
   Scenario: 관리자가 예약을 취소한다
-    Given 사용자가 예약을 했다
+    Given 사용자가 예약을 했다 1
     When 관리자가 예약을 "CANCELLED" 상태로 변경한다
     Then 예약은 취소된다
 
@@ -10,7 +10,7 @@ Feature: 예약 상태 변경
     Then 변경은 실패한다
 
   Scenario: 상태값을 입력하지 않은 경우 변경되지 않는다.
-    Given 사용자가 예약을 했다.
+    Given 사용자가 예약을 했다 2
     When 관리자가 상태값을 입력하지 않고 변경한다
     Then 예약 상태는 변경되지 않는다
 
