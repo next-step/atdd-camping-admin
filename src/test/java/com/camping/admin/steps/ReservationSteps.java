@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.fixture.ReservationFixture;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
@@ -10,9 +9,7 @@ import io.cucumber.java.en.When;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.jdbc.Sql;
 
-import java.time.LocalDate;
 import java.util.Map;
 
 import static com.camping.admin.api.ReservationApiClient.sendChangeStatus;
@@ -28,7 +25,6 @@ public class ReservationSteps extends BaseSteps {
     @Autowired
     private CampsiteRepository campsiteRepository;
 
-    @Sql
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {
         var reservation = ReservationFixture.builder()
