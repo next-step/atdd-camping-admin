@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -61,5 +62,24 @@ public class ReservationStepDefs {
     @Then("변경 요청이 성공한다")
     public void 변경요청이성공한다() {
         CommonContext.lastResponse.then().statusCode(200);
+    }
+
+    @When("관리자가 변경 내용 없이 사용자 예약 상태 변경을 시도한다")
+    public void 관리자가변경내용없이사용자예약상태변경을시도한다() {
+        String url = String.format("/admin/reservations/%d/status", reservationId);
+
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, Map.of());
+    }
+
+    @Then("잘못된 요청 형식으로 인해 예약 상태 변경이 실패한다")
+    public void 잘못된요청형식으로인해예약상태변경이실패한다() {
+        CommonContext.lastResponse.then().statusCode(400);
+    }
+
+    @And("응답에 기존 사용자 예약 정보가 포함된다")
+    public void 응답에기존사용자예약정보가포함된다() {
+        Long extractedId = CommonContext.lastResponse.then().extract().jsonPath().getLong("id");
+
+        assertThat(extractedId).isEqualTo(reservationId);
     }
 }
