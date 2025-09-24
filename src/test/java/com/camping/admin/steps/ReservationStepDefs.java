@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import static com.camping.admin.support.CommonContext.lastParams;
 import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -12,6 +13,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
@@ -23,7 +25,9 @@ public class ReservationStepDefs {
 
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {
+        // data.sql 기반 픽스처 세팅
         reservationId = 1L;
+        lastParams.put("status", "CONFIRMED");
 
         // 여러 테스트에서 사용해도 해당 예약 상태가 동일하도록 초기화 수행
         String url = String.format("/admin/reservations/%d/status", reservationId);
@@ -78,8 +82,11 @@ public class ReservationStepDefs {
 
     @And("응답에 기존 사용자 예약 정보가 포함된다")
     public void 응답에기존사용자예약정보가포함된다() {
-        Long extractedId = CommonContext.lastResponse.then().extract().jsonPath().getLong("id");
+        JsonPath jsonPath = CommonContext.lastResponse.then().extract().jsonPath();
+        Long extractedId = jsonPath.getLong("id");
+        String status = jsonPath.getString("status");
 
         assertThat(extractedId).isEqualTo(reservationId);
+        assertThat(status).isEqualTo(CommonContext.lastParams.get("status"));
     }
 }
