@@ -29,3 +29,10 @@ Feature: 관리자 예약 관리 기능
     When 관리자가 예약 상태를 null 값으로 변경을 시도한다
     Then 변경 요청이 성공한다
     And 예약은 "CONFIRMED" 상태다
+
+  Scenario: 사용자 예약을 변경할 상태를 빈 문자열로 지정하면 예약 상태가 변경되지 않는다
+    Given 사용자가 예약을 했다
+    When 관리자가 예약을 "" 상태로 변경한다
+    Then 변경 요청이 성공한다
+    And 예약은 "CONFIRMED" 상태다
+
