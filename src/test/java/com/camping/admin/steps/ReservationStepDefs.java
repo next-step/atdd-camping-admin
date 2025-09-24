@@ -9,6 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import io.cucumber.core.options.CurlOption.HttpMethod;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -17,6 +18,7 @@ import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ReservationStepDefs {
@@ -88,5 +90,15 @@ public class ReservationStepDefs {
 
         assertThat(extractedId).isEqualTo(reservationId);
         assertThat(status).isEqualTo(CommonContext.lastParams.get("status"));
+    }
+
+    @When("관리자가 예약 상태를 null 값으로 변경을 시도한다")
+    public void 관리자가예약상태를Null값으로변경을시도한다() {
+        String url = String.format("/admin/reservations/%d/status", reservationId);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", null);
+
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, body);
     }
 }
