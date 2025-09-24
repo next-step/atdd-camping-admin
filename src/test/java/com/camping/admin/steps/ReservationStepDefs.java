@@ -101,4 +101,17 @@ public class ReservationStepDefs {
 
         CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, body);
     }
+
+    @When("관리자가 전체 예약을 조회한다")
+    public void 관리자가_전체_예약을_조회한다() {
+        String url = "/admin/reservations";
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.GET, url, null);
+    }
+
+    @Then("조회된 예약 목록에는 {int}개 이상의 예약이 포함되어 있다")
+    public void 조회된_예약_목록에는_N개_이상의_예약이_포함되어_있다(int count) {
+        CommonContext.lastResponse.then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(count));
+    }
 }
