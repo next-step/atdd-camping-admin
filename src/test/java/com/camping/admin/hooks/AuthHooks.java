@@ -1,4 +1,4 @@
-package hooks;
+package com.camping.admin.hooks;
 
 import io.restassured.RestAssured;
 

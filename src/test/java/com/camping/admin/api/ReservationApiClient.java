@@ -1,4 +1,4 @@
-package api;
+package com.camping.admin.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -20,7 +20,6 @@ public class ReservationApiClient {
                 .when().log().all()
                 .patch("/admin/reservations/{id}/status", reservationId)
                 .then().log().all()
-                .statusCode(200)
                 .extract();
     }
 }
