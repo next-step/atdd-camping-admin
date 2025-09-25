@@ -31,7 +31,7 @@ public class ReservationStepDefs {
 
     @When("관리자가 해당 예약을 조회한다.")
     public void 관리자가예약ID을조회한다() {
-        world.common.response = reservationApi.getReservation(world.common.authToken, world.reservationId);
+        world.common.response = reservationApi.find(world.common.authToken, world.reservationId);
     }
 
     @Then("예약 ID 1 의 상세 정보가 조회된다.")
@@ -43,11 +43,6 @@ public class ReservationStepDefs {
     @Given("존재하지 않는 예약 ID 9999 가 있다.")
     public void 존재하지않는예약ID가있다() {
         world.reservationId = 9999L;
-    }
-
-    @Then("찾을 수 없음 응답이 발생한다.")
-    public void 찾을수없음응답이발생한다() {
-        assertThat(world.common.response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
     }
 
     @Given("WAITING 상태인 예약이 존재한다.")

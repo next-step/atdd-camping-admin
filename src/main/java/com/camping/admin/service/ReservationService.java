@@ -12,6 +12,10 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
+    public Reservation getReservationById(Long reservationId) {
+        return findReservationById(reservationId);
+    }
+
     public Reservation updateReservationStatus(final Long reservationId, final ReservationStatusUpdateRequest request) {
         Reservation reservation = findReservationById(reservationId);
         reservation.updateStatus(request);
