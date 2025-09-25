@@ -26,8 +26,8 @@ public class ReservationResponse {
         this.customerName = reservation.getCustomerName();
         this.startDate = reservation.getStartDate();
         this.endDate = reservation.getEndDate();
-        this.status = reservation.getStatus().name();
-        this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
+        this.status = reservation.getStatusName();
+        this.campsiteSiteNumber = reservation.getCampsiteSiteNumber();
         this.reservationDate = reservation.getReservationDate();
     }
 }

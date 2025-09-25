@@ -63,16 +63,13 @@ public class ReservationStepDefs {
         assertThat(world.response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
-
-    @When("특정 예약에 대해 공백 상태로 예약 상태를 변경한다.")
-    public void 특정예약에대해공백상태로예약상태를변경한다() {
-        var response = reservationApi.patchStatus(world.authToken, 1, "");
-        world.status = response.jsonPath().get("status");
+    @When("특정 예약에 대해 잘못된 상태로 예약 상태를 변경한다.")
+    public void 특정예약에대해잘못된상태로예약상태를변경한다() {
+        world.response = reservationApi.patchStatus(world.authToken, 1, "");
     }
 
-
-    @Then("예약 상태가 기존 상태로 유지된다.")
-    public void 예약상태가기존상태로유지된다() {
-        assertThat(world.status).isNotBlank();
+    @Then("잘못된 요청 응답이 발생한다.")
+    public void 잘못된요청응답이발생한다() {
+        assertThat(world.response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }

@@ -60,6 +60,14 @@ public class Reservation {
         this.campsite = campsite;
     }
 
+    public String getStatusName() {
+        return status.name();
+    }
+
+    public String getCampsiteSiteNumber() {
+        return campsite.getSiteNumber();
+    }
+
     public void updateStatus(ReservationStatusUpdateRequest request) {
         this.status = request.getStatus();
     }
