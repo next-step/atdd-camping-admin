@@ -10,6 +10,5 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ScenarioContext {
-    private ExtractableResponse<Response> response;
     private long reservationId;
 }
