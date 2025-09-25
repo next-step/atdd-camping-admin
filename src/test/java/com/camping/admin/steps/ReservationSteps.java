@@ -8,19 +8,18 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.response.ExtractableResponse;
-import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
 import static com.camping.admin.api.ReservationApiClient.sendChangeStatus;
 import static com.camping.admin.context.AuthContext.getAccessToken;
+import static com.camping.admin.context.ScenarioContext.getResponse;
+import static com.camping.admin.context.ScenarioContext.setResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps extends BaseSteps {
     long reservationId;
-    ExtractableResponse<Response> response;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -38,15 +37,15 @@ public class ReservationSteps extends BaseSteps {
 
     @When("관리자가 예약을 {string} 상태로 변경한다")
     public void 관리자가예약상태를변경한다(String status) {
-        response = sendChangeStatus(getAccessToken(), reservationId, Map.of("status", status));
+        setResponse(sendChangeStatus(getAccessToken(), reservationId, Map.of("status", status)));
     }
 
     @Then("예약은 취소된다")
     public void 예약은취소된다() {
-        String status = response.jsonPath().getString("status");
-        long reservationId = response.jsonPath().getInt("id");
+        String status = getResponse().jsonPath().getString("status");
+        long reservationId = getResponse().jsonPath().getInt("id");
 
-        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(getResponse().statusCode()).isEqualTo(200);
         assertThat(reservationId).isEqualTo(this.reservationId);
         assertThat(status).isEqualTo(ReservationStatus.CANCELLED.toString());
     }
@@ -58,18 +57,18 @@ public class ReservationSteps extends BaseSteps {
 
     @Then("변경은 실패한다")
     public void 변경은실패한다() {
-        assertThat(response.statusCode()).isEqualTo(500);
+        assertThat(getResponse().statusCode()).isEqualTo(500);
     }
 
     @When("관리자가 상태값을 입력하지 않고 변경한다")
     public void 관리자가상태값을입력하지않고변경한다() {
-        response = sendChangeStatus(getAccessToken(), reservationId, Map.of("hasNotStatus", "DUMMY"));
+        setResponse(sendChangeStatus(getAccessToken(), reservationId, Map.of("hasNotStatus", "DUMMY")));
     }
 
     @Then("예약 상태는 변경되지 않는다")
     public void 예약상태는변경되지않는다() {
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.jsonPath().getString("status")).isEqualTo("CONFIRMED");
+        assertThat(getResponse().statusCode()).isEqualTo(200);
+        assertThat(getResponse().jsonPath().getString("status")).isEqualTo("CONFIRMED");
     }
 
     @And("다른 사용자가 동일 기간으로 예약을 했다")
