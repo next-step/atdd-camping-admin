@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.context.ScenarioContext;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.fixture.ReservationFixture;
 import com.camping.admin.repository.CampsiteRepository;
@@ -14,12 +15,10 @@ import java.util.Map;
 
 import static com.camping.admin.api.ReservationApiClient.sendChangeStatus;
 import static com.camping.admin.context.AuthContext.getAccessToken;
-import static com.camping.admin.context.ScenarioContext.getResponse;
-import static com.camping.admin.context.ScenarioContext.setResponse;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps extends BaseSteps {
-    long reservationId;
+    private final ScenarioContext context = new ScenarioContext();
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -32,43 +31,47 @@ public class ReservationSteps extends BaseSteps {
                 .campsite(campsiteRepository.findById(1L).get())
                 .build();
         var reservationEntity = reservationRepository.save(reservation);
-        this.reservationId = reservationEntity.getId();
+        context.setReservationId(reservationEntity.getId());
     }
 
     @When("관리자가 예약을 {string} 상태로 변경한다")
     public void 관리자가예약상태를변경한다(String status) {
-        setResponse(sendChangeStatus(getAccessToken(), reservationId, Map.of("status", status)));
+        var response = sendChangeStatus(getAccessToken(), context.getReservationId(), Map.of("status", status));
+        context.setResponse(response);
     }
 
     @Then("예약은 취소된다")
     public void 예약은취소된다() {
-        String status = getResponse().jsonPath().getString("status");
-        long reservationId = getResponse().jsonPath().getInt("id");
+        var statusChangeResponse = context.getResponse();
+        String status = statusChangeResponse.jsonPath().getString("status");
+        long reservationId = statusChangeResponse.jsonPath().getInt("id");
 
-        assertThat(getResponse().statusCode()).isEqualTo(200);
-        assertThat(reservationId).isEqualTo(this.reservationId);
+        assertThat(statusChangeResponse.statusCode()).isEqualTo(200);
+        assertThat(reservationId).isEqualTo(context.getReservationId());
         assertThat(status).isEqualTo(ReservationStatus.CANCELLED.toString());
     }
 
     @Given("예약이 존재하지 않는다")
     public void 예약이존재하지않는다() {
-        reservationId = 99999;
+        context.setReservationId(99999);
     }
 
     @Then("변경은 실패한다")
     public void 변경은실패한다() {
-        assertThat(getResponse().statusCode()).isEqualTo(500);
+        assertThat(context.getResponse().statusCode()).isEqualTo(500);
     }
 
     @When("관리자가 상태값을 입력하지 않고 변경한다")
     public void 관리자가상태값을입력하지않고변경한다() {
-        setResponse(sendChangeStatus(getAccessToken(), reservationId, Map.of("hasNotStatus", "DUMMY")));
+        var response = sendChangeStatus(getAccessToken(), context.getReservationId(), Map.of("hasNotStatus", "DUMMY"));
+        context.setResponse(response);
     }
 
     @Then("예약 상태는 변경되지 않는다")
     public void 예약상태는변경되지않는다() {
-        assertThat(getResponse().statusCode()).isEqualTo(200);
-        assertThat(getResponse().jsonPath().getString("status")).isEqualTo("CONFIRMED");
+        var response = context.getResponse();
+        assertThat(response.statusCode()).isEqualTo(200);
+        assertThat(response.jsonPath().getString("status")).isEqualTo("CONFIRMED");
     }
 
     @And("다른 사용자가 동일 기간으로 예약을 했다")
