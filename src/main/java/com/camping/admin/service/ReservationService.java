@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ReservationService {
@@ -21,7 +23,25 @@ public class ReservationService {
             return reservation;
         }
 
-        reservation.setStatus(ReservationStatus.valueOf(request.status()));
+        ReservationStatus newStatus = ReservationStatus.valueOf(request.status());
+
+        if (ReservationStatus.CONFIRMED.equals(newStatus)) {
+            validateReservationNotConflict(reservation);
+        }
+
+        reservation.setStatus(newStatus);
         return reservationRepository.save(reservation);
+    }
+
+    private void validateReservationNotConflict(Reservation reservation) {
+        List<Reservation> overlappingReservations = reservationRepository.findOverlappingReservations(
+                reservation.getCampsite().getId(),
+                reservation.getEndDate(),
+                reservation.getStartDate()
+        );
+
+        if (!overlappingReservations.isEmpty()) {
+            throw new IllegalArgumentException("동일 기간에 이미 확정된 예약이 존재합니다.");
+        }
     }
 }

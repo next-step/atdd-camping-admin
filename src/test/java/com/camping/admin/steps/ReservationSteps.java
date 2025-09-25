@@ -4,6 +4,7 @@ import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.fixture.ReservationFixture;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -69,5 +70,14 @@ public class ReservationSteps extends BaseSteps {
     public void 예약상태는변경되지않는다() {
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(response.jsonPath().getString("status")).isEqualTo("CONFIRMED");
+    }
+
+    @And("다른 사용자가 동일 기간으로 예약을 했다")
+    public void 다른사용자가동일기간으로예약을했다() {
+        var reservation = ReservationFixture.builder()
+                .customerName("다른사용자")
+                .campsite(campsiteRepository.findById(1L).get())
+                .build();
+        reservationRepository.save(reservation);
     }
 }
