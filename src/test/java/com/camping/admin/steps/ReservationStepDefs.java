@@ -18,11 +18,13 @@ import org.springframework.http.HttpStatus;
 public class ReservationStepDefs {
 
     private final ReservationWorld world;
-    private final AuthApi authApi = new AuthApi();
-    private final ReservationApi reservationApi = new ReservationApi();
+    private final AuthApi authApi;
+    private final ReservationApi reservationApi;
 
-    public ReservationStepDefs(ReservationWorld world) {
+    public ReservationStepDefs(ReservationWorld world, AuthApi authApi, ReservationApi reservationApi) {
         this.world = world;
+        this.authApi = authApi;
+        this.reservationApi = reservationApi;
     }
 
     @Given("관리자가 로그인을 하였다.")
