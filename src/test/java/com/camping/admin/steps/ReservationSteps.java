@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.fixture.ReservationFixture;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
@@ -46,7 +47,7 @@ public class ReservationSteps extends BaseSteps {
 
         assertThat(response.statusCode()).isEqualTo(200);
         assertThat(reservationId).isEqualTo(this.reservationId);
-        assertThat(status).isEqualTo("CANCELLED");
+        assertThat(status).isEqualTo(ReservationStatus.CANCELLED.toString());
     }
 
     @Given("예약이 존재하지 않는다")
