@@ -2,10 +2,8 @@ package com.camping.admin.steps;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.camping.admin.support.api.AuthApi;
 import com.camping.admin.support.api.ReservationApi;
 import com.camping.admin.support.context.ReservationWorld;
-import io.cucumber.java.PendingException;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -26,6 +24,32 @@ public class ReservationStepDefs {
         assertThat(world.common.authToken).isNotBlank();
     }
 
+    @Given("예약 ID 1 이 존재한다.")
+    public void 예약ID이존재한다() {
+        world.reservationId = 1L;
+    }
+
+    @When("관리자가 해당 예약을 조회한다.")
+    public void 관리자가예약ID을조회한다() {
+        world.common.response = reservationApi.getReservation(world.common.authToken, world.reservationId);
+    }
+
+    @Then("예약 ID 1 의 상세 정보가 조회된다.")
+    public void 예약ID의상세정보가조회된다() {
+        assertThat(world.common.response.statusCode()).isEqualTo(HttpStatus.OK.value());
+        assertThat(world.common.response.jsonPath().getLong("id")).isEqualTo(1L);
+    }
+
+    @Given("존재하지 않는 예약 ID 9999 가 있다.")
+    public void 존재하지않는예약ID가있다() {
+        world.reservationId = 9999L;
+    }
+
+    @Then("찾을 수 없음 응답이 발생한다.")
+    public void 찾을수없음응답이발생한다() {
+        assertThat(world.common.response.statusCode()).isEqualTo(HttpStatus.NOT_FOUND.value());
+    }
+
     @Given("WAITING 상태인 예약이 존재한다.")
     public void wating상태인예약이존재한다() {
         world.reservationId = 13L;
@@ -33,7 +57,8 @@ public class ReservationStepDefs {
 
     @When("관리자가 WAITING 상태인 예약 상태를 PENDING 상태로 변경한다.")
     public void 관리자가WAITING상태인예약상태를PENDING상태로변경한다() {
-        var response = reservationApi.patchStatus(world.common.authToken, world.reservationId, "PENDING");
+        var response = reservationApi.patchStatus(world.common.authToken, world.reservationId,
+                "PENDING");
         world.status = response.jsonPath().get("status");
     }
 
@@ -42,19 +67,16 @@ public class ReservationStepDefs {
         assertThat(world.status).isEqualTo("PENDING");
     }
 
-    @Given("존재하지 않는 예약 ID 9999 가 있다.")
-    public void 존재하지않는예약ID가있다() {
-        world.reservationId = 9999L;
-    }
-
     @When("관리자가 예약 ID 9999 의 상태를 PENDING 상태로 변경한다.")
     public void 관리자가예약ID의상태를PENDING상태로변경한다() {
-        world.common.response = reservationApi.patchStatus(world.common.authToken, world.reservationId, "PENDING");
+        world.common.response = reservationApi.patchStatus(world.common.authToken,
+                world.reservationId, "PENDING");
     }
 
     @Then("에러 응답이 발생한다.")
     public void 에러응답이발생한다() {
-        assertThat(world.common.response.statusCode()).isEqualTo(HttpStatus.INTERNAL_SERVER_ERROR.value());
+        assertThat(world.common.response.statusCode()).isEqualTo(
+                HttpStatus.INTERNAL_SERVER_ERROR.value());
     }
 
     @When("특정 예약에 대해 잘못된 상태로 예약 상태를 변경한다.")
