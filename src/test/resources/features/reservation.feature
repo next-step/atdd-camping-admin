@@ -1,3 +1,18 @@
+Feature: 예약 단일 조회
+
+    Background:
+        Given 관리자가 로그인을 하였다.
+
+    Scenario: 관리자가 특정 예약을 조회하면, 해당 예약이 조회된다.
+        Given 예약 ID 1 이 존재한다.
+        When 관리자가 예약 ID 1 을 조회한다.
+        Then 예약 ID 1 의 상세 정보가 조회된다.
+
+    Scenario: 관리자가 존재하지 않는 예약을 조회하면, 예외가 발생한다.
+        Given 존재하지 않는 예약 ID 9999 가 있다.
+        When 관리자가 예약 ID 9999 를 조회한다.
+        Then 에러 응답이 발생한다.
+
 Feature: 예약 상태 변경
 
   Background:
