@@ -1,10 +1,10 @@
-package com.camping.admin.hooks;
+package com.camping.admin.api;
 
 import io.restassured.RestAssured;
 
 import java.util.Map;
 
-public class AuthHooks {
+public class AuthApiClient {
     public static String getAccessToken() {
         return RestAssured
                 .given()
