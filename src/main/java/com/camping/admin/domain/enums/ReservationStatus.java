@@ -1,5 +1,8 @@
 package com.camping.admin.domain.enums;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ReservationStatus {
     WAITING,
     PENDING,
@@ -7,5 +10,5 @@ public enum ReservationStatus {
     REJECTED,
     CHECKED_IN,
     CHECKED_OUT,
-    CANCELLED
+    CANCELED
 }
