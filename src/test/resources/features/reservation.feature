@@ -36,6 +36,12 @@ Feature: 관리자 예약 관리 기능
     Then 잘못된 요청 형식으로 인해 예약 상태 변경이 실패한다
     And 예약은 "CONFIRMED" 상태다
 
+  Scenario: 체크인 상태가 아닌 사용자 예약은 체크아웃 상태로 변경할 수 없다
+    Given 사용자가 예약을 했다
+    When 관리자가 예약을 "CHECKED_OUT" 상태로 변경한다
+    Then 예약 상태 변경이 실패한다
+    And 예약은 "CONFIRMED" 상태다
+
   # --- 전체 예약 목록 조회 ---
 
   Scenario: 관리자가 사용자들의 예약 목록을 조회한다
