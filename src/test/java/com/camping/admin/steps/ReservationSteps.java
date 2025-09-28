@@ -1,6 +1,7 @@
 package com.camping.admin.steps;
 
 import com.camping.admin.context.ScenarioContext;
+import com.camping.admin.utils.AcceptanceTest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -12,7 +13,7 @@ import org.hamcrest.Matchers;
 import java.util.List;
 import java.util.Map;
 
-public class ReservationSteps {
+public class ReservationSteps extends AcceptanceTest {
 
     private String getAccessToken() {
         return ScenarioContext.get().get("accessToken", String.class);
@@ -80,7 +81,7 @@ public class ReservationSteps {
                 .filter(reservation -> status.equals(reservation.get("status")))
                 .map(reservation -> Long.valueOf(reservation.get("id").toString()))
                 .findFirst()
-                .orElseThrow();
+                .orElseThrow(() -> new RuntimeException("No reservation found with status: " + status));
 
         setReservationId(reservationId);
     }
@@ -121,5 +122,6 @@ public class ReservationSteps {
         Response lastResponse = getLastResponse();
         lastResponse.then().statusCode(Matchers.greaterThanOrEqualTo(400));
     }
+
 }
 

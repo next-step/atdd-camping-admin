@@ -1,6 +1,7 @@
 package com.camping.admin.steps;
 
 import com.camping.admin.context.ScenarioContext;
+import com.camping.admin.utils.AcceptanceTest;
 import io.cucumber.java.en.Given;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
@@ -8,9 +9,8 @@ import io.restassured.response.Response;
 
 import java.util.Map;
 
-public class AuthSteps {
+public class AuthSteps extends AcceptanceTest {
 
-    @Given("관리자가 로그인했다")
     public void 관리자가_로그인했다() {
         Response response = RestAssured
                 .given()
