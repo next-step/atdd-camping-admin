@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.micrometer.common.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -52,17 +54,17 @@ public class ReservationAdminController {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
 
-        Object statusObj = body.get("status");
-        if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
-        } else {
+        try {
+            Object statusObj = body.get("status");
+            if (statusObj == null) return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
+            if (!(statusObj instanceof String)) throw new IllegalArgumentException("올바른 상태를 입력해 주세요.");
+
             String statusValue = statusObj.toString();
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
-            } else {
-                // 단순히 그대로 대입
-                reservation.setStatus(statusValue);
-            }
+            if (StringUtils.isBlank(statusValue)) throw new IllegalArgumentException("올바른 상태를 입력해 주세요.");
+            ReservationStatus status = ReservationStatus.fromCode(statusValue);
+            reservation.setStatus(status.toString());
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
 
         reservationRepository.save(reservation);
