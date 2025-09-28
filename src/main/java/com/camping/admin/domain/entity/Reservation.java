@@ -64,6 +64,10 @@ public class Reservation {
         return ReservationStatus.CANCELLED == this.status;
     }
 
+    private boolean isCheckedIn() {
+        return this.status ==  ReservationStatus.CHECKED_IN;
+    }
+
     /**
      * 사용자 예약 상태 변경
      * @param targetStatus
@@ -72,6 +76,11 @@ public class Reservation {
     public boolean updateStatus(ReservationStatus targetStatus) {
         if (targetStatus == ReservationStatus.CHECKED_IN) {
             if (isCanceled()) {
+                return false;
+            }
+        }
+        if (targetStatus == ReservationStatus.CHECKED_OUT) {
+            if (!isCheckedIn()) {
                 return false;
             }
         }
