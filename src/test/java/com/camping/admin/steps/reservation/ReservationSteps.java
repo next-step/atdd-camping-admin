@@ -120,7 +120,6 @@ public class ReservationSteps {
 
     /**
      * Edge 케이스 : 예약 상태를 허용되지 않은 문자열로 변경하면 그대로 저장된다
-     * TODO : EDGE 케이스를 막을 유효성 추가
      */
     @When("예약의 상태를 {string}으로 변경한다")
     public void 예약의상태를_엉뚱한문자열로_변경한다(String status) {
