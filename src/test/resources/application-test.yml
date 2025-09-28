@@ -25,6 +25,7 @@ spring:
   sql:
     init:
       mode: always
+      data-locations: classpath:test-data.sql
 
 server:
   port: 0  # 랜덤 포트 사용
