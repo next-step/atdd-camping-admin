@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.ReservationRepository;
 
 import java.util.List;
@@ -27,7 +28,7 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody Map<String, Object> body) {
-        return reservationAdminService.updateReservationStatus(reservationId, body);
+            @RequestBody UpdateReservationStatusRequest request) {
+        return reservationAdminService.updateReservationStatus(reservationId, request);
     }
 }
