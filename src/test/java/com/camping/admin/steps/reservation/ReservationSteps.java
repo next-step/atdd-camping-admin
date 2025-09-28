@@ -126,12 +126,11 @@ public class ReservationSteps {
     public void 예약의상태를_엉뚱한문자열로_변경한다(String status) {
         Map<String, String> checkedOut = TestDataBuilder.reservationStatusPayload(status);
         Response rawResponse = patchReservationStatus(adminToken, reservationId, checkedOut);
-        response = ResponseAcceptanceFixture.extract(rawResponse, HttpStatus.OK);
+        response = ResponseAcceptanceFixture.extract(rawResponse, HttpStatus.BAD_REQUEST);
     }
 
-    @Then("예약의 상태가 {string}으로 변경된다")
-    public void 예약의상태가_그대로_변경된다(String status) {
-        String responseStatus = response.jsonPath().getString("status");
-        assertThat(responseStatus).isEqualTo(status);
+    @Then("예약의 상태 변경에 실패한다")
+    public void 예약의_상태변경에_실패한다() {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.BAD_REQUEST.value());
     }
 }
