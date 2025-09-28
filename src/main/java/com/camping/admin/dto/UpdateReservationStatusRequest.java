@@ -1,5 +1,6 @@
 package com.camping.admin.dto;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UpdateReservationStatusRequest {
-    private String status;
+    private ReservationStatus status;
 
     public boolean isValid() {
-        return status != null && !status.isEmpty();
+        return status != null;
     }
 }

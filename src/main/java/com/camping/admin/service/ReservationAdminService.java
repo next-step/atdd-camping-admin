@@ -1,7 +1,6 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.repository.ReservationRepository;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -35,11 +33,11 @@ public class ReservationAdminService {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
 
-        if (reservation.isCanceled() && request.getStatus().equals(ReservationStatus.CHECKED_IN.name())) {
+        boolean updateSuccess = reservation.updateStatus(request.getStatus());
+        if (!updateSuccess) {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
-        // 단순히 그대로 대입
-        reservation.setStatus(request.getStatus());
+
         return ResponseEntity.ok(ReservationResponse.from(reservation));
     }
 }

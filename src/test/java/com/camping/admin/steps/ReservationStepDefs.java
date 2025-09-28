@@ -6,6 +6,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import io.cucumber.core.options.CurlOption.HttpMethod;

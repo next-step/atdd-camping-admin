@@ -36,8 +36,9 @@ public class Reservation {
     private Campsite campsite;
     
     private String phoneNumber;
-    
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
     
     @Column(length = 6)
     private String confirmationCode;
@@ -48,7 +49,7 @@ public class Reservation {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "CONFIRMED";
+            this.status = ReservationStatus.CONFIRMED;
         }
     }
     
@@ -60,6 +61,21 @@ public class Reservation {
     }
 
     public boolean isCanceled() {
-        return ReservationStatus.CANCELLED.name().equals(this.status);
+        return ReservationStatus.CANCELLED == this.status;
+    }
+
+    /**
+     * 사용자 예약 상태 변경
+     * @param targetStatus
+     * @return 상태 변경 결과, true면 성공, false 면 실패
+     */
+    public boolean updateStatus(ReservationStatus targetStatus) {
+        if (targetStatus == ReservationStatus.CHECKED_IN) {
+            if (isCanceled()) {
+                return false;
+            }
+        }
+        this.status = targetStatus;
+        return true;
     }
 }
