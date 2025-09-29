@@ -12,9 +12,7 @@ public class ReservationTestHelper {
     }
 
     public static Response getReservationsList() {
-        String token = AuthHelper.getAccessToken();
-        return ApiHelper.given()
-                .header("Authorization", "Bearer " + token)
+        return ApiHelper.givenAuthenticated()
                 .when()
                 .get("/admin/reservations")
                 .then()
