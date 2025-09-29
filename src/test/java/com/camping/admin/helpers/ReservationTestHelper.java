@@ -11,19 +11,6 @@ public class ReservationTestHelper {
         return ContextHelper.getReservationId();
     }
 
-    public static Response getReservationsList() {
-        return ApiHelper.givenAuthenticated()
-                .when()
-                .get("/admin/reservations")
-                .then()
-                .statusCode(200)
-                .extract().response();
-    }
-
-    public static List<Map<String, Object>> getReservationsFromResponse(Response response) {
-        return response.jsonPath().getList("");
-    }
-
     public static void setReservationId(Long reservationId) {
         ContextHelper.setReservationId(reservationId);
     }
@@ -45,28 +32,36 @@ public class ReservationTestHelper {
         return ApiHelper.patch("/admin/reservations/" + reservationId + "/status");
     }
 
-    public static Long findReservationByStatus(String status) {
-        Response response = getReservationsList();
-        List<Map<String, Object>> reservations = getReservationsFromResponse(response);
-
-        return reservations.stream()
-                .filter(reservation -> status.equals(reservation.get("status")))
-                .map(reservation -> Long.valueOf(reservation.get("id").toString()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("No reservation found with status: " + status));
-    }
-
-    public static Long findOrCreateReservationByStatus(String status) {
+    public static Long findOrModifyReservationByStatus(String status) {
         try {
-            return findReservationByStatus(status);
+            Response response = ApiHelper.givenAuthenticated()
+                    .when()
+                    .get("/admin/reservations")
+                    .then()
+                    .statusCode(200)
+                    .extract().response();
+
+            List<Map<String, Object>> reservations = response.jsonPath().getList("");
+
+            return reservations.stream()
+                    .filter(reservation -> status.equals(reservation.get("status")))
+                    .map(reservation -> Long.valueOf(reservation.get("id").toString()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No reservation found with status: " + status));
         } catch (RuntimeException e) {
-            return createReservationByChangingStatus(status);
+            return changeFirstReservationStatus(status);
         }
     }
 
-    private static Long createReservationByChangingStatus(String targetStatus) {
-        Response response = getReservationsList();
-        List<Map<String, Object>> reservations = getReservationsFromResponse(response);
+    private static Long changeFirstReservationStatus(String targetStatus) {
+        Response response = ApiHelper.givenAuthenticated()
+                .when()
+                .get("/admin/reservations")
+                .then()
+                .statusCode(200)
+                .extract().response();
+
+        List<Map<String, Object>> reservations = response.jsonPath().getList("");
 
         if (reservations.isEmpty()) {
             throw new RuntimeException("No reservations available to modify");

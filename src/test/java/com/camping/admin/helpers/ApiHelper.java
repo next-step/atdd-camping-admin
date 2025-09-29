@@ -8,10 +8,6 @@ import org.hamcrest.Matchers;
 
 public class ApiHelper {
 
-    public static RequestSpecification given() {
-        return RestAssured.given();
-    }
-
     public static RequestSpecification givenAuthenticated() {
         AuthHelper.ensureAuthenticated();
         return RestAssured
@@ -19,13 +15,9 @@ public class ApiHelper {
                 .header("Authorization", "Bearer " + AuthHelper.getAccessToken());
     }
 
-    public static RequestSpecification givenAuthenticatedWithJson() {
-        return givenAuthenticated()
-                .contentType(ContentType.JSON);
-    }
-
     public static Response patch(String path, Object body) {
-        return givenAuthenticatedWithJson()
+        return givenAuthenticated()
+                .contentType(ContentType.JSON)
                 .body(body)
                 .when()
                 .patch(path);
@@ -38,29 +30,13 @@ public class ApiHelper {
                 .patch(path);
     }
 
-    public static void assertStatusCode(Response response, int expectedStatusCode) {
-        response.then().statusCode(expectedStatusCode);
-    }
-
     public static void assertClientError(Response response) {
         response.then().statusCode(Matchers.greaterThanOrEqualTo(400));
     }
 
-    public static void assertFieldEquals(Response response, String fieldPath, Object expectedValue) {
-        response.then().body(fieldPath, Matchers.equalTo(expectedValue));
-    }
-
-    public static void assertReservationStatus(Response response, String expectedStatus) {
-        assertFieldEquals(response, "status", expectedStatus);
-    }
-
-    public static void assertReservationId(Response response, Long expectedId) {
-        assertFieldEquals(response, "id", expectedId.intValue());
-    }
-
     public static void assertReservationStatusAndId(Response response, String expectedStatus, Long expectedId) {
-        assertStatusCode(response, 200);
-        assertReservationStatus(response, expectedStatus);
-        assertReservationId(response, expectedId);
+        response.then().statusCode(200);
+        response.then().body("status", Matchers.equalTo(expectedStatus));
+        response.then().body("id", Matchers.equalTo(expectedId.intValue()));
     }
 }

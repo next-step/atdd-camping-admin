@@ -11,7 +11,7 @@ public class ReservationSteps {
 
     @Given("{string} 상태인 예약이 있다")
     public void stateReservation(String status) {
-        Long reservationId = ReservationTestHelper.findOrCreateReservationByStatus(status);
+        Long reservationId = ReservationTestHelper.findOrModifyReservationByStatus(status);
         ReservationTestHelper.setReservationId(reservationId);
     }
 
