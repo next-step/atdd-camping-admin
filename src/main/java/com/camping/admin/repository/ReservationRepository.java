@@ -15,7 +15,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     List<Reservation> findByCampsiteId(Long campsiteId);
 
     @Query("SELECT r FROM Reservation r WHERE r.campsite.id = :campsiteId " +
-           "AND r.status != 'CANCELLED' " +
+           "AND r.status != com.camping.admin.domain.enums.ReservationStatus.CANCELLED " +
            "AND (r.startDate < :endDate AND r.endDate > :startDate)")
     List<Reservation> findOverlappingReservations(
         @Param("campsiteId") Long campsiteId,

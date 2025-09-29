@@ -8,6 +8,7 @@ import io.cucumber.java.Before;
 import io.cucumber.java.BeforeAll;
 import io.restassured.specification.RequestSpecification;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Hooks {
@@ -21,6 +22,9 @@ public class Hooks {
     }
 
     @Before
-    public void beforeScenario() { CommonContext.requestSpec = RequestSpecFactory.create(); }
+    public void beforeScenario() {
+        CommonContext.requestSpec = RequestSpecFactory.create();
+        CommonContext.lastParams = new HashMap<>();
+    }
 
 }

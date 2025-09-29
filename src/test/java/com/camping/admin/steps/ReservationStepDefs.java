@@ -1,19 +1,25 @@
 package com.camping.admin.steps;
 
+import static com.camping.admin.support.CommonContext.lastParams;
+import static org.assertj.core.api.Assertions.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.support.ApiHelper;
 import com.camping.admin.support.CommonContext;
 import io.cucumber.core.options.CurlOption.HttpMethod;
+import io.cucumber.java.PendingException;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ReservationStepDefs {
@@ -22,7 +28,9 @@ public class ReservationStepDefs {
 
     @Given("사용자가 예약을 했다")
     public void 사용자가예약을했다() {
+        // data.sql 기반 픽스처 세팅
         reservationId = 1L;
+        lastParams.put("status", "CONFIRMED");
 
         // 여러 테스트에서 사용해도 해당 예약 상태가 동일하도록 초기화 수행
         String url = String.format("/admin/reservations/%d/status", reservationId);
@@ -61,5 +69,50 @@ public class ReservationStepDefs {
     @Then("변경 요청이 성공한다")
     public void 변경요청이성공한다() {
         CommonContext.lastResponse.then().statusCode(200);
+    }
+
+    @When("관리자가 변경 내용 없이 사용자 예약 상태 변경을 시도한다")
+    public void 관리자가변경내용없이사용자예약상태변경을시도한다() {
+        String url = String.format("/admin/reservations/%d/status", reservationId);
+
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, Map.of());
+    }
+
+    @Then("잘못된 요청 형식으로 인해 예약 상태 변경이 실패한다")
+    public void 잘못된요청형식으로인해예약상태변경이실패한다() {
+        CommonContext.lastResponse.then().statusCode(400);
+    }
+
+    @And("응답에 기존 사용자 예약 정보가 포함된다")
+    public void 응답에기존사용자예약정보가포함된다() {
+        JsonPath jsonPath = CommonContext.lastResponse.then().extract().jsonPath();
+        Long extractedId = jsonPath.getLong("id");
+        String status = jsonPath.getString("status");
+
+        assertThat(extractedId).isEqualTo(reservationId);
+        assertThat(status).isEqualTo(CommonContext.lastParams.get("status"));
+    }
+
+    @When("관리자가 예약 상태를 null 값으로 변경을 시도한다")
+    public void 관리자가예약상태를Null값으로변경을시도한다() {
+        String url = String.format("/admin/reservations/%d/status", reservationId);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", null);
+
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.PATCH, url, body);
+    }
+
+    @When("관리자가 전체 예약을 조회한다")
+    public void 관리자가_전체_예약을_조회한다() {
+        String url = "/admin/reservations";
+        CommonContext.lastResponse = ApiHelper.request(HttpMethod.GET, url, null);
+    }
+
+    @Then("조회된 예약 목록에는 {int}개 이상의 예약이 포함되어 있다")
+    public void 조회된_예약_목록에는_N개_이상의_예약이_포함되어_있다(int count) {
+        CommonContext.lastResponse.then()
+            .statusCode(200)
+            .body("size()", greaterThanOrEqualTo(count));
     }
 }
