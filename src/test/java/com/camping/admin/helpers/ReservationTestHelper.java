@@ -37,7 +37,7 @@ public class ReservationTestHelper {
     }
 
     public static Response patchReservationStatus(Long reservationId, String status) {
-        Map<String, Object> statusUpdate = DataHelper.StatusUpdate.create(status);
+        Map<String, Object> statusUpdate = Map.of("status", status);
         return ApiHelper.patch("/admin/reservations/" + reservationId + "/status", statusUpdate);
     }
 
