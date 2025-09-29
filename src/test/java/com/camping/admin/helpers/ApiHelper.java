@@ -24,26 +24,6 @@ public class ApiHelper {
                 .contentType(ContentType.JSON);
     }
 
-    public static Response get(String path) {
-        return givenAuthenticated()
-                .when()
-                .get(path);
-    }
-
-    public static Response post(String path, Object body) {
-        return givenAuthenticatedWithJson()
-                .body(body)
-                .when()
-                .post(path);
-    }
-
-    public static Response put(String path, Object body) {
-        return givenAuthenticatedWithJson()
-                .body(body)
-                .when()
-                .put(path);
-    }
-
     public static Response patch(String path, Object body) {
         return givenAuthenticatedWithJson()
                 .body(body)
@@ -58,42 +38,8 @@ public class ApiHelper {
                 .patch(path);
     }
 
-    public static Response delete(String path) {
-        return givenAuthenticated()
-                .when()
-                .delete(path);
-    }
-
-    public static Response getWithExpectedStatus(String path, int expectedStatus) {
-        return get(path)
-                .then()
-                .statusCode(expectedStatus)
-                .extract().response();
-    }
-
-    public static Response postWithExpectedStatus(String path, Object body, int expectedStatus) {
-        return post(path, body)
-                .then()
-                .statusCode(expectedStatus)
-                .extract().response();
-    }
-
-    public static Response patchWithExpectedStatus(String path, Object body, int expectedStatus) {
-        return patch(path, body)
-                .then()
-                .statusCode(expectedStatus)
-                .extract().response();
-    }
-
     public static void assertStatusCode(Response response, int expectedStatusCode) {
         response.then().statusCode(expectedStatusCode);
-    }
-
-    public static void assertSuccessfulStatusCode(Response response) {
-        response.then().statusCode(Matchers.allOf(
-            Matchers.greaterThanOrEqualTo(200),
-            Matchers.lessThan(300)
-        ));
     }
 
     public static void assertClientError(Response response) {
@@ -102,10 +48,6 @@ public class ApiHelper {
 
     public static void assertFieldEquals(Response response, String fieldPath, Object expectedValue) {
         response.then().body(fieldPath, Matchers.equalTo(expectedValue));
-    }
-
-    public static void assertFieldNotNull(Response response, String fieldPath) {
-        response.then().body(fieldPath, Matchers.notNullValue());
     }
 
     public static void assertReservationStatus(Response response, String expectedStatus) {
@@ -120,13 +62,5 @@ public class ApiHelper {
         assertStatusCode(response, 200);
         assertReservationStatus(response, expectedStatus);
         assertReservationId(response, expectedId);
-    }
-
-    public static void assertListNotEmpty(Response response) {
-        response.then().body("size()", Matchers.greaterThan(0));
-    }
-
-    public static void assertListSize(Response response, int expectedSize) {
-        response.then().body("size()", Matchers.equalTo(expectedSize));
     }
 }
