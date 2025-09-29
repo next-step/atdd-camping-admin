@@ -2,13 +2,12 @@ package com.camping.admin.steps;
 
 import com.camping.admin.helpers.ApiHelper;
 import com.camping.admin.helpers.ReservationTestHelper;
-import com.camping.admin.utils.AcceptanceTest;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
-public class ReservationSteps extends AcceptanceTest {
+public class ReservationSteps {
 
     @Given("{string} 상태인 예약이 있다")
     public void stateReservation(String status) {
