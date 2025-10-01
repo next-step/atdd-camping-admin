@@ -3,12 +3,17 @@
 -- Campsites
 insert into campsites (id, site_number, description, max_people) values
   (1, 'A-01', '숲 뷰, 전기가능', 4),
-  (2, 'A-02', '강가, 그늘많음', 6);
+  (2, 'A-02', '강가, 그늘많음', 6),
+  (3, 'B-01', '호수 뷰, 조용함', 4),
+  (4, 'B-02', '산 뷰, 넓은 공간', 8);
 
 -- Products
 insert into products (id, name, stock_quantity, price, product_type) values
   (1, '랜턴', 20, 30000.00, 'RENTAL'),
-  (2, '장작팩', 50, 10000.00, 'SALE');
+  (2, '장작팩', 50, 10000.00, 'SALE'),
+  (3, '텐트', 15, 100000.00, 'RENTAL'),
+  (4, '침낭', 30, 50000.00, 'RENTAL'),
+  (5, '코펠세트', 25, 8000.00, 'SALE');
 
 -- Test Reservations with various states
 insert into reservations (id, customer_name, start_date, end_date, campsite_id, phone_number, status, reservation_date, confirmation_code, created_at)

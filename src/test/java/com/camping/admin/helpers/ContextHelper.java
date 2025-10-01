@@ -11,7 +11,6 @@ public class ContextHelper {
 
     private static final String RESERVATION_ID_KEY = "reservationId";
     private static final String RESPONSE_KEY = "response";
-    private static final String CREATED_RESERVATIONS_KEY = "createdReservations";
 
     private final Map<String, Object> data = new HashMap<>();
 
@@ -37,20 +36,6 @@ public class ContextHelper {
 
     public static void setResponse(Response response) {
         get().setData(RESPONSE_KEY, response);
-    }
-
-    @SuppressWarnings("unchecked")
-    public static List<Long> getCreatedReservations() {
-        return get().getData(CREATED_RESERVATIONS_KEY, List.class);
-    }
-
-    public static void addCreatedReservation(Long reservationId) {
-        List<Long> createdReservations = getCreatedReservations();
-        if (createdReservations != null) {
-            createdReservations.add(reservationId);
-        } else {
-            get().setData(CREATED_RESERVATIONS_KEY, List.of(reservationId));
-        }
     }
 
     public static void clearContext() {
