@@ -1,67 +1,52 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.context.ScenarioContext;
+import com.camping.admin.helpers.ApiHelper;
+import com.camping.admin.helpers.ReservationTestHelper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.hamcrest.Matchers;
-
-import java.util.Map;
 
 public class ReservationSteps {
 
     @Given("{string} 상태인 예약이 있다")
     public void stateReservation(String status) {
-        String token = ScenarioContext.get().get("accessToken", String.class);
-
-        Response response = RestAssured
-                .given()
-                .header("Authorization", "Bearer " + token)
-                .when()
-                .get("/admin/reservations")
-                .then()
-                .statusCode(200)
-                .extract().response();
-
-        Long reservationId = response.jsonPath()
-                .getList("", Map.class)
-                .stream()
-                .filter(reservation -> status.equals(reservation.get("status")))
-                .map(reservation -> Long.valueOf(reservation.get("id").toString()))
-                .findFirst()
-                .orElseThrow();
-
-        ScenarioContext.get().set("reservationId", reservationId);
+        Long reservationId = ReservationTestHelper.findOrModifyReservationByStatus(status);
+        ReservationTestHelper.setReservationId(reservationId);
     }
 
     @When("예약을 {string} 상태로 변경한다")
     public void changeReservation(String newStatus) {
-        String token = ScenarioContext.get().get("accessToken", String.class);
-        Long reservationId = ScenarioContext.get().get("reservationId", Long.class);
-
-        Response response = RestAssured
-                .given()
-                .header("Authorization", "Bearer " + token)
-                .contentType(ContentType.JSON)
-                .body(Map.of("status", newStatus))
-                .when()
-                .patch("/admin/reservations/" + reservationId + "/status");
-
-        ScenarioContext.get().set("response", response);
+        Long reservationId = ReservationTestHelper.getReservationId();
+        Response response = ReservationTestHelper.patchReservationStatus(reservationId, newStatus);
+        ReservationTestHelper.setResponse(response);
     }
 
     @Then("예약 상태가 {string}으로 변경된다")
     public void completeReservation(String expectedStatus) {
-        Response lastResponse = ScenarioContext.get().get("response", Response.class);
-        Long id = ScenarioContext.get().get("reservationId", Long.class);
+        Response lastResponse = ReservationTestHelper.getLastResponse();
+        Long id = ReservationTestHelper.getReservationId();
 
-        lastResponse.then()
-                .statusCode(200)
-                .body("status", Matchers.equalTo(expectedStatus))
-                .body("id", Matchers.equalTo(id.intValue()));
+        ApiHelper.assertReservationStatusAndId(lastResponse, expectedStatus, id);
     }
+
+    @Given("존재하지 않는 예약 번호를 사용한다")
+    public void useNonExistingReservationId() {
+        ReservationTestHelper.setReservationId(999999L);
+    }
+
+    @When("예약 상태 변경 정보를 제공하지 않고 요청한다")
+    public void requestStatusChangeWithoutInfo() {
+        Long reservationId = ReservationTestHelper.getReservationId();
+        Response response = ReservationTestHelper.patchReservationStatusWithoutBody(reservationId);
+        ReservationTestHelper.setResponse(response);
+    }
+
+    @Then("상태 변경이 실패한다")
+    public void statusChangeFails() {
+        Response lastResponse = ReservationTestHelper.getLastResponse();
+        ApiHelper.assertClientError(lastResponse);
+    }
+
 }
 
