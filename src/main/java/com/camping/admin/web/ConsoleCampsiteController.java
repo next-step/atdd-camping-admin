@@ -1,30 +1,30 @@
 package com.camping.admin.web;
 
-import com.camping.admin.domain.entity.Campsite;
-import com.camping.admin.repository.CampsiteRepository;
-import java.util.Map;
+import com.camping.admin.dto.CampsiteRequest;
+import com.camping.admin.dto.CampsiteResponse;
+import com.camping.admin.service.CampsiteService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
 
 @Controller
 @RequestMapping("/console/campsites")
+@RequiredArgsConstructor
 public class ConsoleCampsiteController {
 
-    private final CampsiteRepository campsiteRepository;
-
-    public ConsoleCampsiteController(CampsiteRepository campsiteRepository) {
-        this.campsiteRepository = campsiteRepository;
-    }
+    private final CampsiteService campsiteService;
 
     @GetMapping
     public String list(Model model) {
-        model.addAttribute("campsites", campsiteRepository.findAll());
+        List<CampsiteResponse> campsites = campsiteService.getAllCampsites();
+        model.addAttribute("campsites", campsites);
         return "campsites/list";
     }
 
@@ -35,29 +35,17 @@ public class ConsoleCampsiteController {
     }
 
     @PostMapping
-    public String create(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        String siteNumber = params.containsKey("siteNumber") ? params.get("siteNumber") : null;
-        String description = params.containsKey("description") ? params.get("description") : "";
-        Integer maxPeople;
-        if (params.containsKey("maxPeople")) {
-            try {
-                maxPeople = Integer.valueOf(params.get("maxPeople"));
-            } catch (Exception e) {
-                maxPeople = null;
-            }
-        } else {
-            maxPeople = null;
-        }
-
-        Campsite entity = new Campsite(siteNumber, description, maxPeople);
-        campsiteRepository.save(entity);
+    public String create(CampsiteRequest request, RedirectAttributes redirectAttributes) {
+        campsiteService.createCampsite(request);
         redirectAttributes.addFlashAttribute("success", "캠프사이트가 등록되었습니다.");
         return "redirect:/console/campsites";
     }
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        Campsite campsite = campsiteRepository.findById(id)
+        CampsiteResponse campsite = campsiteService.getAllCampsites().stream()
+                .filter(c -> c.getId().equals(id))
+                .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + id));
         model.addAttribute("formAction", "/console/campsites/" + id);
         model.addAttribute("campsite", campsite);
@@ -65,22 +53,8 @@ public class ConsoleCampsiteController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        Campsite campsite = campsiteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + id));
-
-        if (params.containsKey("siteNumber")) {
-            campsite.setSiteNumber(params.get("siteNumber"));
-        }
-        if (params.containsKey("description")) {
-            campsite.setDescription(params.get("description"));
-        }
-        if (params.containsKey("maxPeople")) {
-            try {
-                campsite.setMaxPeople(Integer.valueOf(params.get("maxPeople")));
-            } catch (Exception ignore) {}
-        }
-
+    public String update(@PathVariable Long id, CampsiteRequest request, RedirectAttributes redirectAttributes) {
+        campsiteService.updateCampsite(id, request);
         redirectAttributes.addFlashAttribute("success", "캠프사이트가 수정되었습니다.");
         return "redirect:/console/campsites";
     }
