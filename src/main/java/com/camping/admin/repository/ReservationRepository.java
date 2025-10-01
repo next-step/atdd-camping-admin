@@ -12,8 +12,6 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    List<Reservation> findByCampsiteId(Long campsiteId);
-
     @Query("SELECT r FROM Reservation r WHERE r.campsite.id = :campsiteId " +
            "AND r.status != com.camping.admin.domain.value.ReservationStatus.CANCELLED " +
            "AND (r.startDate < :endDate AND r.endDate > :startDate)")
@@ -22,8 +20,6 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
-
-    List<Reservation> findByStartDateBetween(LocalDate startDate, LocalDate endDate);
 
     @Query("SELECT r FROM Reservation r WHERE r.reservationDate = :date")
     List<Reservation> findByReservationDate(@Param("date") LocalDate date);

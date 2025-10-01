@@ -1,14 +1,14 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.service.ReservationService;
-import java.util.List;
-import java.util.Map;
-
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/reservations")
@@ -26,20 +26,12 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody Map<String, Object> body) {
-
-        if (body == null || body.isEmpty()) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        Object statusObj = body.get("status");
-        if (statusObj == null) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        String statusValue = statusObj.toString();
-        ReservationResponse updatedReservation = reservationService.updateReservationStatus(reservationId, statusValue);
-
+            @Valid @RequestBody UpdateReservationStatusRequest request
+    ) {
+        ReservationResponse updatedReservation = reservationService.updateReservationStatus(
+                reservationId,
+                request.getStatus()
+        );
         return ResponseEntity.ok(updatedReservation);
     }
 }

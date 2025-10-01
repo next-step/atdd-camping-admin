@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -33,6 +31,13 @@ public class Product {
     private ProductType productType;
 
     public Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+        this.name = name;
+        this.stockQuantity = stockQuantity;
+        this.price = price;
+        this.productType = productType;
+    }
+
+    public void updateProduct(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         this.name = name;
         this.stockQuantity = stockQuantity;
         this.price = price;
@@ -66,5 +71,15 @@ public class Product {
             throw new IllegalArgumentException("Quantity must be positive");
         }
         return this.price.multiply(new BigDecimal(quantity));
+    }
+
+    public boolean isRentalProduct() {
+        return this.productType == ProductType.RENTAL;
+    }
+
+    public void validateRentalProduct() {
+        if (!isRentalProduct()) {
+            throw new IllegalArgumentException("Product is not a rental item.");
+        }
     }
 }

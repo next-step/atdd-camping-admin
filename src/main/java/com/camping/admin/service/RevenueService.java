@@ -72,7 +72,7 @@ public class RevenueService {
 
     private BigDecimal calculateDailyRentalRevenue(LocalDate date) {
         return rentalRecordRepository.findByCreatedAtDate(date).stream()
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
+                .map(it -> it.getProduct().getPrice().multiply(new BigDecimal(it.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -94,13 +94,8 @@ public class RevenueService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-
-    private boolean isDateInRange(LocalDate date, LocalDate from, LocalDate to) {
-        return (date.isEqual(from) || date.isAfter(from)) && (date.isEqual(to) || date.isBefore(to));
-    }
-
     private void addSalesEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
-        salesRecordRepository.findByCreatedAtDateBetween(from, to).stream()
+        salesRecordRepository.findByCreatedAtDateBetween(from, to)
                 .forEach(record -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.SALE,
                         record.getProduct().getName() + BusinessConstants.SALES_ITEM_SUFFIX,
@@ -110,23 +105,23 @@ public class RevenueService {
     }
 
     private void addReservationEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
-        reservationRepository.findByReservationDateBetween(from, to).stream()
-                .forEach(r -> entries.add(new RevenueEntryResponse(
+        reservationRepository.findByReservationDateBetween(from, to)
+                .forEach(it -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.RESERVATION,
-                        BusinessConstants.RESERVATION_PREFIX + r.getId(),
-                        r.calculateRevenue(),
-                        r.getCreatedAt()
+                        BusinessConstants.RESERVATION_PREFIX + it.getId(),
+                        it.calculateRevenue(),
+                        it.getCreatedAt()
                 )));
     }
 
     private void addRentalEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
-        rentalRecordRepository.findByCreatedAtDateBetween(from, to).stream()
-                .forEach(rr -> entries.add(new RevenueEntryResponse(
+        rentalRecordRepository.findByCreatedAtDateBetween(from, to)
+                .forEach(it -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.RENTAL,
-                        rr.getProduct().getName() + (rr.getReservation() != null ?
-                            BusinessConstants.RENTAL_RESERVATION_SUFFIX + rr.getReservation().getId() + BusinessConstants.PARENTHESIS_CLOSE : ""),
-                        rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())),
-                        rr.getCreatedAt()
+                        it.getProduct().getName() + (it.getReservation() != null ?
+                            BusinessConstants.RENTAL_RESERVATION_SUFFIX + it.getReservation().getId() + BusinessConstants.PARENTHESIS_CLOSE : ""),
+                        it.getProduct().getPrice().multiply(new BigDecimal(it.getQuantity())),
+                        it.getCreatedAt()
                 )));
     }
 }

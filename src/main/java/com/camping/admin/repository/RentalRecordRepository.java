@@ -11,17 +11,6 @@ import java.util.List;
 
 @Repository
 public interface RentalRecordRepository extends JpaRepository<RentalRecord, Long> {
-    List<RentalRecord> findByReservationId(Long reservationId);
-
-    List<RentalRecord> findByProductId(Long productId);
-
-    List<RentalRecord> findByIsReturned(Boolean isReturned);
-
-    @Query("SELECT rr FROM RentalRecord rr " +
-           "LEFT JOIN rr.reservation r " +
-           "WHERE rr.product.id = :productId " +
-           "AND rr.isReturned = false")
-    List<RentalRecord> findActiveRentalsByProductId(@Param("productId") Long productId);
 
     @Query("SELECT rr FROM RentalRecord rr WHERE DATE(rr.createdAt) = :date")
     List<RentalRecord> findByCreatedAtDate(@Param("date") LocalDate date);
