@@ -39,4 +39,32 @@ public class Product {
         this.productType = productType;
     }
 
+    public void decreaseStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        if (this.stockQuantity < quantity) {
+            throw new IllegalStateException("Not enough stock for product " + this.name +
+                ". Available: " + this.stockQuantity + ", Requested: " + quantity);
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        this.stockQuantity += quantity;
+    }
+
+    public boolean isAvailable() {
+        return this.stockQuantity > 0;
+    }
+
+    public BigDecimal calculateTotalPrice(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        return this.price.multiply(new BigDecimal(quantity));
+    }
 }

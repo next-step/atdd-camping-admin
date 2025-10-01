@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -21,4 +22,10 @@ public interface RentalRecordRepository extends JpaRepository<RentalRecord, Long
            "WHERE rr.product.id = :productId " +
            "AND rr.isReturned = false")
     List<RentalRecord> findActiveRentalsByProductId(@Param("productId") Long productId);
+
+    @Query("SELECT rr FROM RentalRecord rr WHERE DATE(rr.createdAt) = :date")
+    List<RentalRecord> findByCreatedAtDate(@Param("date") LocalDate date);
+
+    @Query("SELECT rr FROM RentalRecord rr WHERE DATE(rr.createdAt) BETWEEN :fromDate AND :toDate")
+    List<RentalRecord> findByCreatedAtDateBetween(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
 }
