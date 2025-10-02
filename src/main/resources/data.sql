@@ -1,7 +1,7 @@
 -- Campsites
-insert into campsites (id, site_number, description, max_people) values
-  (1, 'A-01', '숲 뷰, 전기가능', 4),
-  (2, 'A-02', '강가, 그늘많음', 6);
+insert into campsites (id, site_number, description, max_people, status) values
+  (1, 'A-01', '숲 뷰, 전기가능', 4, 'AVAILABLE'),
+  (2, 'A-02', '강가, 그늘많음', 6, 'AVAILABLE');
 
 -- Products
 insert into products (id, name, stock_quantity, price, product_type) values

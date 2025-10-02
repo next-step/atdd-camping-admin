@@ -5,7 +5,6 @@ import com.camping.admin.domain.value.ReservationStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -14,7 +13,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "reservations")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Reservation {
     
@@ -57,10 +55,31 @@ public class Reservation {
     }
     
     public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite) {
+        validateDates(startDate, endDate);
         this.customerName = customerName;
         this.startDate = startDate;
         this.endDate = endDate;
         this.campsite = campsite;
+        this.reservationDate = LocalDate.now();
+    }
+
+    public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite, String phoneNumber) {
+        validateDates(startDate, endDate);
+        this.customerName = customerName;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.campsite = campsite;
+        this.phoneNumber = phoneNumber;
+        this.reservationDate = LocalDate.now();
+    }
+
+    private void validateDates(LocalDate startDate, LocalDate endDate) {
+        if (startDate == null || endDate == null) {
+            throw new IllegalArgumentException("Start date and end date are required");
+        }
+        if (endDate.isBefore(startDate) || endDate.isEqual(startDate)) {
+            throw new IllegalArgumentException("End date must be after start date");
+        }
     }
 
     public void updateStatus(String newStatus) {
@@ -73,6 +92,25 @@ public class Reservation {
         if (newStatus != null) {
             this.status = newStatus;
         }
+    }
+
+    public void updateReservationDetails(LocalDate startDate, LocalDate endDate, String phoneNumber) {
+        validateDates(startDate, endDate);
+        this.startDate = startDate;
+        this.endDate = endDate;
+        if (phoneNumber != null) {
+            this.phoneNumber = phoneNumber;
+        }
+    }
+
+    public void cancel() {
+        if (this.status == ReservationStatus.CANCELLED) {
+            throw new IllegalStateException("Reservation is already cancelled");
+        }
+        if (this.status == ReservationStatus.CHECKED_OUT) {
+            throw new IllegalStateException("Cannot cancel a completed reservation");
+        }
+        this.status = ReservationStatus.CANCELLED;
     }
 
     public BigDecimal calculateRevenue() {

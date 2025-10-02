@@ -1,11 +1,11 @@
 -- Test Data for Cucumber Tests
 
 -- Campsites
-insert into campsites (id, site_number, description, max_people) values
-  (1, 'A-01', '숲 뷰, 전기가능', 4),
-  (2, 'A-02', '강가, 그늘많음', 6),
-  (3, 'B-01', '호수 뷰, 조용함', 4),
-  (4, 'B-02', '산 뷰, 넓은 공간', 8);
+insert into campsites (id, site_number, description, max_people, status) values
+  (1, 'A-01', '숲 뷰, 전기가능', 4, 'AVAILABLE'),
+  (2, 'A-02', '강가, 그늘많음', 6, 'AVAILABLE'),
+  (3, 'B-01', '호수 뷰, 조용함', 4, 'AVAILABLE'),
+  (4, 'B-02', '산 뷰, 넓은 공간', 8, 'AVAILABLE');
 
 -- Products
 insert into products (id, name, stock_quantity, price, product_type) values

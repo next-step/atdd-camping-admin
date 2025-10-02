@@ -1,7 +1,10 @@
 package com.camping.admin.helpers;
 
+import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,6 +24,23 @@ public class ReservationTestHelper {
 
     public static Response getLastResponse() {
         return ContextHelper.getLastResponse();
+    }
+
+    public static Response createReservation(String customerName, LocalDate startDate, LocalDate endDate, Long campsiteId, String phoneNumber) {
+        Map<String, Object> request = new HashMap<>();
+        request.put("customerName", customerName);
+        request.put("startDate", startDate.toString());
+        request.put("endDate", endDate.toString());
+        request.put("campsiteId", campsiteId);
+        if (phoneNumber != null) {
+            request.put("phoneNumber", phoneNumber);
+        }
+
+        return ApiHelper.givenAuthenticated()
+                .contentType(ContentType.JSON)
+                .body(request)
+                .when()
+                .post("/admin/reservations");
     }
 
     public static Response patchReservationStatus(Long reservationId, String status) {
