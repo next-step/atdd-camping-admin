@@ -70,11 +70,13 @@ public class RentalTestHelper {
     }
 
     public static Long createRentalProduct(String name, Integer stockQuantity) {
-        return ProductTestHelper.createAndGetProductId(name, stockQuantity, new BigDecimal("50000"), "RENTAL");
+        String uniqueName = name + "-" + System.currentTimeMillis();
+        return ProductTestHelper.createAndGetProductId(uniqueName, stockQuantity, new BigDecimal("50000"), "RENTAL");
     }
 
     public static Long createSaleProduct(String name, Integer stockQuantity) {
-        return ProductTestHelper.createAndGetProductId(name, stockQuantity, new BigDecimal("10000"), "SALE");
+        String uniqueName = name + "-" + System.currentTimeMillis();
+        return ProductTestHelper.createAndGetProductId(uniqueName, stockQuantity, new BigDecimal("10000"), "SALE");
     }
 
     public static Long createAndGetRentalId(Long productId, Integer quantity) {

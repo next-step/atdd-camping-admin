@@ -14,20 +14,23 @@ public class ProductSteps {
 
     @Given("상품이 등록되어 있다")
     public void productExists() {
-        Long productId = ProductTestHelper.createAndGetProductId("텐트", 10, new BigDecimal("100000"), "RENTAL");
+        String uniqueName = "텐트-" + System.currentTimeMillis();
+        Long productId = ProductTestHelper.createAndGetProductId(uniqueName, 10, new BigDecimal("100000"), "RENTAL");
         ProductTestHelper.setProductId(productId);
     }
 
     @Given("상품이 {int}개 등록되어 있다")
     public void multipleProductsExist(int count) {
+        long timestamp = System.currentTimeMillis();
         for (int i = 1; i <= count; i++) {
-            ProductTestHelper.createProduct("상품" + i, 10, new BigDecimal("10000"), "SALE");
+            ProductTestHelper.createProduct("상품" + i + "-" + timestamp, 10, new BigDecimal("10000"), "SALE");
         }
     }
 
     @When("관리자가 새로운 상품을 등록한다")
     public void createNewProduct() {
-        Response response = ProductTestHelper.createProduct("신규 상품", 20, new BigDecimal("50000"), "SALE");
+        String uniqueName = "신규상품-" + System.currentTimeMillis();
+        Response response = ProductTestHelper.createProduct(uniqueName, 20, new BigDecimal("50000"), "SALE");
         ProductTestHelper.setResponse(response);
     }
 

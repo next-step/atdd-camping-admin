@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -30,6 +31,11 @@ public class ReservationService {
     public ReservationResponse createReservation(CreateReservationRequest request) {
         Campsite campsite = campsiteRepository.findById(request.getCampsiteId())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + request.getCampsiteId()));
+
+        // 과거 날짜 검증
+        if (request.getStartDate().isBefore(LocalDate.now())) {
+            throw new IllegalArgumentException("Cannot create reservation with past start date");
+        }
 
         // 캠프사이트 상태 검증
         campsite.validateAvailability();
