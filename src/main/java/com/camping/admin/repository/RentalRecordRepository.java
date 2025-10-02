@@ -6,15 +6,15 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface RentalRecordRepository extends JpaRepository<RentalRecord, Long> {
 
-    @Query("SELECT rr FROM RentalRecord rr WHERE DATE(rr.createdAt) = :date")
-    List<RentalRecord> findByCreatedAtDate(@Param("date") LocalDate date);
+    @Query("SELECT rr FROM RentalRecord rr WHERE rr.createdAt >= :startDateTime AND rr.createdAt < :endDateTime")
+    List<RentalRecord> findByCreatedAtDate(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
 
-    @Query("SELECT rr FROM RentalRecord rr WHERE DATE(rr.createdAt) BETWEEN :fromDate AND :toDate")
-    List<RentalRecord> findByCreatedAtDateBetween(@Param("fromDate") LocalDate fromDate, @Param("toDate") LocalDate toDate);
+    @Query("SELECT rr FROM RentalRecord rr WHERE rr.createdAt >= :startDateTime AND rr.createdAt < :endDateTime")
+    List<RentalRecord> findByCreatedAtDateBetween(@Param("startDateTime") LocalDateTime startDateTime, @Param("endDateTime") LocalDateTime endDateTime);
 }

@@ -18,7 +18,7 @@ public class RentalRecord {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id") // Nullable for walk-in rentals
+    @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -48,10 +48,6 @@ public class RentalRecord {
             throw new IllegalStateException("This item has already been returned.");
         }
         this.isReturned = true;
-    }
-
-    public boolean canReturn() {
-        return !this.isReturned;
     }
 
     private void validateQuantity(Integer quantity) {

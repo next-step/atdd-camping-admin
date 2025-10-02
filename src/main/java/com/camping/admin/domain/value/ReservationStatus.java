@@ -16,10 +16,6 @@ public enum ReservationStatus {
         return value;
     }
 
-    public boolean isActive() {
-        return this == CONFIRMED || this == CHECKED_IN;
-    }
-
     public static ReservationStatus fromString(String value) {
         if (value == null || value.isBlank()) {
             return CONFIRMED;

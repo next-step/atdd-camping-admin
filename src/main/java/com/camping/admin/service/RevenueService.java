@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -59,7 +61,9 @@ public class RevenueService {
     }
 
     private BigDecimal calculateDailySalesRevenue(LocalDate date) {
-        return salesRecordRepository.findByCreatedAtDate(date).stream()
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
+        return salesRecordRepository.findByCreatedAtDate(startDateTime, endDateTime).stream()
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -71,13 +75,17 @@ public class RevenueService {
     }
 
     private BigDecimal calculateDailyRentalRevenue(LocalDate date) {
-        return rentalRecordRepository.findByCreatedAtDate(date).stream()
+        LocalDateTime startDateTime = date.atStartOfDay();
+        LocalDateTime endDateTime = date.plusDays(1).atStartOfDay();
+        return rentalRecordRepository.findByCreatedAtDate(startDateTime, endDateTime).stream()
                 .map(it -> it.getProduct().getPrice().multiply(new BigDecimal(it.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private BigDecimal calculateRangeSalesRevenue(LocalDate from, LocalDate to) {
-        return salesRecordRepository.findByCreatedAtDateBetween(from, to).stream()
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
+        return salesRecordRepository.findByCreatedAtDateBetween(startDateTime, endDateTime).stream()
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
@@ -89,13 +97,17 @@ public class RevenueService {
     }
 
     private BigDecimal calculateRangeRentalRevenue(LocalDate from, LocalDate to) {
-        return rentalRecordRepository.findByCreatedAtDateBetween(from, to).stream()
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
+        return rentalRecordRepository.findByCreatedAtDateBetween(startDateTime, endDateTime).stream()
                 .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private void addSalesEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
-        salesRecordRepository.findByCreatedAtDateBetween(from, to)
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
+        salesRecordRepository.findByCreatedAtDateBetween(startDateTime, endDateTime)
                 .forEach(record -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.SALE,
                         record.getProduct().getName() + BusinessConstants.SALES_ITEM_SUFFIX,
@@ -115,7 +127,9 @@ public class RevenueService {
     }
 
     private void addRentalEntries(List<RevenueEntryResponse> entries, LocalDate from, LocalDate to) {
-        rentalRecordRepository.findByCreatedAtDateBetween(from, to)
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
+        rentalRecordRepository.findByCreatedAtDateBetween(startDateTime, endDateTime)
                 .forEach(it -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.RENTAL,
                         it.getProduct().getName() + (it.getReservation() != null ?

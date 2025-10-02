@@ -12,15 +12,6 @@ import java.util.List;
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
-    @Query("SELECT r FROM Reservation r WHERE r.campsite.id = :campsiteId " +
-           "AND r.status != com.camping.admin.domain.value.ReservationStatus.CANCELLED " +
-           "AND (r.startDate < :endDate AND r.endDate > :startDate)")
-    List<Reservation> findOverlappingReservations(
-        @Param("campsiteId") Long campsiteId,
-        @Param("startDate") LocalDate startDate,
-        @Param("endDate") LocalDate endDate
-    );
-
     @Query("SELECT r FROM Reservation r WHERE r.reservationDate = :date")
     List<Reservation> findByReservationDate(@Param("date") LocalDate date);
 

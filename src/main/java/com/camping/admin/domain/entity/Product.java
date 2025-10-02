@@ -62,10 +62,6 @@ public class Product {
         this.stockQuantity += quantity;
     }
 
-    public boolean isAvailable() {
-        return this.stockQuantity > 0;
-    }
-
     public BigDecimal calculateTotalPrice(Integer quantity) {
         if (quantity <= 0) {
             throw new IllegalArgumentException("Quantity must be positive");

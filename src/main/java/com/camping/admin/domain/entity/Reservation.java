@@ -53,15 +53,6 @@ public class Reservation {
             this.status = ReservationStatus.CONFIRMED;
         }
     }
-    
-    public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite) {
-        validateDates(startDate, endDate);
-        this.customerName = customerName;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.campsite = campsite;
-        this.reservationDate = LocalDate.now();
-    }
 
     public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite, String phoneNumber) {
         validateDates(startDate, endDate);
@@ -88,46 +79,11 @@ public class Reservation {
         }
     }
 
-    public void updateStatus(ReservationStatus newStatus) {
-        if (newStatus != null) {
-            this.status = newStatus;
-        }
-    }
-
-    public void updateReservationDetails(LocalDate startDate, LocalDate endDate, String phoneNumber) {
-        validateDates(startDate, endDate);
-        this.startDate = startDate;
-        this.endDate = endDate;
-        if (phoneNumber != null) {
-            this.phoneNumber = phoneNumber;
-        }
-    }
-
-    public void cancel() {
-        if (this.status == ReservationStatus.CANCELLED) {
-            throw new IllegalStateException("Reservation is already cancelled");
-        }
-        if (this.status == ReservationStatus.CHECKED_OUT) {
-            throw new IllegalStateException("Cannot cancel a completed reservation");
-        }
-        this.status = ReservationStatus.CANCELLED;
-    }
-
     public BigDecimal calculateRevenue() {
         long nights = java.time.temporal.ChronoUnit.DAYS.between(this.startDate, this.endDate);
         if (nights < BusinessConstants.MINIMUM_NIGHTS) {
             nights = BusinessConstants.MINIMUM_NIGHTS;
         }
         return new BigDecimal(nights).multiply(BusinessConstants.RESERVATION_DAILY_RATE);
-    }
-
-    public boolean isActive() {
-        return this.status != null && this.status.isActive();
-    }
-
-    public boolean isInDateRange(java.time.LocalDate from, java.time.LocalDate to) {
-        if (this.reservationDate == null) return false;
-        return (this.reservationDate.isEqual(from) || this.reservationDate.isAfter(from)) &&
-               (this.reservationDate.isEqual(to) || this.reservationDate.isBefore(to));
     }
 }

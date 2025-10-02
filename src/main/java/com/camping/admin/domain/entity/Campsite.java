@@ -46,13 +46,6 @@ public class Campsite {
         this.maxPeople = maxPeople;
     }
 
-    public void updateStatus(CampsiteStatus status) {
-        if (status == null) {
-            throw new IllegalArgumentException("Campsite status cannot be null");
-        }
-        this.status = status;
-    }
-
     public boolean isAvailable() {
         return this.status == CampsiteStatus.AVAILABLE;
     }
