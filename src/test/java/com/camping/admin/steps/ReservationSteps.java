@@ -3,7 +3,6 @@ package com.camping.admin.steps;
 import com.camping.admin.helpers.ApiHelper;
 import com.camping.admin.helpers.CampsiteTestHelper;
 import com.camping.admin.helpers.ReservationTestHelper;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
