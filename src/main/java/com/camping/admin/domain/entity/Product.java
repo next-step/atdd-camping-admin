@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,4 +37,45 @@ public class Product {
         this.productType = productType;
     }
 
+    public void updateProduct(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+        this.name = name;
+        this.stockQuantity = stockQuantity;
+        this.price = price;
+        this.productType = productType;
+    }
+
+    public void decreaseStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        if (this.stockQuantity < quantity) {
+            throw new IllegalStateException("Not enough stock for product " + this.name +
+                ". Available: " + this.stockQuantity + ", Requested: " + quantity);
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        this.stockQuantity += quantity;
+    }
+
+    public BigDecimal calculateTotalPrice(Integer quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be positive");
+        }
+        return this.price.multiply(new BigDecimal(quantity));
+    }
+
+    public boolean isRentalProduct() {
+        return this.productType == ProductType.RENTAL;
+    }
+
+    public void validateRentalProduct() {
+        if (!isRentalProduct()) {
+            throw new IllegalArgumentException("Product is not a rental item.");
+        }
+    }
 }

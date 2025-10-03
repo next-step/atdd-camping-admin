@@ -18,7 +18,7 @@ public class RentalRecord {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "reservation_id") // Nullable for walk-in rentals
+    @JoinColumn(name = "reservation_id")
     private Reservation reservation;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -35,6 +35,7 @@ public class RentalRecord {
     private LocalDateTime createdAt;
 
     public RentalRecord(Reservation reservation, Product product, Integer quantity) {
+        validateQuantity(quantity);
         this.reservation = reservation;
         this.product = product;
         this.quantity = quantity;
@@ -42,7 +43,16 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
+    public void markAsReturned() {
+        if (this.isReturned) {
+            throw new IllegalStateException("This item has already been returned.");
+        }
+        this.isReturned = true;
+    }
+
+    private void validateQuantity(Integer quantity) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Rental quantity must be positive");
+        }
     }
 }

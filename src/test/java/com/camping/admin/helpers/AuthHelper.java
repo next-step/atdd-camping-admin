@@ -14,19 +14,11 @@ public class AuthHelper {
         return ContextHelper.get(ACCESS_TOKEN_KEY, String.class);
     }
 
-    public static String getRefreshToken() {
-        return ContextHelper.get(REFRESH_TOKEN_KEY, String.class);
-    }
-
     public static void setTokens(String accessToken, String refreshToken) {
         ContextHelper.set(ACCESS_TOKEN_KEY, accessToken);
         if (refreshToken != null) {
             ContextHelper.set(REFRESH_TOKEN_KEY, refreshToken);
         }
-    }
-
-    public static void setAccessToken(String accessToken) {
-        ContextHelper.set(ACCESS_TOKEN_KEY, accessToken);
     }
 
     public static void clearTokens() {
@@ -66,7 +58,4 @@ public class AuthHelper {
         }
     }
 
-    public static void logout() {
-        clearTokens();
-    }
 }
