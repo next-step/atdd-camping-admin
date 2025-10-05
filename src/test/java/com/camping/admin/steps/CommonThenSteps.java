@@ -38,4 +38,16 @@ public class CommonThenSteps {
                     .body("[0].status", notNullValue());
         }
     }
+
+    @Then("접근이 거부된다.")
+    public void 접근이거부된다() {
+        lastResponse.then().statusCode(401);
+    }
+
+    @Then("로그인 화면으로 안내된다.")
+    public void 로그인화면으로안내된다() {
+        lastResponse.then()
+                .statusCode(302)
+                .header("Location", containsString("/login"));
+    }
 }
