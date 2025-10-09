@@ -12,15 +12,20 @@ import static com.camping.admin.steps.ReservationListSteps.lastResponse;
 
 public class CommonThenSteps {
 
-    @Then("예약 목록을 응답 받았다.")
-    public void 예약목록을응답받았다() {
+    // 공통 헬퍼: 상태코드 검증 + 실패 시 디버그 출력
+    private void assertStatus(int expected) {
         Response res = lastResponse.then().extract().response();
-        if (res.statusCode() != 200) {
+        if (res.statusCode() != expected) {
             System.out.println("[ATDD] >>> Unexpected status: " + res.statusCode());
             System.out.println("[ATDD] >>> Body: " + res.asString());
             System.out.println("[ATDD] >>> Headers: " + res.getHeaders());
         }
-        lastResponse.then().statusCode(200);
+        lastResponse.then().statusCode(expected);
+    }
+
+    @Then("예약 목록을 응답 받았다.")
+    public void 예약목록을응답받았다() {
+        assertStatus(200);
     }
 
     @And("응답 본문은 유효한 예약 목록이다.")
@@ -41,13 +46,12 @@ public class CommonThenSteps {
 
     @Then("접근이 거부된다.")
     public void 접근이거부된다() {
-        lastResponse.then().statusCode(401);
+        assertStatus(401);
     }
 
     @Then("로그인 화면으로 안내된다.")
     public void 로그인화면으로안내된다() {
-        lastResponse.then()
-                .statusCode(302)
-                .header("Location", containsString("/login"));
+        assertStatus(302);
+        lastResponse.then().header("Location", containsString("/login"));
     }
 }
