@@ -1,7 +1,6 @@
 Feature: 예약 상태를 관리자가 수행한다
   Background:
-    Given 관리자가 로그인한다
-    And 사용자가 예약했다
+    Given 사용자가 예약했다
 
   Scenario: 관리자가 예약을 대기 상태로 바꿀 수 있다
     When 관리자가 예약을 "WAITING" 상태로 바꾼다
