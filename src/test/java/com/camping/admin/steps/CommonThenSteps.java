@@ -12,6 +12,22 @@ import static com.camping.admin.steps.ReservationListSteps.lastResponse;
 
 public class CommonThenSteps {
 
+    // 공통 헬퍼: 상태코드 검증 + 실패 시 디버그 출력
+    private void assertStatus(int expected) {
+        Response res = lastResponse.then().extract().response();
+        if (res.statusCode() != expected) {
+            System.out.println("[ATDD] >>> Unexpected status: " + res.statusCode());
+            System.out.println("[ATDD] >>> Body: " + res.asString());
+            System.out.println("[ATDD] >>> Headers: " + res.getHeaders());
+        }
+        lastResponse.then().statusCode(expected);
+    }
+
+    @Then("예약 목록을 응답 받았다.")
+    public void 예약목록을응답받았다() {
+        assertStatus(200);
+    }
+
     @And("응답 본문은 유효한 예약 목록이다.")
     public void 응답본문은유효한예약목록이다() {
         // 루트가 JSON 배열인지 확인한다
@@ -28,14 +44,14 @@ public class CommonThenSteps {
         }
     }
 
-    @Then("응답 상태코드는 {int}이다.")
-    public void 응답상태코드는이다(int code) {
-        Response res = lastResponse.then().extract().response();
-        if (res.statusCode() != code) {
-            System.out.println("[ATDD] >>> Unexpected status: " + res.statusCode());
-            System.out.println("[ATDD] >>> Body: " + res.asString());
-            System.out.println("[ATDD] >>> Headers: " + res.getHeaders());
-        }
-        lastResponse.then().statusCode(code);
+    @Then("접근이 거부된다.")
+    public void 접근이거부된다() {
+        assertStatus(401);
+    }
+
+    @Then("로그인 화면으로 안내된다.")
+    public void 로그인화면으로안내된다() {
+        assertStatus(302);
+        lastResponse.then().header("Location", containsString("/login"));
     }
 }
