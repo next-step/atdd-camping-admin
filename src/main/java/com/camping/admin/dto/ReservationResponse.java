@@ -4,7 +4,9 @@ import com.camping.admin.domain.entity.Reservation;
 import java.time.LocalDate;
 
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor
 @Getter
 public class ReservationResponse {
     private Long id;
