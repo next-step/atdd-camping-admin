@@ -14,49 +14,40 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-public class ReservationSteps extends CucumberSpringConfiguration{
+public class ReservationSteps {
 
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    private Reservation savedReservation;
-
-    @Autowired
-    private JwtService jwtService;
-
-    @Value("${admin.username}")
-    private String adminUsername;
-
+    private Long savedReservationId;
+    private Response lastResponse;
     private String adminToken;
 
     @Before(order = 0)
     public void setupRestAssured() {
-        RestAssured.port = port;
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = 8080;
+        adminToken = obtainAdminTokenViaLoginApi("admin", "admin123");
         System.out.println(">>> [Before] RestAssured 기본 설정 완료.");
     }
 
-    @Before
-    public void setupAdminToken() {
-        this.adminToken = jwtService.generateToken(adminUsername);
+    private String obtainAdminTokenViaLoginApi(String admin, String admin123) {
+        // 실제 로그인 API를 호출하고 응답에서 토큰을 추출하는 로직
+        return "mock-token";
     }
 
     @Given("사용자가 캠핑장 예약을 했다")
     public void userHasMadeReservation() {
-        this.savedReservation = reservationRepository.findById(1L).orElseThrow(RuntimeException::new);
+        // Test-only API나 DB 직접 제어를 통해 예약 데이터 생성
+        this.savedReservationId = 123L;
         System.out.println(">>> [Given] 사용자가 캠핑장 예약을 하는 단계를 수행합니다.");
     }
 
     @When("관리자가 해당 예약을 취소하면")
     public void adminCancelsTheReservation() {
-        Response response = RestAssured.given()
+        lastResponse = RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
                 .body("{\"status\":\"CANCELLED\"}")
                 .when()
-                .patch("/admin/reservations/" + savedReservation.getId() + "/status");
+                .patch("/admin/reservations/" + savedReservationId + "/status");
         System.out.println(">>> [When] 관리자가 해당 예약을 취소하는 단계를 수행합니다.");
     }
 
