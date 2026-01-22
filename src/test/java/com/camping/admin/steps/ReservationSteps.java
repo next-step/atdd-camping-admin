@@ -1,8 +1,5 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.security.JwtService;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -10,9 +7,6 @@ import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
 public class ReservationSteps {
 
