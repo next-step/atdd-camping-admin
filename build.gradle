@@ -43,6 +43,7 @@ dependencies {
     
     // JUnit Platform Suite for Cucumber
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.0'
+    testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
     
     // Cucumber
     testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
