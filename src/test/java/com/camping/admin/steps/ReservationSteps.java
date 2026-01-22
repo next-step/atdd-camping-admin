@@ -8,8 +8,16 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import static com.camping.admin.TestConstants.예약상태_취소;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps extends CucumberSpringConfiguration {
 
@@ -19,27 +27,66 @@ public class ReservationSteps extends CucumberSpringConfiguration {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private JwtService jwtService;
+
+    @Value("${admin.username}")
+    private String adminUsername;
+
+    private String adminToken;
+
     private Reservation savedReservation;
 
     @Before(order = 0)
     public void setupRestAssured() {
         RestAssured.port = port;
-        System.out.println(">>> [Before] RestAssured 기본 설정 완료.");
     }
 
-    @Given("사용자가 캠핑장 예약을 했다")
-    public void userHasMadeReservation() {
-        this.savedReservation = reservationRepository.findById(1L).orElseThrow(RuntimeException::new);
-        System.out.println(">>> [Given] 예약 데이터 생성 완료: ID " + savedReservation.getId());
+    @Before(order = 1)
+    public void setupAdminToken() {
+        this.adminToken = jwtService.generateToken(adminUsername);
     }
 
-    @When("관리자가 해당 예약을 취소하면")
-    public void adminCancelsTheReservation() {
-        System.out.println(">>> [When] 관리자가 해당 예약을 취소하는 단계를 수행합니다.");
+    @Given("사용자가 {long}번 사이트 예약을 했다")
+    public void 사용자가_사이트를_예약했다(Long siteNo) {
+        this.savedReservation = reservationRepository.findById(siteNo).orElseThrow(RuntimeException::new);
+    }
+
+    @When("관리자가 해당 사이트 예약을 취소하면")
+    public void 관리자가_해당_사이트_예약을_취소한다() {
+        RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"" + 예약상태_취소 + "\"}")
+                .when()
+                .patch("/admin/reservations/" + savedReservation.getId() + "/status");
     }
 
     @Then("예약이 성공적으로 취소된다")
-    public void reservationIsSuccessfullyCancelled() {
-        System.out.println(">>> [Then] 예약이 성공적으로 취소되었는지 확인하는 단계를 수행합니다.");
+    public void 예약이_성공적으로_취소된다() {
+        String status = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .when()
+                .get("/admin/reservations")
+                .then()
+                .statusCode(200)
+                .extract()
+                .jsonPath()
+                .getString("find { it.id == " + savedReservation.getId() + " }.status");
+
+        assertThat(status).isEqualTo(예약상태_취소);
+    }
+
+    @Then("해당 사이트는 다시 예약이 가능하다")
+    public void 해당_사이트는_다시_예약이_가능하다() {
+        Long campsiteId = savedReservation.getCampsite().getId();
+        LocalDate startDate = savedReservation.getStartDate();
+        LocalDate endDate = savedReservation.getEndDate();
+
+        List<Reservation> conflictingReservations = reservationRepository
+                .findOverlappingReservations(campsiteId, startDate, endDate);
+
+        assertThat(conflictingReservations).isEmpty();
     }
 }
