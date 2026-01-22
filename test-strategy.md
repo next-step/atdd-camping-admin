@@ -20,7 +20,7 @@ private ScenarioContext scenarioContext;
 
 @Given("확정된 예약이 있다")
 public void 확정된_예약이_있다() {
-    Reservation reservation = testDataFactory.createConfirmedReservation();
+    Reservation reservation = testDataFactory.getConfirmedReservation();
     scenarioContext.setReservation(reservation);  // 상태 저장
 }
 
@@ -44,19 +44,19 @@ public void 관리자가_해당_예약을_취소한다() {
 
 **위치**: `src/test/java/com/camping/admin/support/TestDataFactory.java`
 
-**목적**: 테스트용 엔티티 생성 팩토리
+**목적**: 테스트 데이터 조회 팩토리
 
 **특징**:
-- 하드코딩된 ID 의존성 제거
-- 테스트마다 새 데이터 생성으로 격리 보장
-- 필요한 연관 엔티티 자동 생성
+- `data.sql`로 생성된 초기 데이터 활용
+- 하드코딩된 ID 의존성 제거 (`findById(1L)` 대신 조건 기반 조회)
+- 상태 기반 데이터 조회로 유연성 확보
 
 **제공 메서드**:
 
 | 메서드 | 설명 |
 |--------|------|
-| `createConfirmedReservation()` | CONFIRMED 상태의 예약 생성 |
-| `createReservationWithStatus(String status)` | 지정된 상태의 예약 생성 |
+| `getConfirmedReservation()` | CONFIRMED 상태의 예약 조회 |
+| `getReservationWithStatus(String status)` | 지정된 상태의 예약 조회 |
 
 **사용 예시**:
 ```java
@@ -65,16 +65,28 @@ private TestDataFactory testDataFactory;
 
 @Given("확정된 예약이 있다")
 public void 확정된_예약이_있다() {
-    Reservation reservation = testDataFactory.createConfirmedReservation();
+    Reservation reservation = testDataFactory.getConfirmedReservation();
     // ...
 }
 
 @Given("{string} 상태의 예약이 있다")
 public void 특정_상태의_예약이_있다(String status) {
-    Reservation reservation = testDataFactory.createReservationWithStatus(status);
+    Reservation reservation = testDataFactory.getReservationWithStatus(status);
     // ...
 }
 ```
+
+---
+
+## 테스트 데이터
+
+테스트는 `src/main/resources/data.sql`에서 생성된 초기 데이터를 사용합니다.
+
+| 엔티티 | 초기 데이터 |
+|--------|------------|
+| Campsite | 2개 (A-01, A-02) |
+| Reservation | 12개 (모두 CONFIRMED 상태) |
+| Product | 12개 (RENTAL 6개, SALE 6개) |
 
 ---
 
@@ -85,7 +97,7 @@ src/test/java/com/camping/admin/
 ├── support/
 │   ├── CucumberTestRunner.java    # Cucumber 실행기
 │   ├── ScenarioContext.java       # 시나리오 상태 관리
-│   └── TestDataFactory.java       # 테스트 데이터 생성
+│   └── TestDataFactory.java       # 테스트 데이터 조회
 └── steps/
     ├── CucumberSpringConfiguration.java  # Spring 연동 설정
     └── ReservationChangeSteps.java       # 예약 상태 변경 Step 정의
@@ -106,11 +118,9 @@ src/test/java/com/camping/admin/
    - 로컬 변수 대신 ScenarioContext 사용
    - 여러 Step 클래스 간 데이터 공유 가능
 
-
-3. **TestDataFactory로 데이터 생성**
+3. **TestDataFactory로 데이터 조회**
    - `findById(1L)` 같은 하드코딩 금지
-   - 테스트마다 새 데이터 생성
-
+   - 상태 기반 조회 메서드 사용
 
 4. **비즈니스 언어 사용**
    - Feature 파일: "예약은 취소 상태다" (O)
