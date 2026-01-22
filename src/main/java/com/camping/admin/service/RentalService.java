@@ -10,6 +10,8 @@ import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +33,7 @@ public class RentalService {
     }
 
     @Transactional
-    public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
+    public RentalResponse createRental(Long productId, Integer quantity, @Nullable Long reservationId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
 

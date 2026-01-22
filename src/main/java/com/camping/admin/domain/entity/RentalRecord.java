@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -34,7 +35,7 @@ public class RentalRecord {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public RentalRecord(Reservation reservation, Product product, Integer quantity) {
+    public RentalRecord(@Nullable Reservation reservation, Product product, Integer quantity) {
         this.reservation = reservation;
         this.product = product;
         this.quantity = quantity;
