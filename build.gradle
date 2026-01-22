@@ -40,6 +40,7 @@ dependencies {
     
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
     
     // JUnit Platform Suite for Cucumber
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.0'
