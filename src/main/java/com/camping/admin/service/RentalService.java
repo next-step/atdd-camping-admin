@@ -34,6 +34,10 @@ public class RentalService {
 
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, @Nullable Long reservationId) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than zero.");
+        }
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
 
@@ -47,6 +51,10 @@ public class RentalService {
         if (reservationId != null) {
             reservation = reservationRepository.findById(reservationId)
                     .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+            
+            if ("CANCELLED".equals(reservation.getStatus())) {
+                throw new IllegalStateException("Cannot create rental for a cancelled reservation.");
+            }
         }
 
         RentalRecord rentalRecord = new RentalRecord(reservation, product, quantity);

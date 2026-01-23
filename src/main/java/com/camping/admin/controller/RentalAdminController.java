@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -23,7 +24,7 @@ public class RentalAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<RentalResponse> createRental(@RequestBody CreateRentalRequest request) {
+    public ResponseEntity<RentalResponse> createRental(@Validated @RequestBody CreateRentalRequest request) {
         RentalResponse createdRental = rentalService.createRental(
                 request.getProductId(),
                 request.getQuantity(),
