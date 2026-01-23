@@ -43,6 +43,10 @@ public class ProductAdminController {
             name = null;
         }
 
+        if (name == null || name.isBlank()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         Integer stockQuantity;
         if (body.containsKey("stockQuantity")) {
             Object v = body.get("stockQuantity");
@@ -61,6 +65,10 @@ public class ProductAdminController {
             stockQuantity = 0;
         }
 
+        if (stockQuantity < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         BigDecimal price;
         if (body.containsKey("price")) {
             Object v = body.get("price");
@@ -77,6 +85,10 @@ public class ProductAdminController {
             }
         } else {
             price = BigDecimal.ZERO;
+        }
+
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         ProductType productType;
