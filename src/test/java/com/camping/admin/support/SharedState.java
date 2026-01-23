@@ -5,6 +5,7 @@ import io.restassured.response.Response;
 public class SharedState {
     private Response response;
     private Long productId;
+    private Long rentalRecordId;
 
     public Response getResponse() {
         return response;
@@ -20,5 +21,13 @@ public class SharedState {
 
     public void setProductId(Long productId) {
         this.productId = productId;
+    }
+
+    public Long getRentalRecordId() {
+        return rentalRecordId;
+    }
+
+    public void setRentalRecordId(Long rentalRecordId) {
+        this.rentalRecordId = rentalRecordId;
     }
 }

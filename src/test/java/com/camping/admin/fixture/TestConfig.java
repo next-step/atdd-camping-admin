@@ -17,6 +17,7 @@ public class TestConfig {
         public static final Long CHAIR = 4L;             // 의자 (RENTAL)
         public static final Long TABLE = 5L;             // 테이블 (RENTAL)
         public static final Long BURNER = 6L;            // 버너 (RENTAL)
+        public static final Long NOT_EXIST = 99999L;     // 존재하지 않는 상품
 
         private ProductIds() {}
     }
@@ -26,6 +27,14 @@ public class TestConfig {
         public static final Long KIM_RESERVATION = 2L;   // 김철수 예약
 
         private ReservationIds() {}
+    }
+
+    public static final class RentalRecordIds {
+        public static final Long NOT_RETURNED = 1L;      // 반납 안 된 대여 기록
+        public static final Long ALREADY_RETURNED = 2L;  // 이미 반납된 대여 기록
+        public static final Long NOT_EXIST = 99999L;     // 존재하지 않는 대여 기록
+
+        private RentalRecordIds() {}
     }
 
     private TestConfig() {}
