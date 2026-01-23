@@ -54,11 +54,11 @@ public class ReservationAdminController {
 
         Object statusObj = body.get("status");
         if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
+            return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         } else {
             String statusValue = statusObj.toString();
             if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
+                return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
             } else {
                 // 단순히 그대로 대입
                 reservation.setStatus(statusValue);

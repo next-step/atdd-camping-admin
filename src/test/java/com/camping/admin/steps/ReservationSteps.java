@@ -38,9 +38,19 @@ public class ReservationSteps {
         testContext.setLastResponse(reservationApi.예약_상태_변경_요청(testContext.getAdminToken(), testContext.getLastReservationId(), status));
     }
 
+    @When("관리자가 존재하지 않는 예약 ID의 상태를 {string}로 변경하면")
+    public void adminUpdatesNonExistentReservationStatus(String status) {
+        testContext.setLastResponse(reservationApi.예약_상태_변경_요청(testContext.getAdminToken(), 9999L, status));
+    }
+
     @Then("예약 상태가 {string}로 변경된다")
     public void reservationStatusShouldBe(String expectedStatus) {
         Reservation reservation = reservationRepository.findById(testContext.getLastReservationId()).orElseThrow();
         assertThat(reservation.getStatus()).isEqualTo(expectedStatus);
+    }
+
+    @Then("예약 상태 변경 요청이 실패한다")
+    public void reservationStatusUpdateShouldFail() {
+        assertThat(testContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
     }
 }
