@@ -5,6 +5,7 @@ import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.steps.api.ProductApi;
 import com.camping.admin.steps.context.TestContext;
+import com.camping.admin.steps.support.ProductTypeMapper;
 import com.camping.admin.steps.support.TestDataFactory;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -32,15 +33,10 @@ public class ProductSteps {
     @Autowired
     private ProductApi productApi;
 
-    @Given("재고가 {int}개인 {string} 대여 상품이 등록되어 있다")
-    public void rentalProductIsRegistered(int stockQuantity, String productName) {
-        Product product = testDataFactory.createProduct(productName, stockQuantity, BigDecimal.valueOf(10000), ProductType.RENTAL);
-        testContext.setLastProductId(product.getId());
-    }
-
-    @Given("재고가 {int}개인 {string} 판매 상품이 등록되어 있다")
-    public void saleProductIsRegistered(int stockQuantity, String productName) {
-        Product product = testDataFactory.createProduct(productName, stockQuantity, BigDecimal.valueOf(10000), ProductType.SALE);
+    @Given("재고가 {int}개인 {string} {string} 상품이 등록되어 있다")
+    public void productIsRegistered(int stockQuantity, String productName, String inputProductType) {
+        ProductType productType = ProductTypeMapper.from(inputProductType);
+        Product product = testDataFactory.createProduct(productName, stockQuantity, BigDecimal.valueOf(10000), productType);
         testContext.setLastProductId(product.getId());
     }
 
