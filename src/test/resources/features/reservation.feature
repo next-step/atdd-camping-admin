@@ -16,3 +16,9 @@ Feature: 예약 관리
     Given "CONFIRMED" 상태의 예약이 등록되어 있다
     When 관리자가 해당 예약의 상태를 ""로 변경하면
     Then 예약 상태 변경 요청이 실패한다
+
+  Scenario: 관리자가 예약 목록을 조회한다
+    Given "CONFIRMED" 상태의 예약이 등록되어 있다
+    And "WAITING" 상태의 예약이 등록되어 있다
+    When 관리자가 예약 목록을 조회하면
+    Then 2개의 예약 목록이 조회된다

@@ -25,4 +25,12 @@ public class ReservationApi {
                 .then().log().all()
                 .extract();
     }
+
+    public ExtractableResponse<Response> 예약_목록_조회_요청(String accessToken) {
+        return RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().get("/admin/reservations")
+                .then().log().all()
+                .extract();
+    }
 }

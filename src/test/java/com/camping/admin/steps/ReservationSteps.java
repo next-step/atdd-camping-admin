@@ -8,6 +8,7 @@ import com.camping.admin.steps.support.TestDataFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -52,5 +53,16 @@ public class ReservationSteps {
     @Then("예약 상태 변경 요청이 실패한다")
     public void reservationStatusUpdateShouldFail() {
         assertThat(testContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
+    }
+
+    @When("관리자가 예약 목록을 조회하면")
+    public void adminFetchesAllReservations() {
+        testContext.setLastResponse(reservationApi.예약_목록_조회_요청(testContext.getAdminToken()));
+    }
+
+    @Then("{int}개의 예약 목록이 조회된다")
+    public void reservationListSizeShouldBe(int size) {
+        List<?> list = testContext.getLastResponse().jsonPath().getList("");
+        assertThat(list.size()).isGreaterThanOrEqualTo(size);
     }
 }
