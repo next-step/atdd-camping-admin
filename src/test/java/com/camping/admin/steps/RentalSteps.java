@@ -76,11 +76,6 @@ public class RentalSteps {
         testContext.setLastResponse(rentalApi.대여_생성_요청(testContext.getAdminToken(), testContext.getLastProductId(), quantity, testContext.getLastReservationId()));
     }
 
-    @When("관리자가 필수 값인 상품 ID 없이 대여 처리하면")
-    public void adminCreatesRentalWithoutProductId() {
-        testContext.setLastResponse(rentalApi.대여_생성_요청(testContext.getAdminToken(), null, 1));
-    }
-
     @Then("대여 기록이 정상적으로 생성된다")
     public void rentalRecordIsCreated() {
         assertThat(testContext.getLastResponse().statusCode()).isEqualTo(HttpStatus.CREATED.value());

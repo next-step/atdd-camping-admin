@@ -44,20 +44,6 @@ public class ProductSteps {
         testContext.setLastProductId(product.getId());
     }
 
-    @Given("재고가 {int}개인 {string} 상품인 {string} 판매 상품이 등록되어 있다")
-    public void saleProductIsRegistered(int stockQuantity, String productType, String productName) {
-        ProductType type = "세일".equals(productType) ? ProductType.SALE : ProductType.RENTAL;
-        Product product = testDataFactory.createProduct(productName, stockQuantity, BigDecimal.valueOf(10000), type);
-        testContext.setLastProductId(product.getId());
-    }
-
-    @Given("{string}은 세일 상품이다")
-    public void productIsSaleItem(String productName) {
-        Product product = productRepository.findById(testContext.getLastProductId()).orElseThrow();
-        assertThat(product.getName()).isEqualTo(productName);
-        assertThat(product.getProductType()).isEqualTo(ProductType.SALE);
-    }
-
     @When("관리자가 이름 {string}, 재고 {int}개, 가격 {int}원, 타입 {string}인 상품을 등록하면")
     public void adminCreatesProduct(String name, int stockQuantity, int price, String productType) {
         testContext.setLastResponse(productApi.상품_생성_요청(testContext.getAdminToken(), name, stockQuantity, price, productType));
