@@ -31,7 +31,7 @@ public class Product {
     private ProductType productType;
 
     @Builder
-    private Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+    public Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         this.name = name;
         this.stockQuantity = stockQuantity;
         this.price = price;
