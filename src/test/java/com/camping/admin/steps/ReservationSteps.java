@@ -69,32 +69,32 @@ public class ReservationSteps {
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 대기 상태로 존재한다")
     public void 대기_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 대기);
+        reservationFactory.createReservation(customerName, siteNumber, 대기);
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 보류 상태로 존재한다")
     public void 보류_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 보류);
+        reservationFactory.createReservation(customerName, siteNumber, 보류);
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 취소된 상태로 존재한다")
     public void 취소된_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 취소);
+        reservationFactory.createReservation(customerName, siteNumber, 취소);
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 체크인된 상태로 존재한다")
     public void 체크인된_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 체크인);
+        reservationFactory.createReservation(customerName, siteNumber, 체크인);
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 체크아웃된 상태로 존재한다")
     public void 체크아웃된_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 체크아웃);
+        reservationFactory.createReservation(customerName, siteNumber, 체크아웃);
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 거절된 상태로 존재한다")
     public void 거절된_예약이_존재한다(String customerName, String siteNumber) {
-        createReservation(customerName, siteNumber, 거절);
+        reservationFactory.createReservation(customerName, siteNumber, 거절);
     }
 
     @Given("예약 ID {string}는 존재하지 않는다")
@@ -191,25 +191,6 @@ public class ReservationSteps {
         assertErrorResponse(HttpStatus.BAD_REQUEST, "복구할 수 없");
     }
 
-    // ==================== Helper Methods ====================
-
-    private void createReservation(String customerName, String siteNumber, String status) {
-        Campsite campsite = campsiteRepository.findBySiteNumber(siteNumber)
-                .orElseGet(() -> campsiteRepository.save(
-                        new Campsite(siteNumber, "테스트 캠프사이트", 4)));
-
-        Reservation reservation = new Reservation(
-                customerName,
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(3),
-                campsite
-        );
-        reservation.setStatus(status);
-        reservation.setReservationDate(LocalDate.now());
-
-        Reservation saved = reservationRepository.save(reservation);
-        testContext.setReservationId(saved.getId());
-    }
 
     private void assertErrorResponse(HttpStatus expectedStatus, String expectedMessagePart) {
         assertThat(testContext.getResponse().statusCode())

@@ -4,6 +4,8 @@ import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.factory.RentalFactory;
+import com.camping.admin.factory.ReservationFactory;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.ReservationRepository;
@@ -45,6 +47,12 @@ public class RentalSteps {
     @Autowired
     private CampsiteRepository campsiteRepository;
 
+    @Autowired
+    private RentalFactory rentalFactory;
+
+    @Autowired
+    private ReservationFactory reservationFactory;
+
     @Before
     public void setUp() {
         RestAssured.port = port;
@@ -54,18 +62,12 @@ public class RentalSteps {
 
     @Given("{string} 대여 상품이 재고 {int}개로 등록되어 있다")
     public void 대여_상품이_등록되어_있다(String productName, int stockQuantity) {
-        Product product = new Product(productName, stockQuantity, BigDecimal.valueOf(10000), ProductType.RENTAL);
-        Product saved = productRepository.save(product);
-        testContext.setProductId(saved.getId());
-        testContext.setProductName(productName);
+        rentalFactory.createRental(productName, stockQuantity, ProductType.RENTAL);
     }
 
     @Given("{string} 판매 상품이 재고 {int}개로 등록되어 있다")
     public void 판매_상품이_등록되어_있다(String productName, int stockQuantity) {
-        Product product = new Product(productName, stockQuantity, BigDecimal.valueOf(5000), ProductType.SALE);
-        Product saved = productRepository.save(product);
-        testContext.setProductId(saved.getId());
-        testContext.setProductName(productName);
+        rentalFactory.createRental(productName, stockQuantity, ProductType.SALE);
     }
 
     @Given("{string} 고객의 예약이 존재한다")
@@ -81,6 +83,8 @@ public class RentalSteps {
         );
         reservation.setStatus("CONFIRMED");
         reservation.setReservationDate(LocalDate.now());
+
+        reservationFactory.createReservation(customerName,"A-001", "CONFIRMED");
 
         Reservation saved = reservationRepository.save(reservation);
         testContext.setReservationId(saved.getId());
