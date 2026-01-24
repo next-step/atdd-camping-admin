@@ -14,14 +14,21 @@ public class ReservationAdminClient {
     @Autowired
     private TestContext testContext;
 
-    public void 관리자가_예약_상태를_변경한다(String status) {
-        var reservationId = testContext.getReservationId();
-        var authToken = testContext.getAuthToken();
+    public void 예약_상태를_변경한다(String status) {
+        예약_상태를_변경한다(Map.of("status", status));
+    }
 
+    public void 예약_상태를_변경한다(Map<String, String> requestBody) {
+        var reservationId = testContext.getReservationId();
+        예약_상태를_변경한다(reservationId, requestBody);
+    }
+
+    public void 예약_상태를_변경한다(long reservationId, Map<String, String> requestBody) {
+        var authToken = testContext.getAuthToken();
         var response = RestAssured.given()
                 .cookie("AUTH_TOKEN", authToken)
                 .contentType(ContentType.JSON)
-                .body(Map.of("status", status))
+                .body(requestBody)
                 .when()
                 .patch("/admin/reservations/" + reservationId + "/status")
                 .then()
