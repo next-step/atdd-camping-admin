@@ -3,10 +3,8 @@ package com.camping.admin.domain.entity;
 import com.camping.admin.domain.enums.ProductType;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+
+import lombok.*;
 
 @Getter
 @Setter
@@ -32,7 +30,8 @@ public class Product {
     @Column(nullable = false)
     private ProductType productType;
 
-    public Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+    @Builder
+    private Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         this.name = name;
         this.stockQuantity = stockQuantity;
         this.price = price;
