@@ -5,6 +5,8 @@ import com.camping.admin.repository.CampsiteRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -90,8 +92,12 @@ public class CampsiteAdminController {
     public ResponseEntity<Campsite> updateCampsite(
             @PathVariable Long campsiteId,
             @RequestBody Map<String, Object> body) {
-        Campsite campsite = campsiteRepository.findById(campsiteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
+        Optional<Campsite> optionalCampsite = campsiteRepository.findById(campsiteId);
+        if (optionalCampsite.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Campsite campsite = optionalCampsite.get();
 
         if (body != null && !body.isEmpty()) {
             if (body.containsKey("siteNumber")) {

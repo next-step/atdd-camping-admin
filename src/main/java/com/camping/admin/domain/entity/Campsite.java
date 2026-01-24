@@ -27,6 +27,7 @@ public class Campsite {
     private Integer maxPeople;
     
     @OneToMany(mappedBy = "campsite", cascade = CascadeType.ALL)
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
     
     public Campsite(String siteNumber, String description, Integer maxPeople) {
