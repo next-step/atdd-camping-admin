@@ -1,4 +1,4 @@
-package com.camping.admin.steps.api;
+package com.camping.admin.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -26,36 +26,32 @@ public class ReservationAPI {
     /**
      * 예약 상태 변경 API 호출
      * PATCH /admin/reservations/{id}/status
-     *
-     * @param newStatus 변경할 상태값 (예: "CANCELLED")
-     * @return API 응답
      */
     public ExtractableResponse<Response> 예약_상태_변경(String newStatus) {
         Map<String, String> requestBody = Map.of("status", newStatus);
 
-        return RestAssured
+        var response = RestAssured
                 .given()
                     .header("Authorization", "Bearer " + testContext.getAccessToken())
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                     .body(requestBody)
                 .when()
-                    .patch("/admin/reservations/{id}/status", testContext.getReservationId())
+                    .patch("/admin/reservations/{id}/status", testContext.getReservation().getId())
                 .then()
                     .extract();
+
+        testContext.setResponse(response);
+        return response;
     }
 
     /**
      * 특정 예약 ID로 상태 변경 API 호출
      * PATCH /admin/reservations/{id}/status
-     *
-     * @param reservationId 예약 ID
-     * @param newStatus 변경할 상태값
-     * @return API 응답
      */
     public ExtractableResponse<Response> 예약_상태_변경_by_ID(Long reservationId, String newStatus) {
         Map<String, String> requestBody = Map.of("status", newStatus);
 
-        return RestAssured
+        var response = RestAssured
                 .given()
                     .header("Authorization", "Bearer " + testContext.getAccessToken())
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -64,22 +60,26 @@ public class ReservationAPI {
                     .patch("/admin/reservations/{id}/status", reservationId)
                 .then()
                     .extract();
+
+        testContext.setResponse(response);
+        return response;
     }
 
     /**
      * 요청 본문 없이 상태 변경 API 호출
      * PATCH /admin/reservations/{id}/status
-     *
-     * @return API 응답
      */
     public ExtractableResponse<Response> 예약_상태_변경_본문없이() {
-        return RestAssured
+        var response = RestAssured
                 .given()
                     .header("Authorization", "Bearer " + testContext.getAccessToken())
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .when()
-                    .patch("/admin/reservations/{id}/status", testContext.getReservationId())
+                    .patch("/admin/reservations/{id}/status", testContext.getReservation().getId())
                 .then()
                     .extract();
+
+        testContext.setResponse(response);
+        return response;
     }
 }

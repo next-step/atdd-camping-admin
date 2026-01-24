@@ -9,8 +9,8 @@ import com.camping.admin.factory.ReservationFactory;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.steps.api.RentalAPI;
-import com.camping.admin.steps.api.TestContext;
+import com.camping.admin.api.RentalAPI;
+import com.camping.admin.api.TestContext;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -75,19 +74,7 @@ public class RentalSteps {
         Campsite campsite = campsiteRepository.findBySiteNumber("A-001")
                 .orElseGet(() -> campsiteRepository.save(new Campsite("A-001", "테스트 캠프사이트", 4)));
 
-        Reservation reservation = new Reservation(
-                customerName,
-                LocalDate.now().plusDays(1),
-                LocalDate.now().plusDays(3),
-                campsite
-        );
-        reservation.setStatus("CONFIRMED");
-        reservation.setReservationDate(LocalDate.now());
-
         reservationFactory.createReservation(customerName,"A-001", "CONFIRMED");
-
-        Reservation saved = reservationRepository.save(reservation);
-        testContext.setReservationId(saved.getId());
     }
 
     // ==================== When Steps ====================
@@ -95,28 +82,24 @@ public class RentalSteps {
     @When("관리자가 해당 예약에 {string} 상품 {int}개를 대여한다")
     public void 예약에_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        var response = rentalAPI.대여_생성(productId, quantity, testContext.getReservationId());
-        testContext.setResponse(response);
+        rentalAPI.대여_생성(productId, quantity, testContext.getReservation().getId());
     }
 
     @When("관리자가 예약 없이 {string} 상품 {int}개를 대여한다")
     public void 예약_없이_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        var response = rentalAPI.대여_생성(productId, quantity, null);
-        testContext.setResponse(response);
+        rentalAPI.대여_생성(productId, quantity, null);
     }
 
     @When("관리자가 존재하지 않는 상품을 대여한다")
     public void 존재하지_않는_상품을_대여한다() {
-        var response = rentalAPI.대여_생성(99999L, 1, null);
-        testContext.setResponse(response);
+        rentalAPI.대여_생성(99999L, 1, null);
     }
 
     @When("관리자가 존재하지 않는 예약에 {string} 상품 {int}개를 대여한다")
     public void 존재하지_않는_예약에_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        var response = rentalAPI.대여_생성(productId, quantity, 99999L);
-        testContext.setResponse(response);
+        rentalAPI.대여_생성(productId, quantity, 99999L);
     }
 
     // ==================== Then Steps ====================

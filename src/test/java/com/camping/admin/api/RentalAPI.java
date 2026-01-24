@@ -1,4 +1,4 @@
-package com.camping.admin.steps.api;
+package com.camping.admin.api;
 
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
@@ -28,7 +28,7 @@ public class RentalAPI {
             requestBody.put("reservationId", reservationId);
         }
 
-        return RestAssured
+        var response = RestAssured
                 .given()
                     .header("Authorization", "Bearer " + testContext.getAccessToken())
                     .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -37,5 +37,8 @@ public class RentalAPI {
                     .post("/admin/rentals")
                 .then()
                     .extract();
+
+        testContext.setResponse(response);
+        return response;
     }
 }

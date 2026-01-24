@@ -1,12 +1,11 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.factory.ReservationFactory;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.steps.api.ReservationAPI;
-import com.camping.admin.steps.api.TestContext;
+import com.camping.admin.api.ReservationAPI;
+import com.camping.admin.api.TestContext;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -15,8 +14,6 @@ import io.restassured.RestAssured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
-
-import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -99,33 +96,29 @@ public class ReservationSteps {
 
     @Given("예약 ID {string}는 존재하지 않는다")
     public void 존재하지_않는_예약_ID(String reservationId) {
-        testContext.setReservationId(Long.parseLong(reservationId));
+        testContext.getReservation().setId(Long.parseLong(reservationId));
     }
 
     // ==================== When Steps ====================
 
     @When("관리자가 해당 예약을 취소한다")
     public void 예약을_취소한다() {
-        var response = reservationAPI.예약_상태_변경(취소);
-        testContext.setResponse(response);
+        reservationAPI.예약_상태_변경(취소);
     }
 
     @When("관리자가 해당 예약을 확정한다")
     public void 예약을_확정한다() {
-        var response = reservationAPI.예약_상태_변경(확정);
-        testContext.setResponse(response);
+        reservationAPI.예약_상태_변경(확정);
     }
 
     @When("관리자가 해당 예약의 상태를 빈 값으로 변경 요청한다")
     public void 빈_값으로_상태_변경() {
-        var response = reservationAPI.예약_상태_변경("");
-        testContext.setResponse(response);
+        reservationAPI.예약_상태_변경("");
     }
 
     @When("관리자가 해당 예약의 상태를 본문 없이 변경 요청한다")
     public void 본문_없이_상태_변경() {
-        var response = reservationAPI.예약_상태_변경_본문없이();
-        testContext.setResponse(response);
+        reservationAPI.예약_상태_변경_본문없이();
     }
 
     // ==================== Then Steps ====================
@@ -141,7 +134,7 @@ public class ReservationSteps {
                 .isEqualTo(취소);
 
         Reservation reservation = reservationRepository
-                .findById(testContext.getReservationId())
+                .findById(testContext.getReservation().getId())
                 .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다"));
 
         assertThat(reservation.getStatus())
