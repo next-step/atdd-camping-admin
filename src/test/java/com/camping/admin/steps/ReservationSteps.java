@@ -10,9 +10,7 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
 import java.util.Collections;
@@ -21,9 +19,6 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
-
-    @LocalServerPort
-    private int port;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -43,10 +38,8 @@ public class ReservationSteps {
     @Autowired
     private ReservationAdminClient reservationAdminClient;
 
-    @Before
+    @Before(order = 2)
     public void setUp() {
-        RestAssured.port = port;
-
         databaseCleaner.execute();
     }
 
