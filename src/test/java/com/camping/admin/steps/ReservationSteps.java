@@ -50,6 +50,10 @@ public class ReservationSteps {
         databaseCleaner.execute();
     }
 
+    // ==========================================
+    // Given - 사전 조건 준비
+    // ==========================================
+
     @Given("캠핑장에 {string} 사이트가 등록되어 있다")
     public void 캠핑장에_사이트가_등록되어_있다(String siteNumber) {
         campsiteSupport.캠핑장_사이트가_등록되어_있다(siteNumber);
@@ -65,10 +69,28 @@ public class ReservationSteps {
         reservationSupport.캠핑장에_예약이_되어있다(customerName);
     }
 
+    // ==========================================
+    // When - API 행위 실행
+    // ==========================================
+
     @When("관리자가 예약을 {string} 상태로 변경하면")
     public void 관리자가_예약_상태를_변경한다(String status) {
         reservationAdminClient.예약_상태를_변경한다(status);
     }
+
+    @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 {string}으로 변경하면")
+    public void 관리자가_존재하지_않는_예약의_상태를_변경한다(long reservationId, String status) {
+        reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", status));
+    }
+
+    @When("관리자가 빈 본문으로 예약 상태 변경을 요청하면")
+    public void 관리자가_잘못된_본문으로_예약_상태_변경을_요청한다() {
+        reservationAdminClient.예약_상태를_변경한다(Collections.EMPTY_MAP);
+    }
+
+    // ==========================================
+    // Then - 검증
+    // ==========================================
 
     @Then("요청이 성공한다")
     public void 요청이_성공한다() {
@@ -83,19 +105,9 @@ public class ReservationSteps {
         assertThat(actualStatus).isEqualTo(expectedStatus);
     }
 
-    @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 {string}으로 변경하면")
-    public void 관리자가_존재하지_않는_예약의_상태를_변경한다(long reservationId, String status) {
-        reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", status));
-    }
-
     @Then("요청이 {int} 상태 코드로 실패한다")
     public void 요청이_실패한다(int expectedStatusCode) {
         var response = testContext.getResponse();
         assertThat(response.statusCode()).isEqualTo(expectedStatusCode);
-    }
-
-    @When("관리자가 빈 본문으로 예약 상태 변경을 요청하면")
-    public void 관리자가_잘못된_본문으로_예약_상태_변경을_요청한다() {
-        reservationAdminClient.예약_상태를_변경한다(Collections.EMPTY_MAP);
     }
 }
