@@ -1,0 +1,44 @@
+spring:
+  application:
+    name: camping-admin-service
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: false
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:test-data.sql
+
+server:
+  port: 8080
+
+logging:
+  level:
+    com.camping.admin: DEBUG
+    org.hibernate.SQL: DEBUG
+
+jwt:
+  secret: "change-this-dev-secret-key-please"
+  expiration-minutes: 30
+
+admin:
+  username: admin
+  password: admin123

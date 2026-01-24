@@ -1,6 +1,5 @@
 package com.camping.admin.support;
 
-import com.camping.admin.fixture.TestConfig;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.filter.log.LogDetail;
 import io.restassured.http.ContentType;
@@ -19,7 +18,6 @@ public class RestAssuredConfig {
 
     public static RequestSpecification createRequestSpec() {
         return new RequestSpecBuilder()
-            .setBaseUri(TestConfig.BASE_URL)
             .setContentType(ContentType.JSON)
             .setAccept(ContentType.JSON)
             .log(LogDetail.ALL)

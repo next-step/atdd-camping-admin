@@ -1,3 +1,9 @@
+DELETE FROM rental_records;
+DELETE FROM sales_records;
+DELETE FROM reservations;
+DELETE FROM products;
+DELETE FROM campsites;
+
 -- Campsites
 insert into campsites (id, site_number, description, max_people) values
   (1, 'A-01', '숲 뷰, 전기가능', 4),
@@ -56,3 +62,7 @@ insert into rental_records (id, reservation_id, product_id, quantity, is_returne
 
 -- 시퀀스 재설정 (새로 생성되는 대여는 id=100부터 시작)
 ALTER TABLE rental_records ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE sales_records ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE products ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE campsites ALTER COLUMN id RESTART WITH 100;
+ALTER TABLE reservations ALTER COLUMN id RESTART WITH 100;

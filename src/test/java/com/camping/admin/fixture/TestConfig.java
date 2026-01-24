@@ -23,8 +23,8 @@ public class TestConfig {
     }
 
     public static final class ReservationIds {
-        public static final Long HONG_RESERVATION = 1L;  // 홍길동 예약
-        public static final Long KIM_RESERVATION = 2L;   // 김철수 예약
+        public static final Long CONFIRMED = 1L;      // 확정된 예약
+        public static final Long NOT_EXIST = 99999L;  // 존재하지 않는 예약
 
         private ReservationIds() {}
     }
@@ -35,6 +35,11 @@ public class TestConfig {
         public static final Long NOT_EXIST = 99999L;     // 존재하지 않는 대여 기록
 
         private RentalRecordIds() {}
+    }
+
+    public static class CampsiteIds {
+        public static final Long EXISTING = 1L;
+        public static final Long NOT_EXIST = 99999L;
     }
 
     private TestConfig() {}
