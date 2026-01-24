@@ -2,32 +2,20 @@ package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.security.JwtService;
+import com.camping.admin.support.ApiClient;
 import com.camping.admin.support.ScenarioContext;
 import com.camping.admin.support.TestDataFactory;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationChangeSteps extends CucumberSpringConfiguration {
 
     private static final String INVALID_STATUS = "INVALID_STATUS";
-
-    @LocalServerPort
-    private int port;
-
-    @Autowired
-    private JwtService jwtService;
 
     @Autowired
     private ReservationRepository reservationRepository;
@@ -38,17 +26,8 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
     @Autowired
     private TestDataFactory testDataFactory;
 
-    @Value("${admin.username}")
-    private String adminUsername;
-
-    private String adminToken;
-
-    @Before
-    public void setup() {
-        RestAssured.port = port;
-        RestAssured.baseURI = "http://localhost";
-        adminToken = jwtService.generateToken(adminUsername);
-    }
+    @Autowired
+    private ApiClient apiClient;
 
     // ===== 공통 헬퍼 메서드 =====
 
@@ -60,14 +39,7 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
 
     private void requestStatusChange(String body) {
         Long reservationId = scenarioContext.getReservationId();
-
-        Response response = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body(body)
-                .when()
-                .patch("/admin/reservations/" + reservationId + "/status");
-
+        Response response = apiClient.patch("/admin/reservations/" + reservationId + "/status", body);
         scenarioContext.setResponse(response);
     }
 
@@ -102,12 +74,12 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
     }
 
     @When("관리자가 빈 요청을 보낸다")
-    public void 관리자가_빈_요청을_보낸다() { // body가 아예 없는 경우
+    public void 관리자가_빈_요청을_보낸다() {
         requestStatusChange("{}");
     }
 
     @When("관리자가 상태값 없이 요청한다")
-    public void 관리자가_상태값_없이_요청한다() { // 상태 필드가 없는 경우
+    public void 관리자가_상태값_없이_요청한다() {
         requestStatusChange("{\"other\":\"value\"}");
     }
 
@@ -118,7 +90,7 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
     }
 
     @When("관리자가 빈 문자열로 상태 변경을 요청한다")
-    public void 관리자가_빈_문자열로_상태_변경을_요청한다() { // 빈 문자열인 경우
+    public void 관리자가_빈_문자열로_상태_변경을_요청한다() {
         requestStatusChange("{\"status\":\"\"}");
     }
 
