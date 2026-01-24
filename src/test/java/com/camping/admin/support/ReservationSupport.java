@@ -35,4 +35,21 @@ public class ReservationSupport {
 
         testContext.setReservationId(savedReservation.getId());
     }
+
+    @Transactional
+    public void 캠핑장에_예약이_되어있다(String customerName, String status) {
+        Campsite campsite = testContext.getCampsite();
+
+        Reservation reservation = new Reservation(
+                customerName,
+                LocalDate.now().plusDays(1),
+                LocalDate.now().plusDays(3),
+                campsite
+        );
+        reservation.setStatus(ReservationStatus.valueOf(status).name());
+
+        Reservation savedReservation = reservationRepository.save(reservation);
+
+        testContext.setReservationId(savedReservation.getId());
+    }
 }

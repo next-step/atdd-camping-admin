@@ -8,7 +8,19 @@ Feature: 예약 상태 변경 예외 및 엣지 케이스 처리
     When 관리자가 존재하지 않는 예약(ID 9999)의 상태를 'CONFIRMED'으로 변경하면
     Then 요청이 500 상태 코드로 실패한다
 
-  Scenario: 빈 본문으로 예약 상태를 변경한다
+  Scenario Outline: 잘못된 요청 본문으로 예약 상태 변경을 시도한다
     Given 사이트 번호가 'A-01'인 캠핑장에 '이순신' 이름으로 예약되어 있다
-    When 관리자가 빈 본문으로 예약 상태 변경을 요청하면
+    When 관리자가 예약 상태를 변경할 때 '<request_body>' 와 같이 잘못된 본문으로 요청하면
     Then 요청이 400 상태 코드로 실패한다
+
+    Examples:
+         | request_body            | 설명                   |
+         | {}                      | 비어있는 JSON          |
+         | {"state": "CHECKED_IN"} | 유효하지 않은 상태값   |
+         | {"status": null}        | 필드 값으로 null       |
+         | {"status": ""}          | 필드 값으로 빈 문자열  |
+
+  Scenario: 이미 취소된 예약의 상태를 변경하려고 시도한다
+    Given 사이트 번호가 'A-01'인 캠핑장에 '홍길동' 이름으로 'CANCELLED' 상태의 예약이 있다
+    When 관리자가 예약을 'CHECKED_IN' 상태로 변경하면
+    Then 요청이 409 상태 코드로 실패한다

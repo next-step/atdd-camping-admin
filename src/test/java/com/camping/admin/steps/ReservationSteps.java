@@ -13,7 +13,6 @@ import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
-import java.util.Collections;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -62,13 +61,18 @@ public class ReservationSteps {
         reservationSupport.캠핑장에_예약이_되어있다(customerName);
     }
 
+    @Given("사이트 번호가 {string}인 캠핑장에 {string} 이름으로 {string} 상태의 예약이 있다")
+    public void 캠핑장에_특정_상태의_예약이_있다(String siteNumber, String customerName, String initialStatus) {
+        reservationSupport.캠핑장에_예약이_되어있다(customerName, initialStatus);
+    }
+
     // ==========================================
     // When - API 행위 실행
     // ==========================================
 
     @When("관리자가 예약을 {string} 상태로 변경하면")
     public void 관리자가_예약_상태를_변경한다(String status) {
-        reservationAdminClient.예약_상태를_변경한다(status);
+        reservationAdminClient.예약_상태를_변경한다(Map.of("status", status));
     }
 
     @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 {string}으로 변경하면")
@@ -76,9 +80,9 @@ public class ReservationSteps {
         reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", status));
     }
 
-    @When("관리자가 빈 본문으로 예약 상태 변경을 요청하면")
-    public void 관리자가_잘못된_본문으로_예약_상태_변경을_요청한다() {
-        reservationAdminClient.예약_상태를_변경한다(Collections.EMPTY_MAP);
+    @When("관리자가 예약 상태를 변경할 때 {string} 와 같이 잘못된 본문으로 요청하면")
+    public void 관리자가_잘못된_본문으로_예약_상태를_변경하면(String invalidBody) {
+        reservationAdminClient.예약_상태를_변경한다(invalidBody);
     }
 
     // ==========================================
@@ -103,4 +107,5 @@ public class ReservationSteps {
         var response = testContext.getResponse();
         assertThat(response.statusCode()).isEqualTo(expectedStatusCode);
     }
+
 }
