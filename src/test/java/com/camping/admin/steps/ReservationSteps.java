@@ -1,52 +1,123 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
+import com.camping.admin.repository.CampsiteRepository;
+import com.camping.admin.repository.ReservationRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
+import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
 
-    private Long savedReservationId;
-    private Response lastResponse;
-    private String adminToken;
+    @LocalServerPort
+    private int port;
 
-    @Before(order = 0)
-    public void setupRestAssured() {
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8080;
-        adminToken = obtainAdminTokenViaLoginApi("admin", "admin123");
-        System.out.println(">>> [Before] RestAssured 기본 설정 완료.");
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private CampsiteRepository campsiteRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    @Value("${admin.username}")
+    private String username;
+
+    @Value("${admin.password}")
+    private String password;
+
+    private String authToken;
+    private ExtractableResponse<Response> response;
+    private Long reservationId;
+    private Campsite campsite;
+
+    @Before
+    public void setUp() {
+        RestAssured.port = port;
+
+        reservationRepository.deleteAllInBatch();
+        campsiteRepository.deleteAllInBatch();
     }
 
-    private String obtainAdminTokenViaLoginApi(String admin, String admin123) {
-        // 실제 로그인 API를 호출하고 응답에서 토큰을 추출하는 로직
-        return "mock-token";
+    @Given("캠핑장에 {string} 사이트가 등록되어 있다")
+    public void registerCampsite(String siteNumber) {
+        campsite = campsiteRepository.save(new Campsite(siteNumber, "Test Description", 4));
     }
 
-    @Given("사용자가 캠핑장 예약을 했다")
-    public void userHasMadeReservation() {
-        // Test-only API나 DB 직접 제어를 통해 예약 데이터 생성
-        this.savedReservationId = 123L;
-        System.out.println(">>> [Given] 사용자가 캠핑장 예약을 하는 단계를 수행합니다.");
-    }
+    @Given("관리자로 로그인 되어 있다")
+    public void loginAsAdmin() throws Exception {
+        Map<String, String> loginRequest = new HashMap<>();
+        loginRequest.put("username", username);
+        loginRequest.put("password", password);
 
-    @When("관리자가 해당 예약을 취소하면")
-    public void adminCancelsTheReservation() {
-        lastResponse = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
+        authToken = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body("{\"status\":\"CANCELLED\"}")
-                .when()
-                .patch("/admin/reservations/" + savedReservationId + "/status");
-        System.out.println(">>> [When] 관리자가 해당 예약을 취소하는 단계를 수행합니다.");
+                .body(loginRequest)
+            .when()
+                .post("/auth/login")
+            .then()
+                .statusCode(200)
+                .extract()
+                .cookie("AUTH_TOKEN");
     }
 
-    @Then("예약이 성공적으로 취소된다")
-    public void reservationIsSuccessfullyCancelled() {
-        System.out.println(">>> [Then] 예약이 성공적으로 취소되었는지 확인하는 단계를 수행합니다.");
+    @Given("사이트 번호가 {string}인 캠핑장에 {string} 이름으로 예약되어 있다")
+    public void createReservation(String customerName, String siteNumber) {
+        Reservation reservation = new Reservation(
+                customerName,
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(7),
+                campsite
+        );
+        reservation.setStatus(ReservationStatus.PENDING.name());
+        Reservation savedReservation = reservationRepository.save(reservation);
+        this.reservationId = savedReservation.getId();
+    }
+
+    @When("관리자가 예약을 {string} 상태로 변경하면")
+    public void updateReservationStatus(String status) throws Exception {
+        Map<String, String> requestMap = new HashMap<>();
+        requestMap.put("status", status);
+        String requestBody = objectMapper.writeValueAsString(requestMap);
+
+        response = RestAssured.given()
+                .cookie("AUTH_TOKEN", authToken)
+                .contentType(ContentType.JSON)
+                .body(requestBody)
+            .when()
+                .patch("/admin/reservations/" + this.reservationId + "/status")
+            .then()
+                .extract();
+    }
+
+    @Then("요청이 성공한다")
+    public void verifyRequestSuccess() {
+        assertThat(response.statusCode()).isEqualTo(HttpStatus.OK.value());
+    }
+
+    @And("그리고 예약 상태가 {string} 으로 변경되어 있다")
+    public void verifyReservationStatusChanged(String expectedStatus) {
+        var actual = response.jsonPath().getString("status");
+        assertThat(actual).isEqualTo(expectedStatus);
     }
 }
