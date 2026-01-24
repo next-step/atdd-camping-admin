@@ -6,6 +6,7 @@ import com.camping.admin.security.JwtService;
 import com.camping.admin.support.ScenarioContext;
 import com.camping.admin.support.TestDataFactory;
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -18,6 +19,8 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationChangeSteps extends CucumberSpringConfiguration {
+
+    private static final String INVALID_STATUS = "INVALID_STATUS";
 
     @LocalServerPort
     private int port;
@@ -46,6 +49,8 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         adminToken = jwtService.generateToken(adminUsername);
     }
 
+    // ===== Given =====
+
     @Given("확정된 예약이 있다")
     public void 확정된_예약이_있다() {
         Reservation reservation = testDataFactory.getConfirmedReservation();
@@ -54,19 +59,93 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         assertThat(reservation.getStatus()).isEqualTo("CONFIRMED");
     }
 
+    @Given("존재하지 않는 예약 ID가 주어진다")
+    public void 존재하지_않는_예약_ID가_주어진다() {
+        scenarioContext.setReservationId(99999L);
+    }
+
+    @Given("취소된 예약이 있다")
+    public void 취소된_예약이_있다() {
+        Reservation reservation = testDataFactory.getReservationWithStatus("CANCELLED");
+        scenarioContext.setReservation(reservation);
+
+        assertThat(reservation.getStatus()).isEqualTo("CANCELLED");
+    }
+
+    // ===== When =====
+
     @When("관리자가 해당 예약을 취소한다")
     public void 관리자가_해당_예약을_취소한다() {
-        Reservation reservation = scenarioContext.getReservation();
+        Long reservationId = scenarioContext.getReservationId();
 
         var response = RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
                 .contentType(ContentType.JSON)
                 .body("{\"status\":\"CANCELLED\"}")
                 .when()
-                .patch("/admin/reservations/" + reservation.getId() + "/status");
+                .patch("/admin/reservations/" + reservationId + "/status");
 
         scenarioContext.setResponse(response);
     }
+
+    @When("관리자가 빈 요청을 보낸다")
+    public void 관리자가_빈_요청을_보낸다() {
+        Long reservationId = scenarioContext.getReservationId();
+
+        var response = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{}")
+                .when()
+                .patch("/admin/reservations/" + reservationId + "/status");
+
+        scenarioContext.setResponse(response);
+    }
+
+    @When("관리자가 상태값 없이 요청한다")
+    public void 관리자가_상태값_없이_요청한다() {
+        Long reservationId = scenarioContext.getReservationId();
+
+        var response = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"other\":\"value\"}")
+                .when()
+                .patch("/admin/reservations/" + reservationId + "/status");
+
+        scenarioContext.setResponse(response);
+    }
+
+    @When("관리자가 유효하지 않은 상태값으로 변경을 요청한다")
+    public void 관리자가_유효하지_않은_상태값으로_변경을_요청한다() {
+        Long reservationId = scenarioContext.getReservationId();
+        scenarioContext.setRequestedStatus(INVALID_STATUS);
+
+        var response = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"" + INVALID_STATUS + "\"}")
+                .when()
+                .patch("/admin/reservations/" + reservationId + "/status");
+
+        scenarioContext.setResponse(response);
+    }
+
+    @When("관리자가 빈 문자열로 상태 변경을 요청한다")
+    public void 관리자가_빈_문자열로_상태_변경을_요청한다() {
+        Long reservationId = scenarioContext.getReservationId();
+
+        var response = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"\"}")
+                .when()
+                .patch("/admin/reservations/" + reservationId + "/status");
+
+        scenarioContext.setResponse(response);
+    }
+
+    // ===== Then =====
 
     @Then("예약은 취소 상태다")
     public void 예약은_취소_상태다() {
@@ -80,5 +159,43 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
 
         Reservation updated = reservationRepository.findById(reservation.getId()).orElseThrow();
         assertThat(updated.getStatus()).isEqualTo("CANCELLED");
+    }
+
+    @Then("예약을 찾을 수 없다는 오류가 발생한다")
+    public void 예약을_찾을_수_없다는_오류가_발생한다() {
+        var response = scenarioContext.getResponse();
+
+        assertThat(response.statusCode()).isIn(400, 404, 500);
+    }
+
+    @Then("잘못된 요청이라는 응답을 받는다")
+    public void 잘못된_요청이라는_응답을_받는다() {
+        var response = scenarioContext.getResponse();
+
+        assertThat(response.statusCode()).isEqualTo(400);
+    }
+
+    @Then("예약은 기존 상태를 유지한다")
+    public void 예약은_기존_상태를_유지한다() {
+        Reservation reservation = scenarioContext.getReservation();
+        String originalStatus = scenarioContext.getOriginalStatus();
+
+        Reservation updated = reservationRepository.findById(reservation.getId()).orElseThrow();
+        assertThat(updated.getStatus()).isEqualTo(originalStatus);
+    }
+
+    @Then("예약 상태가 해당 값으로 변경된다")
+    public void 예약_상태가_해당_값으로_변경된다() {
+        var response = scenarioContext.getResponse();
+        Reservation reservation = scenarioContext.getReservation();
+        String requestedStatus = scenarioContext.getRequestedStatus();
+
+        assertThat(response.statusCode()).isEqualTo(200);
+
+        String actualStatus = response.jsonPath().getString("status");
+        assertThat(actualStatus).isEqualTo(requestedStatus);
+
+        Reservation updated = reservationRepository.findById(reservation.getId()).orElseThrow();
+        assertThat(updated.getStatus()).isEqualTo(requestedStatus);
     }
 }

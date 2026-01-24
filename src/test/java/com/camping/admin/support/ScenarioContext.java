@@ -10,7 +10,10 @@ import org.springframework.stereotype.Component;
 public class ScenarioContext {
 
     private Reservation reservation;
+    private Long reservationId;
     private Response response;
+    private String originalStatus;
+    private String requestedStatus;
 
     public Reservation getReservation() {
         return reservation;
@@ -18,6 +21,18 @@ public class ScenarioContext {
 
     public void setReservation(Reservation reservation) {
         this.reservation = reservation;
+        if (reservation != null) {
+            this.reservationId = reservation.getId();
+            this.originalStatus = reservation.getStatus();
+        }
+    }
+
+    public Long getReservationId() {
+        return reservationId;
+    }
+
+    public void setReservationId(Long reservationId) {
+        this.reservationId = reservationId;
     }
 
     public Response getResponse() {
@@ -28,8 +43,23 @@ public class ScenarioContext {
         this.response = response;
     }
 
+    public String getOriginalStatus() {
+        return originalStatus;
+    }
+
+    public String getRequestedStatus() {
+        return requestedStatus;
+    }
+
+    public void setRequestedStatus(String requestedStatus) {
+        this.requestedStatus = requestedStatus;
+    }
+
     public void clear() {
         this.reservation = null;
+        this.reservationId = null;
         this.response = null;
+        this.originalStatus = null;
+        this.requestedStatus = null;
     }
 }
