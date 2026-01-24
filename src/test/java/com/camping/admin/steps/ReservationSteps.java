@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.common.DatabaseCleaner;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ReservationStatus;
@@ -40,6 +41,9 @@ public class ReservationSteps {
     @Autowired
     private ReservationRepository reservationRepository;
 
+    @Autowired
+    private DatabaseCleaner databaseCleaner;
+
     @Value("${admin.username}")
     private String username;
 
@@ -55,8 +59,7 @@ public class ReservationSteps {
     public void setUp() {
         RestAssured.port = port;
 
-        reservationRepository.deleteAllInBatch();
-        campsiteRepository.deleteAllInBatch();
+        databaseCleaner.execute();
     }
 
     @Given("캠핑장에 {string} 사이트가 등록되어 있다")
