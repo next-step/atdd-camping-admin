@@ -1,4 +1,4 @@
-package com.camping.admin.support;
+package com.camping.admin.client;
 
 import com.camping.admin.steps.TestContext;
 import io.restassured.RestAssured;
@@ -11,8 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class AuthSupport {
-
+public class AuthClient {
     @Value("${admin.username}")
     private String username;
 
