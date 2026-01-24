@@ -5,7 +5,6 @@ import com.camping.admin.fixture.TestConfig;
 import com.camping.admin.support.AuthHelper;
 import com.camping.admin.support.RestAssuredConfig;
 import com.camping.admin.support.SharedState;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -26,12 +25,6 @@ public class RentalSteps {
     @Given("관리자가 로그인했다")
     public void 관리자가_로그인했다() {
         AuthHelper.getAdminToken();
-    }
-
-    @And("응답 상태코드는 {int}이다")
-    public void 응답_상태코드는_N이다(int statusCode) {
-        state.getResponse().then()
-            .statusCode(statusCode);
     }
 
     // === 대여 생성 Given ===
@@ -67,11 +60,16 @@ public class RentalSteps {
 
     @Then("대여가 성공한다")
     public void 대여가_성공한다() {
-        System.out.println(">>> Response Body: " + state.getResponse().getBody().asString());
         state.getResponse().then()
-            .body("isReturned", equalTo(false));
+                .statusCode(201)
+                .body("isReturned", equalTo(false));
     }
 
+    @Then("대여가 실패한다")
+    public void 대여가_실패한다() {
+        state.getResponse().then()
+                .statusCode(400);
+    }
 
     // === 반납 Given ===
 
@@ -102,8 +100,14 @@ public class RentalSteps {
 
     @Then("반납이 성공한다")
     public void 반납이_성공한다() {
-        System.out.println(">>> Response Body: " + state.getResponse().getBody().asString());
         state.getResponse().then()
-            .body("isReturned", equalTo(true));
+                .statusCode(200)
+                .body("isReturned", equalTo(true));
+    }
+
+    @Then("반납이 실패한다")
+    public void 반납이_실패한다() {
+        state.getResponse().then()
+                .statusCode(400);
     }
 }
