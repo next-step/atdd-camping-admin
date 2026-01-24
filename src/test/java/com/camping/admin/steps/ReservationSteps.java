@@ -30,6 +30,13 @@ public class ReservationSteps {
     public static final String 체크인 = "CHECKED_IN";
     public static final String 체크아웃 = "CHECKED_OUT";
     public static final String 거절 = "REJECTED";
+    public static final String 이미_취소된_예약 = "이미 취소된 예약";
+    public static final String 체크인된_예약 = "체크인된 예약";
+    public static final String 완료된_예약 = "완료된 예약";
+    public static final String 거절된_예약 = "거절된 예약";
+    public static final String 찾을_수_없다 = "찾을 수 없다";
+    public static final String 필수 = "필수";
+
     @LocalServerPort
     private int port;
 
@@ -144,32 +151,32 @@ public class ReservationSteps {
 
     @Then("이미 취소된 예약이라는 오류가 발생한다")
     public void 이미_취소된_예약_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "이미 취소된 예약");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 이미_취소된_예약);
     }
 
     @Then("체크인된 예약은 취소할 수 없다는 오류가 발생한다")
     public void 체크인_예약_취소_불가_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "체크인된 예약");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 체크인된_예약);
     }
 
     @Then("이미 완료된 예약은 취소할 수 없다는 오류가 발생한다")
     public void 완료된_예약_취소_불가_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "완료된 예약");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 완료된_예약);
     }
 
     @Then("이미 거절된 예약은 취소할 수 없다는 오류가 발생한다")
     public void 거절된_예약_취소_불가_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "거절된 예약");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 거절된_예약);
     }
 
     @Then("예약을 찾을 수 없다는 오류가 발생한다")
     public void 예약_찾을수_없음_오류() {
-        assertErrorResponse(HttpStatus.NOT_FOUND, "찾을 수 없");
+        assertErrorResponse(HttpStatus.NOT_FOUND, 찾을_수_없다);
     }
 
     @Then("상태값은 필수라는 오류가 발생한다")
     public void 상태값_필수_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "필수");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 필수);
     }
 
     @Then("잘못된 요청이라는 오류가 발생한다")

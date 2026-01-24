@@ -17,8 +17,9 @@ public class TestContext {
 
     private String accessToken;
     private Long reservationId;
+    private Long productId;
+    private String productName;
     private ExtractableResponse<Response> response;
-
 
     public String getAccessToken() {
         return accessToken;
@@ -34,6 +35,22 @@ public class TestContext {
 
     public void setReservationId(Long reservationId) {
         this.reservationId = reservationId;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public void setProductId(Long productId) {
+        this.productId = productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
     }
 
     public ExtractableResponse<Response> getResponse() {
