@@ -1,6 +1,5 @@
 package com.camping.admin.service;
 
-import com.camping.admin.domain.entity.SalesRecord;
 import com.camping.admin.dto.DailyRevenueReportResponse;
 import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.RevenueEntryResponse;
@@ -9,6 +8,7 @@ import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.repository.SalesRecordRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,13 +27,12 @@ public class RevenueService {
     private final RentalRecordRepository rentalRecordRepository;
 
     public DailyRevenueReportResponse generateDailyRevenueReport(LocalDate date) {
-        BigDecimal totalSalesRevenue = salesRecordRepository.findAll().stream()
-                .filter(record -> record.getCreatedAt().toLocalDate().equals(date))
-                .map(SalesRecord::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        LocalDateTime startOfDay = date.atStartOfDay();
+        LocalDateTime endOfDay = date.plusDays(1).atStartOfDay();
 
-        BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null && r.getReservationDate().equals(date))
+        BigDecimal totalSalesRevenue = salesRecordRepository.sumTotalPriceByCreatedAtBetween(startOfDay, endOfDay);
+
+        BigDecimal totalReservationRevenue = reservationRepository.findByReservationDate(date).stream()
                 .map(r -> {
                     long nights = ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
                     if (nights < 1) nights = 1;
@@ -41,10 +40,7 @@ public class RevenueService {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalRentalRevenue = rentalRecordRepository.findAll().stream()
-                .filter(rr -> rr.getCreatedAt().toLocalDate().equals(date))
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalRentalRevenue = rentalRecordRepository.sumRevenueByCreatedAtBetween(startOfDay, endOfDay);
 
         BigDecimal grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
 
@@ -52,14 +48,12 @@ public class RevenueService {
     }
 
     public RangeRevenueReportResponse generateRangeRevenueReport(LocalDate from, LocalDate to) {
-        BigDecimal totalSalesRevenue = salesRecordRepository.findAll().stream()
-                .filter(record -> isWithinRange(record.getCreatedAt().toLocalDate(), from, to))
-                .map(SalesRecord::getTotalPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
 
-        BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> isWithinRange(r.getReservationDate(), from, to))
+        BigDecimal totalSalesRevenue = salesRecordRepository.sumTotalPriceByCreatedAtBetween(startDateTime, endDateTime);
+
+        BigDecimal totalReservationRevenue = reservationRepository.findByReservationDateBetween(from, to).stream()
                 .map(r -> {
                     long nights = ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
                     if (nights < 1) nights = 1;
@@ -67,10 +61,7 @@ public class RevenueService {
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalRentalRevenue = rentalRecordRepository.findAll().stream()
-                .filter(rr -> isWithinRange(rr.getCreatedAt().toLocalDate(), from, to))
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalRentalRevenue = rentalRecordRepository.sumRevenueByCreatedAtBetween(startDateTime, endDateTime);
 
         BigDecimal grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
 
@@ -78,10 +69,12 @@ public class RevenueService {
     }
 
     public List<RevenueEntryResponse> generateRangeRevenueEntries(LocalDate from, LocalDate to) {
+        LocalDateTime startDateTime = from.atStartOfDay();
+        LocalDateTime endDateTime = to.plusDays(1).atStartOfDay();
+
         List<RevenueEntryResponse> entries = new ArrayList<>();
 
-        salesRecordRepository.findAll().stream()
-                .filter(record -> isWithinRange(record.getCreatedAt().toLocalDate(), from, to))
+        salesRecordRepository.findByCreatedAtBetween(startDateTime, endDateTime)
                 .forEach(record -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.SALE,
                         record.getProduct().getName() + " 외",
@@ -89,9 +82,7 @@ public class RevenueService {
                         record.getCreatedAt()
                 )));
 
-        reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> isWithinRange(r.getReservationDate(), from, to))
+        reservationRepository.findByReservationDateBetween(from, to)
                 .forEach(r -> {
                     long nights = ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
                     if (nights < 1) nights = 1;
@@ -103,8 +94,7 @@ public class RevenueService {
                     ));
                 });
 
-        rentalRecordRepository.findAll().stream()
-                .filter(rr -> isWithinRange(rr.getCreatedAt().toLocalDate(), from, to))
+        rentalRecordRepository.findByCreatedAtBetween(startDateTime, endDateTime)
                 .forEach(rr -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.RENTAL,
                         rr.getProduct().getName() + (rr.getReservation() != null ? " (예약#" + rr.getReservation().getId() + ")" : ""),
@@ -114,9 +104,5 @@ public class RevenueService {
 
         entries.sort(Comparator.comparing(RevenueEntryResponse::getOccurredAt));
         return entries;
-    }
-
-    private boolean isWithinRange(LocalDate date, LocalDate from, LocalDate to) {
-        return (date.isEqual(from) || date.isAfter(from)) && (date.isEqual(to) || date.isBefore(to));
     }
 }
