@@ -35,6 +35,9 @@ public class RentalRecord {
     private LocalDateTime createdAt;
 
     public RentalRecord(Reservation reservation, Product product, Integer quantity) {
+        product.validateRentable();
+        product.decreaseStock(quantity);
+
         this.reservation = reservation;
         this.product = product;
         this.quantity = quantity;
@@ -42,7 +45,12 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
+
+    public void markAsReturned() {
+        if (this.isReturned) {
+            throw new IllegalStateException("이미 반납된 대여 기록입니다");
+        }
+        this.isReturned = true;
+        this.product.increaseStock(this.quantity);
     }
 }

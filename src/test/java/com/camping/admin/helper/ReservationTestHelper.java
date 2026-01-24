@@ -8,10 +8,10 @@ import java.util.Map;
 public class ReservationTestHelper {
 
     // 테스트용 고정 예약 ID (data.sql 기준)
-    public static final int CONFIRMED_RESERVATION_ID = 1;   // 취소 가능한 예약 (CONFIRMED)
-    public static final int PENDING_RESERVATION_ID = 2;     // 취소 가능한 예약 (PENDING)
-    public static final int CANCELLED_RESERVATION_ID = 3;   // 이미 취소된 예약
-    public static final int CHECKED_OUT_RESERVATION_ID = 4; // 체크아웃된 예약
+    public static final int CONFIRMED_RESERVATION_ID = 1001;  // 취소 가능한 예약 (CONFIRMED)
+    public static final int PENDING_RESERVATION_ID = 1002;    // 취소 가능한 예약 (PENDING)
+    public static final int CANCELLED_RESERVATION_ID = 1003;  // 이미 취소된 예약
+    public static final int CHECKED_OUT_RESERVATION_ID = 1004; // 체크아웃된 예약
 
     private final RequestSpecification requestSpec;
 

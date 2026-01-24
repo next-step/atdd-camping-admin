@@ -1,5 +1,6 @@
 package com.camping.admin.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -8,5 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class StatusUpdateRequest {
+
+    @NotBlank(message = "상태값은 필수입니다")
     private String status;
 }
