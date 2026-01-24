@@ -1,7 +1,7 @@
 Feature: 예약 상태 관리
   Background:
     Given 캠핑장에 'A-01' 사이트가 등록되어 있다
-    And 관리자로 로그인 되어 있다
+    And 관리자 로그인이 되어 있다
 
   Scenario: 예약 상태를 'CONFIRMED'으로 변경한다
     Given 사이트 번호가 'A-01'인 캠핑장에 '홍길동' 이름으로 예약되어 있다
