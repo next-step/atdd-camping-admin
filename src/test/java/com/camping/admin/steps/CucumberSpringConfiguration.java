@@ -1,11 +1,9 @@
 package com.camping.admin.steps;
 
-import io.cucumber.spring.CucumberContextConfiguration;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
-
-@CucumberContextConfiguration // Cucumber와 Spring Context 연동을 위한 애노테이션
-@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
+/**
+ * Cucumber 테스트 설정
+ * 앱은 별도 프로세스로 실행 (localhost:8080)
+ */
 public class CucumberSpringConfiguration {
 
 }

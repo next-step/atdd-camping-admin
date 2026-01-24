@@ -5,28 +5,40 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 
 public class CommonContext {
-    private static String adminToken;
-    private static RequestSpecification requestSpec;
+    private static final String BASE_URI = "http://localhost";
+    private static final int PORT = 8080;
 
-    public static void init(int port, String token) {
-        adminToken = token;
+    private RequestSpecification requestSpec;
+
+    public void login(String username, String password) {
+        String token = RestAssured.given()
+            .baseUri(BASE_URI)
+            .port(PORT)
+            .contentType(ContentType.JSON)
+            .body("{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}")
+            .when()
+            .post("/auth/login")
+            .then()
+            .statusCode(200)
+            .extract()
+            .path("accessToken");
+
         requestSpec = RestAssured.given()
-            .baseUri("http://localhost")
-            .port(port)
+            .baseUri(BASE_URI)
+            .port(PORT)
             .contentType(ContentType.JSON)
             .header("Authorization", "Bearer " + token);
     }
 
-    public static String getAdminToken() {
-        return adminToken;
+    public String getBaseUri() {
+        return BASE_URI;
     }
 
-    public static RequestSpecification getRequestSpec() {
+    public int getPort() {
+        return PORT;
+    }
+
+    public RequestSpecification getRequestSpec() {
         return requestSpec;
-    }
-
-    public static void clear() {
-        adminToken = null;
-        requestSpec = null;
     }
 }
