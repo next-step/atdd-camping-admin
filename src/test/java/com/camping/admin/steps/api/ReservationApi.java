@@ -11,25 +11,25 @@ import java.util.Map;
 
 @SuppressWarnings("NonAsciiCharacters")
 @Component
-public class RentalApi {
+public class ReservationApi {
 
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity) {
-        return 대여_생성_요청(accessToken, productId, quantity, null);
-    }
-
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity, Long reservationId) {
+    public ExtractableResponse<Response> 예약_상태_변경_요청(String accessToken, Long reservationId, String status) {
         Map<String, Object> params = new HashMap<>();
-        params.put("productId", productId);
-        params.put("quantity", quantity);
-        if (reservationId != null) {
-            params.put("reservationId", reservationId);
-        }
+        params.put("status", status);
 
         return RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/admin/rentals")
+                .when().patch("/admin/reservations/" + reservationId + "/status")
+                .then().log().all()
+                .extract();
+    }
+
+    public ExtractableResponse<Response> 예약_목록_조회_요청(String accessToken) {
+        return RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().get("/admin/reservations")
                 .then().log().all()
                 .extract();
     }

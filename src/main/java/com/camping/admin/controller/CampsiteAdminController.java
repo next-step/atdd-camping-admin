@@ -51,6 +51,14 @@ public class CampsiteAdminController {
             siteNumber = null;
         }
 
+        if (siteNumber == null || siteNumber.isBlank()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
         String description;
         if (body.containsKey("description")) {
             Object d = body.get("description");

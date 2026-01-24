@@ -11,25 +11,20 @@ import java.util.Map;
 
 @SuppressWarnings("NonAsciiCharacters")
 @Component
-public class RentalApi {
+public class ProductApi {
 
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity) {
-        return 대여_생성_요청(accessToken, productId, quantity, null);
-    }
-
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity, Long reservationId) {
+    public ExtractableResponse<Response> 상품_생성_요청(String accessToken, String name, int stockQuantity, int price, String productType) {
         Map<String, Object> params = new HashMap<>();
-        params.put("productId", productId);
-        params.put("quantity", quantity);
-        if (reservationId != null) {
-            params.put("reservationId", reservationId);
-        }
+        params.put("name", name);
+        params.put("stockQuantity", stockQuantity);
+        params.put("price", price);
+        params.put("productType", productType);
 
         return RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/admin/rentals")
+                .when().post("/admin/products")
                 .then().log().all()
                 .extract();
     }

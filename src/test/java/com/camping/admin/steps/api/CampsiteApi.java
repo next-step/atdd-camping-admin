@@ -11,25 +11,19 @@ import java.util.Map;
 
 @SuppressWarnings("NonAsciiCharacters")
 @Component
-public class RentalApi {
+public class CampsiteApi {
 
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity) {
-        return 대여_생성_요청(accessToken, productId, quantity, null);
-    }
-
-    public ExtractableResponse<Response> 대여_생성_요청(String accessToken, Long productId, int quantity, Long reservationId) {
+    public ExtractableResponse<Response> 캠프사이트_생성_요청(String accessToken, String siteNumber, String description, Integer maxPeople) {
         Map<String, Object> params = new HashMap<>();
-        params.put("productId", productId);
-        params.put("quantity", quantity);
-        if (reservationId != null) {
-            params.put("reservationId", reservationId);
-        }
+        params.put("siteNumber", siteNumber);
+        params.put("description", description);
+        params.put("maxPeople", maxPeople);
 
         return RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
                 .contentType(ContentType.JSON)
                 .body(params)
-                .when().post("/admin/rentals")
+                .when().post("/admin/campsites")
                 .then().log().all()
                 .extract();
     }
