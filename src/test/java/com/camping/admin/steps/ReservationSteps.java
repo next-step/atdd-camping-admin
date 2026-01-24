@@ -11,9 +11,13 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+
+import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -78,5 +82,45 @@ public class ReservationSteps {
         var response = testContext.getResponse();
         String actualStatus = response.jsonPath().getString("status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
+    }
+
+    @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 {string}으로 변경하면")
+    public void 관리자가_존재하지_않는_예약의_상태를_변경한다(long reservationId, String status) {
+        var authToken = testContext.getAuthToken();
+        var response = RestAssured
+                .given()
+                    .cookie("AUTH_TOKEN", authToken)
+                    .contentType(ContentType.JSON)
+                    .body(Map.of("status", status))
+                .when()
+                    .patch("/admin/reservations/" + reservationId + "/status")
+                .then()
+                    .extract();
+
+        testContext.setResponse(response);
+    }
+
+    @Then("요청이 {int} 상태 코드로 실패한다")
+    public void 요청이_실패한다(int expectedStatusCode) {
+        var response = testContext.getResponse();
+        assertThat(response.statusCode()).isEqualTo(expectedStatusCode);
+    }
+
+    @When("관리자가 빈 본문으로 예약 상태 변경을 요청하면")
+    public void 관리자가_잘못된_본문으로_예약_상태_변경을_요청한다() {
+        var reservationId = testContext.getReservationId();
+        var authToken = testContext.getAuthToken();
+
+        var response = RestAssured
+                .given()
+                    .cookie("AUTH_TOKEN", authToken)
+                    .contentType(ContentType.JSON)
+                    .body(Collections.EMPTY_MAP)
+                .when()
+                    .patch("/admin/reservations/" + reservationId + "/status")
+                    .then()
+                .extract();
+
+        testContext.setResponse(response);
     }
 }
