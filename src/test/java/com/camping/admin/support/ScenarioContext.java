@@ -1,5 +1,6 @@
 package com.camping.admin.support;
 
+import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import io.cucumber.spring.ScenarioScope;
 import io.restassured.response.Response;
@@ -14,6 +15,7 @@ public class ScenarioContext {
     private Response response;
     private String originalStatus;
     private String requestedStatus;
+    private Campsite campsite;
 
     public Reservation getReservation() {
         return reservation;
@@ -55,11 +57,7 @@ public class ScenarioContext {
         this.requestedStatus = requestedStatus;
     }
 
-    public void clear() {
-        this.reservation = null;
-        this.reservationId = null;
-        this.response = null;
-        this.originalStatus = null;
-        this.requestedStatus = null;
+    public void setCampsite(Campsite campsite) {
+        this.campsite = campsite;
     }
 }
