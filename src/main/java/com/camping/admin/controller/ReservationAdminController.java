@@ -59,6 +59,7 @@ public class ReservationAdminController {
             String statusValue = statusObj.toString();
             if (statusValue.isBlank()) {
                 // 빈 문자열이면 기존 값 유지
+                throw new IllegalArgumentException("빈 값은 허용되지 않습니다.");
             } else {
                 // 단순히 그대로 대입
                 reservation.setStatus(statusValue);

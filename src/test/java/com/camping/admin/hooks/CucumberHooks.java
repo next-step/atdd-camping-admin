@@ -8,6 +8,7 @@ public class CucumberHooks {
 
     @Before(order = 0)
     public void setUp() {
+        AuthHelper.clearToken();
         System.out.println(">>> [Before] 시나리오 시작");
     }
 

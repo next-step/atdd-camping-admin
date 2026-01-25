@@ -7,6 +7,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -41,6 +43,11 @@ public class ProductAdminController {
             name = v == null ? null : v.toString();
         } else {
             name = null;
+        }
+
+        // 이름 검증: null이거나 빈 문자열이면 400 반환
+        if (name == null || name.trim().isEmpty()) {
+            return ResponseEntity.badRequest().build();
         }
 
         Integer stockQuantity;
@@ -107,8 +114,13 @@ public class ProductAdminController {
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long productId,
             @RequestBody Map<String, Object> body) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
+
+        Optional<Product> optionalProduct = productRepository.findById(productId);
+        if (optionalProduct.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product product = optionalProduct.get();
 
         if (body != null) {
             if (body.containsKey("name")) {
