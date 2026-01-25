@@ -1,4 +1,4 @@
-package com.camping.admin.steps;
+package com.camping.admin.steps.common;
 
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.support.ApiClient;
@@ -6,7 +6,6 @@ import com.camping.admin.support.ScenarioContext;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -62,13 +61,6 @@ public class ProductRegistrationSteps {
         }
         json.append("}");
         return json.toString();
-    }
-
-    // ===== Given =====
-
-    @Given("관리자 권한으로 인증되어 있다")
-    public void 관리자_권한으로_인증되어_있다() {
-        apiClient.initialize();
     }
 
     // ===== When =====
