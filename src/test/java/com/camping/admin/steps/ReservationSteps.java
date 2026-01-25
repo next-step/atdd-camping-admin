@@ -1,6 +1,7 @@
 package com.camping.admin.steps;
 
 import io.cucumber.java.Before;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -16,12 +17,9 @@ public class ReservationSteps {
     private Response lastResponse;
     private String adminToken;
 
-    @Before
-    public void setup() {
-        RestAssured.baseURI = "http://localhost";
-        RestAssured.port = 8080;
+    @Before(order = 1)
+    public void setupAdminToken() {
         adminToken = obtainAdminTokenViaLoginApi("admin", "admin123");
-        System.out.println(">>> [Before] RestAssured 기본 설정 완료. 포트: 8080");
         System.out.println(">>> [Before] 관리자 토큰 생성 완료.");
     }
 
@@ -58,5 +56,34 @@ public class ReservationSteps {
         assertThat(lastResponse.statusCode()).isEqualTo(200);
         assertThat(lastResponse.jsonPath().getString("status")).isEqualTo("CANCELLED");
         System.out.println(">>> [Then] 예약이 성공적으로 취소되었는지 확인하는 단계를 수행합니다.");
+    }
+
+    @And("관리자가 이미 해당 예약을 취소했다")
+    public void adminAlreadyCancelledTheReservation() {
+        RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"CANCELLED\"}")
+                .when()
+                .patch("/admin/reservations/" + savedReservationId + "/status");
+        System.out.println(">>> [And] 관리자가 이미 해당 예약을 취소했습니다.");
+    }
+
+    @When("관리자가 다시 해당 예약을 취소하면")
+    public void adminCancelsTheReservationAgain() {
+        lastResponse = RestAssured.given()
+                .header("Authorization", "Bearer " + adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"CANCELLED\"}")
+                .when()
+                .patch("/admin/reservations/" + savedReservationId + "/status");
+        System.out.println(">>> [When] 관리자가 다시 해당 예약을 취소하는 단계를 수행합니다.");
+    }
+
+    @Then("시스템 정책에 맞는 결과가 반환된다")
+    public void systemPolicyResultIsReturned() {
+        // 현재 시스템 정책: 이미 취소된 예약을 다시 취소해도 200 OK 반환
+        assertThat(lastResponse.statusCode()).isEqualTo(200);
+        System.out.println(">>> [Then] 시스템 정책에 맞는 결과가 반환되었는지 확인하는 단계를 수행합니다.");
     }
 }
