@@ -2,6 +2,7 @@ package com.camping.admin.support;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
 import org.springframework.stereotype.Component;
@@ -17,7 +18,7 @@ public class TestDataFactory {
         this.campsiteRepository = campsiteRepository;
     }
 
-    public Reservation getReservationWithStatus(String status) {
+    public Reservation getReservationWithStatus(ReservationStatus status) {
         return reservationRepository.findAll().stream()
                 .filter(r -> status.equals(r.getStatus()))
                 .findFirst()
