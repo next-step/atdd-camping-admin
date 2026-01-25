@@ -8,8 +8,9 @@ import com.camping.admin.steps.support.TestDataFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -48,6 +49,9 @@ public class ReservationSteps {
     public void reservationStatusShouldBe(String expectedStatus) {
         Reservation reservation = reservationRepository.findById(testContext.getLastReservationId()).orElseThrow();
         assertThat(reservation.getStatus()).isEqualTo(expectedStatus);
+
+        assertThat(testContext.getLastResponse().statusCode()).isEqualTo(200);
+        assertThat(testContext.getLastResponse().jsonPath().getString("status")).isEqualTo(expectedStatus);
     }
 
     @Then("예약 상태 변경 요청이 실패한다")
@@ -64,5 +68,11 @@ public class ReservationSteps {
     public void reservationListSizeShouldBe(int size) {
         List<?> list = testContext.getLastResponse().jsonPath().getList("");
         assertThat(list.size()).isGreaterThanOrEqualTo(size);
+    }
+
+    @Then("조회된 예약 목록에 {string} 상태의 예약이 포함되어 있어야 한다")
+    public void reservationListShouldContainStatus(String status) {
+        List<String> statuses = testContext.getLastResponse().jsonPath().getList("status");
+        assertThat(statuses).contains(status);
     }
 }

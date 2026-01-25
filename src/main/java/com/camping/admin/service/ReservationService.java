@@ -17,19 +17,31 @@ public class ReservationService {
 
     private final ReservationRepository reservationRepository;
 
+    @Transactional
+    public ReservationResponse updateStatus(Long reservationId, String status) {
+        Reservation reservation = findById(reservationId);
+
+        reservation.changeStatus(status);
+        return ReservationResponse.from(reservation);
+    }
+
     public @Nullable Reservation findActiveReservation(final Long reservationId) {
         if (reservationId == null) {
             return null;
         }
 
-        final Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+        final Reservation reservation = findById(reservationId);
 
         if (reservation.isCancelled()) {
             throw new IllegalStateException("Cannot create rental for a cancelled reservation.");
         }
 
         return reservation;
+    }
+
+    private Reservation findById(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
     }
 
     public List<ReservationResponse> getAll() {

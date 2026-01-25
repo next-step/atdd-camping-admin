@@ -49,7 +49,7 @@ public class TestDataFactory {
         String siteNumber = "A" + System.nanoTime();
         Campsite campsite = createCampsite(siteNumber, "Test Site", 4);
         Reservation reservation = new Reservation(customerName, LocalDate.now(), LocalDate.now().plusDays(1), campsite);
-        reservation.setStatus(status);
+        reservation.changeStatus(status);
         return reservationRepository.save(reservation);
     }
 }
