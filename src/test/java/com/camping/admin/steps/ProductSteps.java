@@ -71,4 +71,21 @@ public class ProductSteps {
         assertThat(new BigDecimal(product.get("price").toString())).isEqualByComparingTo(BigDecimal.valueOf(price));
         assertThat(product.get("productType")).isEqualTo(productType);
     }
+
+    @When("관리자가 {string} 키워드로 상품을 검색하면")
+    public void adminSearchesProduct(String query) {
+        testContext.setLastResponse(productApi.상품_목록_조회_요청(testContext.getAdminToken(), query));
+    }
+
+    @Then("검색 결과에 {string} 상품이 포함되어야 한다")
+    public void searchResultShouldContain(String productName) {
+        List<String> productNames = testContext.getLastResponse().jsonPath().getList("name");
+        assertThat(productNames).contains(productName);
+    }
+
+    @Then("검색 결과에 {string} 상품이 포함되지 않아야 한다")
+    public void searchResultShouldNotContain(String productName) {
+        List<String> productNames = testContext.getLastResponse().jsonPath().getList("name");
+        assertThat(productNames).doesNotContain(productName);
+    }
 }

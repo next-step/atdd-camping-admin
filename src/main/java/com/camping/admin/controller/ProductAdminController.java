@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -26,17 +25,9 @@ public class ProductAdminController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        List<Product> all = productRepository.findAll();
-        List<Product> result = new ArrayList<>();
-        if (all != null) {
-            for (Product p : all) {
-                if (p != null) {
-                    result.add(p);
-                }
-            }
-        }
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<ProductResponse>> getAllProducts(@RequestParam(required = false) String query) {
+        List<ProductResponse> responses = productService.findAll(query);
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping

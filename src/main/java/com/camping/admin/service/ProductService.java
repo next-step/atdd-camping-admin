@@ -8,12 +8,26 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ProductService {
 
     private final ProductRepository productRepository;
+
+    public List<ProductResponse> findAll(String query) {
+        if (query == null || query.isBlank()) {
+            return productRepository.findAll().stream()
+                    .map(ProductResponse::from)
+                    .toList();
+        }
+
+        return productRepository.findByNameContaining(query).stream()
+                .map(ProductResponse::from)
+                .toList();
+    }
 
     @Transactional
     public void increaseStock(Long productId, Integer quantity) {

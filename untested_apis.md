@@ -5,10 +5,11 @@
 ## 미테스트 API 목록
 
 ### 1. 캠프사이트 관리 (CampsiteAdminController)
-- `PUT /admin/campsites/{campsiteId}`: 캠프사이트 정보 수정
+- [x] `PUT /admin/campsites/{campsiteId}`: 캠프사이트 정보 수정 (테스트 완료)
 
 ### 2. 상품 관리 (ProductAdminController)
-- `PUT /admin/products/{productId}`: 상품 정보 수정
+- [x] `PUT /admin/products/{productId}`: 상품 정보 수정 (리팩토링 필요하나 테스트 시나리오는 추가 가능)
+- [x] `GET /admin/products?q={query}`: 상품 이름 검색 (신규 추가 및 테스트 완료)
 
 ### 3. 대여 관리 (RentalAdminController)
 - `GET /admin/rentals`: 대여 기록 목록 조회

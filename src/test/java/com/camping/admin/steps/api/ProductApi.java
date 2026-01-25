@@ -29,8 +29,13 @@ public class ProductApi {
                 .extract();
     }
     public ExtractableResponse<Response> 상품_목록_조회_요청(String accessToken) {
+        return 상품_목록_조회_요청(accessToken, null);
+    }
+
+    public ExtractableResponse<Response> 상품_목록_조회_요청(String accessToken, String query) {
         return RestAssured.given().log().all()
                 .header("Authorization", "Bearer " + accessToken)
+                .queryParam("query", query)
                 .when().get("/admin/products")
                 .then().log().all()
                 .extract();
