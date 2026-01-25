@@ -1,0 +1,65 @@
+diff --git a/src/test/java/com/camping/admin/CucumberTestRunner.java b/src/test/java/com/camping/admin/CucumberTestRunner.java
+new file mode 100644
+index 0000000..d90bf0c
+--- /dev/null
++++ b/src/test/java/com/camping/admin/CucumberTestRunner.java
+@@ -0,0 +1,17 @@
++package com.camping.admin;
++
++import org.junit.platform.suite.api.ConfigurationParameter;
++import org.junit.platform.suite.api.IncludeEngines;
++import org.junit.platform.suite.api.SelectClasspathResource;
++import org.junit.platform.suite.api.Suite;
++
++import static io.cucumber.junit.platform.engine.Constants.GLUE_PROPERTY_NAME;
++import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
++
++@Suite
++@IncludeEngines("cucumber")
++@SelectClasspathResource("features")
++@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.camping.admin.steps")
++@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty")
++public class CucumberTestRunner {
++}
+diff --git a/src/test/java/com/camping/admin/steps/ReservationSteps.java b/src/test/java/com/camping/admin/steps/ReservationSteps.java
+new file mode 100644
+index 0000000..606ceac
+--- /dev/null
++++ b/src/test/java/com/camping/admin/steps/ReservationSteps.java
+@@ -0,0 +1,23 @@
++package com.camping.admin.steps;
++
++import io.cucumber.java.en.Given;
++import io.cucumber.java.en.Then;
++import io.cucumber.java.en.When;
++
++public class ReservationSteps {
++
++    @Given("사용자가 캠핑장 예약을 완료한 상태이다")
++    public void 사용자가_캠핑장_예약을_완료한_상태이다() {
++        System.out.println(">>> [Given] 사용자가 캠핑장 예약을 하는 단계를 수행합니다.");
++    }
++
++    @When("관리자가 해당 예약을 취소한다")
++    public void 관리자가_해당_예약을_취소한다() {
++        System.out.println(">>> [When] 관리자가 해당 예약을 취소하는 단계를 수행합니다.");
++    }
++
++    @Then("예약이 성공적으로 취소된다")
++    public void 예약이_성공적으로_취소된다() {
++        System.out.println(">>> [Then] 예약이 성공적으로 취소되었는지 확인하는 단계를 수행합니다.");
++    }
++}
+diff --git a/src/test/resources/features/reservation_cancel.feature b/src/test/resources/features/reservation_cancel.feature
+new file mode 100644
+index 0000000..0757bd7
+--- /dev/null
++++ b/src/test/resources/features/reservation_cancel.feature
+@@ -0,0 +1,7 @@
++Feature: Reservation Cancel
++  Admin can cancel user's reservation
++
++  Scenario: Admin cancels a reservation
++    Given 사용자가 캠핑장 예약을 완료한 상태이다
++    When 관리자가 해당 예약을 취소한다
++    Then 예약이 성공적으로 취소된다
