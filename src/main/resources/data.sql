@@ -21,13 +21,18 @@ insert into products (id, name, stock_quantity, price, product_type) values
   (12, '아이스팩', 90, 1500.00, 'SALE');
 
 -- Reservations
+-- 테스트용 고정 데이터: 다양한 상태의 예약
 insert into reservations (id, customer_name, start_date, end_date, campsite_id, phone_number, status, reservation_date, confirmation_code, created_at)
 values
+  -- 취소 가능한 예약 (CONFIRMED) - 테스트 ID: 1
   (1, '홍길동', current_date, current_date + 1, 1, '010-1111-2222', 'CONFIRMED', current_date, 'ABC123', current_timestamp),
-  (2, '김철수', current_date + 1, current_date + 2, 2, '010-3333-4444', 'CONFIRMED', current_date, 'XYZ789', current_timestamp),
-  -- 최근 한달 예약 더미 데이터
-  (3, '이영희', DATEADD('DAY', -28, current_date), DATEADD('DAY', -27, current_date), 1, '010-5555-6666', 'CONFIRMED', DATEADD('DAY', -29, current_date), 'R00003', DATEADD('DAY', -29, current_timestamp)),
-  (4, '박민수', DATEADD('DAY', -25, current_date), DATEADD('DAY', -24, current_date), 2, '010-7777-8888', 'CONFIRMED', DATEADD('DAY', -26, current_date), 'R00004', DATEADD('DAY', -26, current_timestamp)),
+  -- 취소 가능한 예약 (PENDING) - 테스트 ID: 2
+  (2, '김철수', current_date + 1, current_date + 2, 2, '010-3333-4444', 'PENDING', current_date, 'XYZ789', current_timestamp),
+  -- 이미 취소된 예약 - 테스트 ID: 3
+  (3, '이영희', DATEADD('DAY', -28, current_date), DATEADD('DAY', -27, current_date), 1, '010-5555-6666', 'CANCELLED', DATEADD('DAY', -29, current_date), 'R00003', DATEADD('DAY', -29, current_timestamp)),
+  -- 체크아웃된 예약 - 테스트 ID: 4
+  (4, '박민수', DATEADD('DAY', -25, current_date), DATEADD('DAY', -24, current_date), 2, '010-7777-8888', 'CHECKED_OUT', DATEADD('DAY', -26, current_date), 'R00004', DATEADD('DAY', -26, current_timestamp)),
+  -- 일반 예약들
   (5, '최수정', DATEADD('DAY', -21, current_date), DATEADD('DAY', -19, current_date), 1, '010-9999-0000', 'CONFIRMED', DATEADD('DAY', -22, current_date), 'R00005', DATEADD('DAY', -22, current_timestamp)),
   (6, '정하늘', DATEADD('DAY', -18, current_date), DATEADD('DAY', -17, current_date), 2, '010-2222-3333', 'CONFIRMED', DATEADD('DAY', -19, current_date), 'R00006', DATEADD('DAY', -19, current_timestamp)),
   (7, '오세훈', DATEADD('DAY', -15, current_date), DATEADD('DAY', -14, current_date), 1, '010-4444-5555', 'CONFIRMED', DATEADD('DAY', -16, current_date), 'R00007', DATEADD('DAY', -16, current_timestamp)),
