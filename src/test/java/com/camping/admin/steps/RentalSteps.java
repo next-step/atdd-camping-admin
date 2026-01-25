@@ -45,11 +45,6 @@ public class RentalSteps {
     @Autowired
     private ReservationFactory reservationFactory;
 
-    @Before
-    public void setUp() {
-        RestAssured.port = port;
-    }
-
     // ==================== Given Steps ====================
 
     @Given("{string} 대여 상품이 재고 {int}개로 등록되어 있다")

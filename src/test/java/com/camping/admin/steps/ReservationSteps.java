@@ -48,10 +48,7 @@ public class ReservationSteps {
     @Autowired
     private ReservationFactory reservationFactory;
 
-    @Before
-    public void setUp() {
-        RestAssured.port = port;
-    }
+
 
     // ==================== Given Steps ====================
 
