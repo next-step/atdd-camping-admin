@@ -1,7 +1,6 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.support.AuthHelper;
-import io.cucumber.java.Before;
+import com.camping.admin.support.TestContext;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -14,14 +13,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class ReservationSteps {
 
-    private AuthHelper authHelper;
+    private TestContext context = TestContext.getInstance();
     private int reservationId;
-    private Response lastResponse;
-
-    @Before
-    public void setup() {
-        authHelper = new AuthHelper();
-    }
 
     // Given
 
@@ -30,21 +23,26 @@ public class ReservationSteps {
         this.reservationId = id;
     }
 
-    @Given("존재하지 않는 예약건 {int}이 있다")
-    public void 존재하지_않는_예약건이_있다(int id) {
-        this.reservationId = id;
-    }
-
     // When
 
     @When("관리자가 예약건 {int}을 취소한다")
     public void 관리자가_예약건을_취소한다(int id) {
-        lastResponse = changeReservationStatus(id, "CANCELLED");
+        context.setLastResponse(changeReservationStatus(id, "CANCELLED"));
     }
 
     @When("관리자가 예약건 {int}을 확정한다")
     public void 관리자가_예약건을_확정한다(int id) {
-        lastResponse = changeReservationStatus(id, "CONFIRMED");
+        context.setLastResponse(changeReservationStatus(id, "CONFIRMED"));
+    }
+
+    @When("관리자가 존재하지 않는 예약 {int}을 취소한다")
+    public void 관리자가_존재하지_않는_예약을_취소한다(int id) {
+        context.setLastResponse(changeReservationStatus(id, "CANCELLED"));
+    }
+
+    @When("관리자가 존재하지 않는 예약 {int}을 확정한다")
+    public void 관리자가_존재하지_않는_예약을_확정한다(int id) {
+        context.setLastResponse(changeReservationStatus(id, "CONFIRMED"));
     }
 
     // Then
@@ -62,7 +60,7 @@ public class ReservationSteps {
     @Then("해당 캠핑장은 다시 예약 가능하다")
     public void 해당_캠핑장은_다시_예약_가능하다() {
         given()
-                .spec(authHelper.authorizedSpec())
+                .spec(context.getAuthHelper().authorizedSpec())
                 .when()
                 .get("/admin/reservations")
                 .then()
@@ -70,16 +68,12 @@ public class ReservationSteps {
                 .body("find { it.id == " + reservationId + " }.status", equalTo("CANCELLED"));
     }
 
-    @Then("에러가 발생한다")
-    public void 에러가_발생한다() {
-        lastResponse.then().statusCode(500);
-    }
 
     // helper
 
     private Response changeReservationStatus(int id, String status) {
         return given()
-                .spec(authHelper.authorizedSpec())
+                .spec(context.getAuthHelper().authorizedSpec())
                 .body(Map.of("status", status))
                 .when()
                 .patch("/admin/reservations/" + id + "/status")
@@ -88,7 +82,7 @@ public class ReservationSteps {
     }
 
     private void assertReservationStatus(int statusCode, String expectedStatus) {
-        lastResponse.then()
+        context.getLastResponse().then()
                 .statusCode(statusCode)
                 .body("status", equalTo(expectedStatus));
     }
