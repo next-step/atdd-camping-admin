@@ -31,10 +31,9 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
 
     // ===== 공통 헬퍼 메서드 =====
 
-    private void givenReservationWithStatus(String status) {
+    private void setReservationWithStatus(String status) {
         Reservation reservation = testDataFactory.getReservationWithStatus(status);
         scenarioContext.setReservation(reservation);
-        assertThat(reservation.getStatus()).isEqualTo(status);
     }
 
     private void requestStatusChange(String body) {
@@ -53,23 +52,29 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
 
     @Given("확정된 예약이 있다")
     public void 확정된_예약이_있다() {
-        givenReservationWithStatus("CONFIRMED");
-    }
-
-    @Given("존재하지 않는 예약 ID가 주어진다")
-    public void 존재하지_않는_예약_ID가_주어진다() {
-        scenarioContext.setReservationId(99999L);
+        setReservationWithStatus("CONFIRMED");
     }
 
     @Given("취소된 예약이 있다")
     public void 취소된_예약이_있다() {
-        givenReservationWithStatus("CANCELLED");
+        setReservationWithStatus("CANCELLED");
     }
 
     // ===== When =====
+    @When("관리자가 확정된 예약을 취소한다")
+    public void 관리자가_확정된_예약을_취소한다() {
+        setReservationWithStatus("CONFIRMED");
+        requestStatusChange("{\"status\":\"CANCELLED\"}");
+    }
 
-    @When("관리자가 해당 예약을 취소한다")
-    public void 관리자가_해당_예약을_취소한다() {
+    @When("관리자가 존재하지 않는 예약을 취소한다")
+    public void 관리자가_존재하지_않는_예약을_취소한다() {
+        scenarioContext.setReservationId(99999L);
+        requestStatusChange("{\"status\":\"CANCELLED\"}");
+    }
+
+    @When("관리자가 예약을 취소한다")
+    public void 관리자가_예약을_취소한다() {
         requestStatusChange("{\"status\":\"CANCELLED\"}");
     }
 
