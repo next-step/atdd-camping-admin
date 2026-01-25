@@ -61,6 +61,10 @@ public class Reservation {
     }
 
     public void changeStatus(ReservationStatus newStatus) {
+        if (!this.status.canTransitionTo(newStatus)) {
+            throw new IllegalStateException(
+                    String.format("Cannot transition from %s to %s", this.status, newStatus));
+        }
         this.status = newStatus;
     }
 }
