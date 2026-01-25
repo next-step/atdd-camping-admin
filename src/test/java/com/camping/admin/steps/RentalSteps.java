@@ -5,9 +5,9 @@ import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.factory.RentalFactory;
 import com.camping.admin.factory.ReservationFactory;
-import com.camping.admin.repository.ProductRepository;
-import com.camping.admin.api.RentalAPI;
+import com.camping.admin.support.TestApiSupport;
 import com.camping.admin.api.TestContext;
+import com.camping.admin.support.TestRepositorySupport;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -25,6 +25,8 @@ public class RentalSteps {
 
     public static final String SITE_NUMBER = "A-001";
     public static final String CONFIRMED = "CONFIRMED";
+
+
     @LocalServerPort
     private int port;
 
@@ -32,10 +34,10 @@ public class RentalSteps {
     private TestContext testContext;
 
     @Autowired
-    private RentalAPI rentalAPI;
+    private TestApiSupport api;
 
     @Autowired
-    private ProductRepository productRepository;
+    private TestRepositorySupport repository;
 
     @Autowired
     private RentalFactory rentalFactory;
@@ -75,24 +77,24 @@ public class RentalSteps {
     @When("관리자가 해당 예약에 {string} 상품 {int}개를 대여한다")
     public void 예약에_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        rentalAPI.대여_생성(productId, quantity, testContext.getReservation().getId());
+        api.rental().대여_생성(productId, quantity, testContext.getReservation().getId());
     }
 
     @When("관리자가 예약 없이 {string} 상품 {int}개를 대여한다")
     public void 예약_없이_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        rentalAPI.대여_생성(productId, quantity, null);
+        api.rental().대여_생성(productId, quantity, null);
     }
 
     @When("관리자가 존재하지 않는 상품을 대여한다")
     public void 존재하지_않는_상품을_대여한다() {
-        rentalAPI.대여_생성(99999L, 1, null);
+        api.rental().대여_생성(99999L, 1, null);
     }
 
     @When("관리자가 존재하지 않는 예약에 {string} 상품 {int}개를 대여한다")
     public void 존재하지_않는_예약에_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        rentalAPI.대여_생성(productId, quantity, 99999L);
+        api.rental().대여_생성(productId, quantity, 99999L);
     }
 
     // ==================== Then Steps ====================
@@ -110,7 +112,7 @@ public class RentalSteps {
 
     @And("{string} 상품의 재고가 {int}개로 감소한다")
     public void 상품의_재고가_감소한다(String productName, int expectedStock) {
-        Product product = productRepository.findByName(productName)
+        Product product = repository.product().findByName(productName)
                 .orElseThrow(() -> new AssertionError("상품을 찾을 수 없습니다: " + productName));
 
         assertThat(product.getStockQuantity())
@@ -120,7 +122,7 @@ public class RentalSteps {
 
     @And("{string} 상품의 재고는 {int}개로 유지된다")
     public void 상품의_재고가_유지된다(String productName, int expectedStock) {
-        Product product = productRepository.findByName(productName)
+        Product product = repository.product().findByName(productName)
                 .orElseThrow(() -> new AssertionError("상품을 찾을 수 없습니다: " + productName));
 
         assertThat(product.getStockQuantity())
@@ -151,7 +153,7 @@ public class RentalSteps {
     // ==================== Helper Methods ====================
 
     private Long findProductIdByName(String productName) {
-        return productRepository.findByName(productName)
+        return repository.product().findByName(productName)
                 .map(Product::getId)
                 .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + productName));
     }

@@ -2,9 +2,9 @@ package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.factory.ReservationFactory;
-import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.api.ReservationAPI;
+import com.camping.admin.support.TestApiSupport;
 import com.camping.admin.api.TestContext;
+import com.camping.admin.support.TestRepositorySupport;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -40,10 +40,10 @@ public class ReservationSteps {
     private TestContext testContext;
 
     @Autowired
-    private ReservationAPI reservationAPI;
+    private TestApiSupport api;
 
     @Autowired
-    private ReservationRepository reservationRepository;
+    private TestRepositorySupport repository;
 
     @Autowired
     private ReservationFactory reservationFactory;
@@ -106,22 +106,22 @@ public class ReservationSteps {
 
     @When("관리자가 해당 예약을 취소한다")
     public void 예약을_취소한다() {
-        reservationAPI.예약_상태_변경(취소);
+        api.reservation().예약_상태_변경(취소);
     }
 
     @When("관리자가 해당 예약을 확정한다")
     public void 예약을_확정한다() {
-        reservationAPI.예약_상태_변경(확정);
+        api.reservation().예약_상태_변경(확정);
     }
 
     @When("관리자가 해당 예약의 상태를 빈 값으로 변경 요청한다")
     public void 빈_값으로_상태_변경() {
-        reservationAPI.예약_상태_변경("");
+        api.reservation().예약_상태_변경("");
     }
 
     @When("관리자가 해당 예약의 상태를 본문 없이 변경 요청한다")
     public void 본문_없이_상태_변경() {
-        reservationAPI.예약_상태_변경_본문없이();
+        api.reservation().예약_상태_변경_본문없이();
     }
 
     // ==================== Then Steps ====================
@@ -136,7 +136,7 @@ public class ReservationSteps {
                 .as("API 응답의 예약 상태")
                 .isEqualTo(취소);
 
-        Reservation reservation = reservationRepository
+        Reservation reservation = repository.reservation()
                 .findById(testContext.getReservation().getId())
                 .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다"));
 
