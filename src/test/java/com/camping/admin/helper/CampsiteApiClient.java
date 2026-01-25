@@ -6,17 +6,13 @@ import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 
 /**
- * 캠핑장 도메인 테스트 헬퍼
+ * 캠핑장 도메인 API 클라이언트
  */
-public class CampsiteTestHelper {
-
-    // 테스트용 고정 캠핑장 ID (data.sql 기준)
-    public static final int CAMPSITE_A01_ID = 1001;  // A-01
-    public static final int CAMPSITE_A02_ID = 1002;  // A-02
+public class CampsiteApiClient {
 
     private final RequestSpecification requestSpec;
 
-    public CampsiteTestHelper(RequestSpecification requestSpec) {
+    public CampsiteApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
@@ -50,18 +46,5 @@ public class CampsiteTestHelper {
             ))
             .when()
             .put("/admin/campsites/" + campsiteId);
-    }
-
-    // === 조회 유틸리티 ===
-
-    public int getFirstCampsiteId() {
-        Response response = getCampsites();
-        return response.jsonPath().getInt("[0].id");
-    }
-
-    public String getCampsiteSiteNumber(int campsiteId) {
-        Response response = getCampsites();
-        return response.jsonPath()
-            .getString("find { it.id == " + campsiteId + " }.siteNumber");
     }
 }

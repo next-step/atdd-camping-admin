@@ -7,13 +7,13 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * 매출 리포트 도메인 테스트 헬퍼
+ * 매출 리포트 도메인 API 클라이언트
  */
-public class RevenueTestHelper {
+public class RevenueApiClient {
 
     private final RequestSpecification requestSpec;
 
-    public RevenueTestHelper(RequestSpecification requestSpec) {
+    public RevenueApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 

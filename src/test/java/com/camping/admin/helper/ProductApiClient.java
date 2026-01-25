@@ -7,27 +7,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 상품 도메인 테스트 헬퍼
+ * 상품 도메인 API 클라이언트
  * - API 호출 메서드
  * - 테스트 데이터 상수
- * - 상태 관리
  */
-public class ProductTestHelper {
+public class ProductApiClient {
 
     // 테스트용 고정 상품 ID (data.sql 기준)
-    public static final int RENTAL_PRODUCT_ID = 1001;      // 랜턴 (RENTAL)
-    public static final int SALE_PRODUCT_ID = 1002;        // 장작팩 (SALE)
     public static final int OUT_OF_STOCK_RENTAL_ID = 1013; // 품절 텐트 (RENTAL, 재고 0)
     public static final int OUT_OF_STOCK_SALE_ID = 1014;   // 품절 침낭 (SALE, 재고 0)
     public static final int LIMITED_STOCK_SALE_ID = 1015;  // 한정판 굿즈 (SALE, 재고 5)
 
     private final RequestSpecification requestSpec;
 
-    // 상태 관리
-    private int targetProductId;
-    private int originalStock;
-
-    public ProductTestHelper(RequestSpecification requestSpec) {
+    public ProductApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
@@ -78,23 +71,5 @@ public class ProductTestHelper {
         Response response = getProducts();
         return response.jsonPath()
             .getInt("find { it.id == " + productId + " }.stockQuantity");
-    }
-
-    // === 상태 관리 ===
-
-    public int getTargetProductId() {
-        return targetProductId;
-    }
-
-    public void setTargetProductId(int targetProductId) {
-        this.targetProductId = targetProductId;
-    }
-
-    public int getOriginalStock() {
-        return originalStock;
-    }
-
-    public void setOriginalStock(int originalStock) {
-        this.originalStock = originalStock;
     }
 }

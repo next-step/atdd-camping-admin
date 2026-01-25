@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 판매 도메인 테스트 헬퍼
+ * 판매 도메인 API 클라이언트
  */
-public class SalesTestHelper {
+public class SalesApiClient {
 
     private final RequestSpecification requestSpec;
 
-    public SalesTestHelper(RequestSpecification requestSpec) {
+    public SalesApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 

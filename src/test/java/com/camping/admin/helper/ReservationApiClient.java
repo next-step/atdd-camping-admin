@@ -5,7 +5,10 @@ import io.restassured.specification.RequestSpecification;
 import io.restassured.RestAssured;
 import java.util.Map;
 
-public class ReservationTestHelper {
+/**
+ * 예약 도메인 API 클라이언트
+ */
+public class ReservationApiClient {
 
     // 테스트용 고정 예약 ID (data.sql 기준)
     public static final int CONFIRMED_RESERVATION_ID = 1001;  // 취소 가능한 예약 (CONFIRMED)
@@ -15,7 +18,7 @@ public class ReservationTestHelper {
 
     private final RequestSpecification requestSpec;
 
-    public ReservationTestHelper(RequestSpecification requestSpec) {
+    public ReservationApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 

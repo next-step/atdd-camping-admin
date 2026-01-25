@@ -6,17 +6,13 @@ import io.restassured.specification.RequestSpecification;
 import java.util.Map;
 
 /**
- * 대여 도메인 테스트 헬퍼
+ * 대여 도메인 API 클라이언트
  */
-public class RentalTestHelper {
-
-    // 테스트용 고정 대여 ID (data.sql 기준)
-    public static final int UNRETURNED_RENTAL_ID = 1001;  // 미반납 대여
-    public static final int RETURNED_RENTAL_ID = 1002;    // 반납 완료 대여
+public class RentalApiClient {
 
     private final RequestSpecification requestSpec;
 
-    public RentalTestHelper(RequestSpecification requestSpec) {
+    public RentalApiClient(RequestSpecification requestSpec) {
         this.requestSpec = requestSpec;
     }
 
