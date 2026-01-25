@@ -22,16 +22,23 @@ public class ReservationSteps {
 
     // === Given ===
 
-    @Given("사용자가 예약을 했다")
-    public void 사용자가예약을했다() {
+    @Given("취소 가능한 예약이 존재한다")
+    public void 취소가능한예약이존재한다() {
         Response response = RestAssured.given()
             .spec(context.getRequestSpec())
             .when()
             .get("/admin/reservations");
 
         response.then().statusCode(200);
-        targetReservationId = response.jsonPath().getInt("[0].id");
-        System.out.println("[Given] 사용자가 예약을 했다. 예약 ID: " + targetReservationId);
+        // 취소 가능한 상태(PENDING, CONFIRMED)인 예약을 찾음
+        Integer id = response.jsonPath()
+            .getInt("find { it.status == 'PENDING' || it.status == 'CONFIRMED' }.id");
+        if (id == null) {
+            // 없으면 첫 번째 예약 사용
+            id = response.jsonPath().getInt("[0].id");
+        }
+        targetReservationId = id;
+        System.out.println("[Given] 취소 가능한 예약이 존재한다. 예약 ID: " + targetReservationId);
     }
 
     @Given("예약이 존재한다")
@@ -48,9 +55,9 @@ public class ReservationSteps {
 
     // === When ===
 
-    @When("관리자가 해당 예약을 취소했다")
-    public void 관리자가해당예약을취소했다() {
-        System.out.println("[When] 관리자가 예약 " + targetReservationId + "을 취소했다");
+    @When("관리자가 해당 예약을 취소한다")
+    public void 관리자가해당예약을취소한다() {
+        System.out.println("[When] 관리자가 예약 " + targetReservationId + "을 취소한다");
 
         lastResponse = RestAssured.given()
             .spec(context.getRequestSpec())
@@ -72,12 +79,12 @@ public class ReservationSteps {
 
     // === Then ===
 
-    @Then("예약은 취소 상태다")
-    public void 예약은취소상태다() {
+    @Then("예약 상태는 취소로 변경된다")
+    public void 예약상태는취소로변경된다() {
         lastResponse.then().statusCode(200);
         String status = lastResponse.jsonPath().getString("status");
         assertThat(status).isEqualTo("CANCELLED");
-        System.out.println("[Then] 예약은 취소 상태다");
+        System.out.println("[Then] 예약 상태는 취소로 변경된다");
     }
 
     @Then("예약 상태가 {word}로 변경된다")
