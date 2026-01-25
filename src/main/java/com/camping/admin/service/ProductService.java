@@ -2,6 +2,8 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.repository.ProductRepository;
+import com.camping.admin.service.dto.ProductCommand;
+import com.camping.admin.service.dto.ProductResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,5 +31,11 @@ public class ProductService {
         Product product = findById(productId);
         product.decreaseStock(quantity);
         return product;
+    }
+
+    public ProductResponse create(ProductCommand productCommand) {
+        Product product = productRepository.save(productCommand.toEntity());
+
+        return ProductResponse.from(product);
     }
 }
