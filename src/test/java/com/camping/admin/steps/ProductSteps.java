@@ -93,9 +93,8 @@ public class ProductSteps {
 
     @Then("상품 등록이 거부된다")
     public void 상품등록이거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 409, 422);
-        log.info("[Then] 상품 등록이 거부된다");
+        scenario.getLastResponse().then().statusCode(400);
+        log.info("[Then] 상품 등록이 거부된다 - 필수 정보 누락");
     }
 
     @When("관리자가 이름 없이 상품을 등록한다")
@@ -115,8 +114,7 @@ public class ProductSteps {
 
     @Then("상품 수정이 거부된다")
     public void 상품수정이거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 404, 409);
-        log.info("[Then] 상품 수정이 거부된다");
+        scenario.getLastResponse().then().statusCode(400);
+        log.info("[Then] 상품 수정이 거부된다 - 존재하지 않는 상품");
     }
 }

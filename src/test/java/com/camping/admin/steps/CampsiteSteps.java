@@ -93,9 +93,8 @@ public class CampsiteSteps {
 
     @Then("캠핑장 등록이 거부된다")
     public void 캠핑장등록이거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 409);
-        log.info("[Then] 캠핑장 등록이 거부된다");
+        scenario.getLastResponse().then().statusCode(409);
+        log.info("[Then] 캠핑장 등록이 거부된다 - 중복 사이트 번호");
     }
 
     @When("관리자가 존재하지 않는 캠핑장을 수정한다")
@@ -105,8 +104,7 @@ public class CampsiteSteps {
 
     @Then("캠핑장 수정이 거부된다")
     public void 캠핑장수정이거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 404, 409);
-        log.info("[Then] 캠핑장 수정이 거부된다");
+        scenario.getLastResponse().then().statusCode(400);
+        log.info("[Then] 캠핑장 수정이 거부된다 - 존재하지 않는 캠핑장");
     }
 }

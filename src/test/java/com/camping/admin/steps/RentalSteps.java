@@ -96,8 +96,7 @@ public class RentalSteps {
 
     @Then("대여가 거부된다")
     public void 대여가거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 409);
+        scenario.getLastResponse().then().statusCode(409);
         log.info("[Then] 대여가 거부된다");
     }
 
@@ -110,8 +109,7 @@ public class RentalSteps {
 
     @Then("반납이 거부된다")
     public void 반납이거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 409);
+        scenario.getLastResponse().then().statusCode(409);
         log.info("[Then] 반납이 거부된다");
     }
 }

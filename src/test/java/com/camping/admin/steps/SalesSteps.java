@@ -78,8 +78,7 @@ public class SalesSteps {
 
     @Then("판매가 거부된다")
     public void 판매가거부된다() {
-        int statusCode = scenario.getLastResponse().getStatusCode();
-        assertThat(statusCode).isIn(400, 409);
-        log.info("[Then] 판매가 거부된다");
+        scenario.getLastResponse().then().statusCode(409);
+        log.info("[Then] 판매가 거부된다 - 재고 부족");
     }
 }
