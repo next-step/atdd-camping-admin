@@ -2,10 +2,10 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.dto.StatusUpdateRequest;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
@@ -44,27 +44,15 @@ public class ReservationAdminController {
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long reservationId,
-            @RequestBody Map<String, Object> body) {
+            @RequestBody StatusUpdateRequest request) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
 
-        if (body == null || body.isEmpty()) {
+        if (request == null || request.getStatus() == null || request.getStatus().isBlank()) {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
 
-        Object statusObj = body.get("status");
-        if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
-        } else {
-            String statusValue = statusObj.toString();
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
-            } else {
-                // 단순히 그대로 대입
-                reservation.setStatus(statusValue);
-            }
-        }
-
+        reservation.setStatus(request.getStatus());
         reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
     }

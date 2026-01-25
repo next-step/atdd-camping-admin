@@ -44,10 +44,11 @@ dependencies {
     // JUnit Platform Suite for Cucumber
     testImplementation 'org.junit.platform:junit-platform-suite:1.10.0'
     
-    // Cucumber
+    // Cucumber (별도 프로세스 방식이므로 cucumber-spring 불필요)
     testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
     testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
-    
+    testImplementation "io.cucumber:cucumber-picocontainer:${cucumberVersion}"
+
     // RestAssured
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
     testImplementation "io.rest-assured:spring-mock-mvc:${restAssuredVersion}"
