@@ -1,16 +1,17 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.steps.api.ReservationApi;
 import com.camping.admin.steps.context.TestContext;
 import com.camping.admin.steps.support.TestDataFactory;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import io.restassured.response.ExtractableResponse;
+import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -26,13 +27,10 @@ public class ReservationSteps {
     @Autowired
     private ReservationApi reservationApi;
 
-    @Autowired
-    private ReservationRepository reservationRepository;
-
     @Given("{string} 상태의 예약이 등록되어 있다")
     public void reservationWithStatusIsRegistered(String status) {
-        Reservation reservation = testDataFactory.createReservation("Test Customer", status);
-        testContext.setLastReservationId(reservation.getId());
+        Long reservationId = testDataFactory.createReservation("Test Customer", status);
+        testContext.setLastReservationId(reservationId);
     }
 
     @When("관리자가 해당 예약의 상태를 {string}로 변경하면")
@@ -47,11 +45,20 @@ public class ReservationSteps {
 
     @Then("예약 상태가 {string}로 변경된다")
     public void reservationStatusShouldBe(String expectedStatus) {
-        Reservation reservation = reservationRepository.findById(testContext.getLastReservationId()).orElseThrow();
-        assertThat(reservation.getStatus()).isEqualTo(expectedStatus);
-
+        // API 응답 검증
         assertThat(testContext.getLastResponse().statusCode()).isEqualTo(200);
         assertThat(testContext.getLastResponse().jsonPath().getString("status")).isEqualTo(expectedStatus);
+
+        // 목록 조회를 통한 재검증 (Repository 대신 API 사용)
+        ExtractableResponse<Response> response = reservationApi.예약_목록_조회_요청(testContext.getAdminToken());
+        List<Map<String, Object>> reservations = response.jsonPath().getList("");
+        
+        Map<String, Object> reservation = reservations.stream()
+                .filter(r -> r.get("id").toString().equals(testContext.getLastReservationId().toString()))
+                .findFirst()
+                .orElseThrow();
+        
+        assertThat(reservation.get("status")).isEqualTo(expectedStatus);
     }
 
     @Then("예약 상태 변경 요청이 실패한다")

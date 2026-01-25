@@ -28,4 +28,11 @@ public class ProductApi {
                 .then().log().all()
                 .extract();
     }
+    public ExtractableResponse<Response> 상품_목록_조회_요청(String accessToken) {
+        return RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().get("/admin/products")
+                .then().log().all()
+                .extract();
+    }
 }
