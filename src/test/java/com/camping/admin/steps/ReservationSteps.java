@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Map;
 
+import static com.camping.admin.domain.enums.ReservationStatus.CANCELLED;
+import static com.camping.admin.domain.enums.ReservationStatus.CONFIRMED;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
@@ -63,7 +65,7 @@ public class ReservationSteps {
 
     @Given("사이트 번호가 {string}인 캠핑장에 {string} 이름으로 취소 상태의 예약이 있다")
     public void 캠핑장에_특정_상태의_예약이_있다(String siteNumber, String customerName) {
-        reservationSupport.캠핑장에_예약이_되어있다(customerName, "CANCELLED");
+        reservationSupport.캠핑장에_예약이_되어있다(customerName, CANCELLED.name());
     }
 
     // ==========================================
@@ -72,12 +74,12 @@ public class ReservationSteps {
 
     @When("관리자가 예약을 확정하면")
     public void 관리자가_예약을_확정한다() {
-        reservationAdminClient.예약_상태를_변경한다(Map.of("status", "CONFIRMED"));
+        reservationAdminClient.예약_상태를_변경한다(Map.of("status", CONFIRMED.name()));
     }
 
     @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 확정하려고 하면")
     public void 관리자가_존재하지_않는_예약의_상태를_변경한다(long reservationId) {
-        reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", "CONFIRMED"));
+        reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", CONFIRMED.name()));
     }
 
     @When("관리자가 예약 상태를 변경할 때 잘못된 본문\\({string}\\)으로 요청하면")
@@ -99,7 +101,7 @@ public class ReservationSteps {
     public void 예약_상태가_변경되어_있다() {
         var response = testContext.getResponse();
         String actualStatus = response.jsonPath().getString("status");
-        assertThat(actualStatus).isEqualTo("CONFIRMED"); // TODO. 상수
+        assertThat(actualStatus).isEqualTo(CONFIRMED.name());
     }
 
     @Then("요청이 실패한다\\({int}\\)")
