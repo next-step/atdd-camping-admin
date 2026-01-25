@@ -4,7 +4,7 @@ import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.repository.RentalRecordRepository;
-import com.camping.admin.service.dto.RentalRequest;
+import com.camping.admin.service.dto.RentalCommand;
 import com.camping.admin.service.dto.RentalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +29,7 @@ public class RentalService {
     }
 
     @Transactional
-    public RentalResponse createRental(RentalRequest request) {
+    public RentalResponse createRental(RentalCommand request) {
         final Reservation reservation = reservationService.findActiveReservation(request.reservationId());
         final Product product = productService.decreaseStock(request.productId(), request.quantity());
         final RentalRecord rental = rentalRecordRepository.save(new RentalRecord(reservation, product, request.quantity()));

@@ -1,6 +1,6 @@
 package com.camping.admin.controller.dto;
 
-import com.camping.admin.service.dto.RentalRequest;
+import com.camping.admin.service.dto.RentalCommand;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -24,7 +24,7 @@ public class CreateRentalRequest {
         this.quantity = quantity;
     }
 
-    public RentalRequest toServiceDto() {
-        return new RentalRequest(reservationId, productId, quantity);
+    public RentalCommand toServiceDto() {
+        return new RentalCommand(reservationId, productId, quantity);
     }
 }
