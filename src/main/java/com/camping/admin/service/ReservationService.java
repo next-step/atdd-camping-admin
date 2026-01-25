@@ -1,11 +1,14 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +30,11 @@ public class ReservationService {
         }
 
         return reservation;
+    }
+
+    public List<ReservationResponse> getAll() {
+        return reservationRepository.findAll().stream()
+                .map(ReservationResponse::from)
+                .toList();
     }
 }
