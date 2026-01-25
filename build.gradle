@@ -37,6 +37,9 @@ dependencies {
     // Lombok
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
+
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
     
     // Test Dependencies
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
@@ -47,7 +50,8 @@ dependencies {
     // Cucumber
     testImplementation "io.cucumber:cucumber-java:${cucumberVersion}"
     testImplementation "io.cucumber:cucumber-junit-platform-engine:${cucumberVersion}"
-    
+    testImplementation "io.cucumber:cucumber-spring:${cucumberVersion}"
+
     // RestAssured
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
     testImplementation "io.rest-assured:spring-mock-mvc:${restAssuredVersion}"
