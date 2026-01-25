@@ -10,17 +10,14 @@ import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
+
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ReservationSteps {
-
-    @LocalServerPort
-    private int port;
 
     @Autowired
     private DatabaseCleaner databaseCleaner;
@@ -40,12 +37,14 @@ public class ReservationSteps {
     @Autowired
     private ReservationAdminClient reservationAdminClient;
 
-    @Before
+    @Before(order = 2)
     public void setUp() {
-        RestAssured.port = port;
-
         databaseCleaner.execute();
     }
+
+    // ==========================================
+    // Given - 사전 조건 준비
+    // ==========================================
 
     @Given("캠핑장에 {string} 사이트가 등록되어 있다")
     public void 캠핑장에_사이트가_등록되어_있다(String siteNumber) {
@@ -62,10 +61,33 @@ public class ReservationSteps {
         reservationSupport.캠핑장에_예약이_되어있다(customerName);
     }
 
+    @Given("사이트 번호가 {string}인 캠핑장에 {string} 이름으로 {string} 상태의 예약이 있다")
+    public void 캠핑장에_특정_상태의_예약이_있다(String siteNumber, String customerName, String initialStatus) {
+        reservationSupport.캠핑장에_예약이_되어있다(customerName, initialStatus);
+    }
+
+    // ==========================================
+    // When - API 행위 실행
+    // ==========================================
+
     @When("관리자가 예약을 {string} 상태로 변경하면")
     public void 관리자가_예약_상태를_변경한다(String status) {
-        reservationAdminClient.관리자가_예약_상태를_변경한다(status);
+        reservationAdminClient.예약_상태를_변경한다(Map.of("status", status));
     }
+
+    @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 {string}으로 변경하면")
+    public void 관리자가_존재하지_않는_예약의_상태를_변경한다(long reservationId, String status) {
+        reservationAdminClient.예약_상태를_변경한다(reservationId, Map.of("status", status));
+    }
+
+    @When("관리자가 예약 상태를 변경할 때 {string} 와 같이 잘못된 본문으로 요청하면")
+    public void 관리자가_잘못된_본문으로_예약_상태를_변경하면(String invalidBody) {
+        reservationAdminClient.예약_상태를_변경한다(invalidBody);
+    }
+
+    // ==========================================
+    // Then - 검증
+    // ==========================================
 
     @Then("요청이 성공한다")
     public void 요청이_성공한다() {
@@ -79,4 +101,11 @@ public class ReservationSteps {
         String actualStatus = response.jsonPath().getString("status");
         assertThat(actualStatus).isEqualTo(expectedStatus);
     }
+
+    @Then("요청이 {int} 상태 코드로 실패한다")
+    public void 요청이_실패한다(int expectedStatusCode) {
+        var response = testContext.getResponse();
+        assertThat(response.statusCode()).isEqualTo(expectedStatusCode);
+    }
+
 }
