@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,18 +15,19 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class Campsite {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    
+
     @Column(unique = true, nullable = false)
     private String siteNumber;
-    
+
     private String description;
-    
+
     private Integer maxPeople;
-    
+
+    @JsonIgnore
     @OneToMany(mappedBy = "campsite", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
     
