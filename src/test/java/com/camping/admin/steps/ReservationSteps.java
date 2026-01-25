@@ -2,7 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.factory.ReservationFactory;
-import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.api.ReservationAPI;
 import com.camping.admin.api.TestContext;
@@ -47,9 +46,6 @@ public class ReservationSteps {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private CampsiteRepository campsiteRepository;
-
-    @Autowired
     private ReservationFactory reservationFactory;
 
     @Before
@@ -61,37 +57,44 @@ public class ReservationSteps {
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 확정된 상태로 존재한다")
     public void 확정된_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 확정);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 확정);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 대기 상태로 존재한다")
     public void 대기_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 대기);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 대기);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 보류 상태로 존재한다")
     public void 보류_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 보류);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 보류);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 취소된 상태로 존재한다")
     public void 취소된_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 취소);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 취소);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 체크인된 상태로 존재한다")
     public void 체크인된_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 체크인);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 체크인);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 체크아웃된 상태로 존재한다")
     public void 체크아웃된_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 체크아웃);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 체크아웃);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("{string} 고객의 {string} 캠프사이트 예약이 거절된 상태로 존재한다")
     public void 거절된_예약이_존재한다(String customerName, String siteNumber) {
-        reservationFactory.createReservation(customerName, siteNumber, 거절);
+        Reservation saved = reservationFactory.createReservation(customerName, siteNumber, 거절);
+        testContext.getReservation().setId(saved.getId());
     }
 
     @Given("예약 ID {string}는 존재하지 않는다")

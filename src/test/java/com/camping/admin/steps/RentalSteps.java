@@ -1,14 +1,11 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.factory.RentalFactory;
 import com.camping.admin.factory.ReservationFactory;
-import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ProductRepository;
-import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.api.RentalAPI;
 import com.camping.admin.api.TestContext;
 import io.cucumber.java.Before;
@@ -21,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import java.time.LocalDate;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 
 public class RentalSteps {
 
+    public static final String SITE_NUMBER = "A-001";
+    public static final String CONFIRMED = "CONFIRMED";
     @LocalServerPort
     private int port;
 
@@ -39,12 +36,6 @@ public class RentalSteps {
 
     @Autowired
     private ProductRepository productRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private CampsiteRepository campsiteRepository;
 
     @Autowired
     private RentalFactory rentalFactory;
@@ -61,20 +52,22 @@ public class RentalSteps {
 
     @Given("{string} 대여 상품이 재고 {int}개로 등록되어 있다")
     public void 대여_상품이_등록되어_있다(String productName, int stockQuantity) {
-        rentalFactory.createRental(productName, stockQuantity, ProductType.RENTAL);
+        Product saved = rentalFactory.createRental(productName, stockQuantity, ProductType.RENTAL);
+        testContext.getProduct().setId(saved.getId());
+        testContext.getProduct().setName(productName);
     }
 
     @Given("{string} 판매 상품이 재고 {int}개로 등록되어 있다")
     public void 판매_상품이_등록되어_있다(String productName, int stockQuantity) {
-        rentalFactory.createRental(productName, stockQuantity, ProductType.SALE);
+        Product saved = rentalFactory.createRental(productName, stockQuantity, ProductType.SALE);
+        testContext.getProduct().setId(saved.getId());
+        testContext.getProduct().setName(productName);
     }
 
     @Given("{string} 고객의 예약이 존재한다")
     public void 고객의_예약이_존재한다(String customerName) {
-        Campsite campsite = campsiteRepository.findBySiteNumber("A-001")
-                .orElseGet(() -> campsiteRepository.save(new Campsite("A-001", "테스트 캠프사이트", 4)));
-
-        reservationFactory.createReservation(customerName,"A-001", "CONFIRMED");
+        Reservation saved = reservationFactory.createReservation(customerName, SITE_NUMBER, CONFIRMED);
+        testContext.getReservation().setId(saved.getId());
     }
 
     // ==================== When Steps ====================
