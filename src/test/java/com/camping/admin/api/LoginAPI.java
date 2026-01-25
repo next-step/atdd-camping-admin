@@ -1,4 +1,4 @@
-package com.camping.admin.steps.api;
+package com.camping.admin.api;
 
 import io.cucumber.java.en.Given;
 import io.restassured.RestAssured;
