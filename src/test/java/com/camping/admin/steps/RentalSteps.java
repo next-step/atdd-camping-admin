@@ -77,24 +77,32 @@ public class RentalSteps {
     @When("관리자가 해당 예약에 {string} 상품 {int}개를 대여한다")
     public void 예약에_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        api.rental().대여_생성(productId, quantity, testContext.getReservation().getId());
+        var response = api.rental().대여_생성(
+                testContext.getAccessToken(), productId, quantity, testContext.getReservation().getId());
+        testContext.setResponse(response);
     }
 
     @When("관리자가 예약 없이 {string} 상품 {int}개를 대여한다")
     public void 예약_없이_상품을_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        api.rental().대여_생성(productId, quantity, null);
+        var response = api.rental().대여_생성(
+                testContext.getAccessToken(), productId, quantity, null);
+        testContext.setResponse(response);
     }
 
     @When("관리자가 존재하지 않는 상품을 대여한다")
     public void 존재하지_않는_상품을_대여한다() {
-        api.rental().대여_생성(99999L, 1, null);
+        var response = api.rental().대여_생성(
+                testContext.getAccessToken(), 99999L, 1, null);
+        testContext.setResponse(response);
     }
 
     @When("관리자가 존재하지 않는 예약에 {string} 상품 {int}개를 대여한다")
     public void 존재하지_않는_예약에_대여한다(String productName, int quantity) {
         Long productId = findProductIdByName(productName);
-        api.rental().대여_생성(productId, quantity, 99999L);
+        var response = api.rental().대여_생성(
+                testContext.getAccessToken(), productId, quantity, 99999L);
+        testContext.setResponse(response);
     }
 
     // ==================== Then Steps ====================

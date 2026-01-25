@@ -106,22 +106,30 @@ public class ReservationSteps {
 
     @When("관리자가 해당 예약을 취소한다")
     public void 예약을_취소한다() {
-        api.reservation().예약_상태_변경(취소);
+        var response = api.reservation().예약_상태_변경(
+                testContext.getAccessToken(), testContext.getReservation().getId(), 취소);
+        testContext.setResponse(response);
     }
 
     @When("관리자가 해당 예약을 확정한다")
     public void 예약을_확정한다() {
-        api.reservation().예약_상태_변경(확정);
+        var response = api.reservation().예약_상태_변경(
+                testContext.getAccessToken(), testContext.getReservation().getId(), 확정);
+        testContext.setResponse(response);
     }
 
     @When("관리자가 해당 예약의 상태를 빈 값으로 변경 요청한다")
     public void 빈_값으로_상태_변경() {
-        api.reservation().예약_상태_변경("");
+        var response = api.reservation().예약_상태_변경(
+                testContext.getAccessToken(), testContext.getReservation().getId(), "");
+        testContext.setResponse(response);
     }
 
     @When("관리자가 해당 예약의 상태를 본문 없이 변경 요청한다")
     public void 본문_없이_상태_변경() {
-        api.reservation().예약_상태_변경_본문없이();
+        var response = api.reservation().예약_상태_변경_본문없이(
+                testContext.getAccessToken(), testContext.getReservation().getId());
+        testContext.setResponse(response);
     }
 
     // ==================== Then Steps ====================
