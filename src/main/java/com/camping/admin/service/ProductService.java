@@ -14,15 +14,6 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalStateException("Not enough stock for product " + product.getName());
-        }
-        product.setStockQuantity(product.getStockQuantity() - quantity);
-    }
-
-    @Transactional
     public void increaseStock(Long productId, Integer quantity) {
         Product product = findById(productId);
         product.setStockQuantity(product.getStockQuantity() + quantity);
@@ -31,5 +22,12 @@ public class ProductService {
     private Product findById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
+    }
+
+    @Transactional
+    public Product decreaseStock(Long productId, Integer quantity) {
+        Product product = findById(productId);
+        product.decreaseStock(quantity);
+        return product;
     }
 }

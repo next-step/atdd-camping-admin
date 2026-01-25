@@ -57,4 +57,9 @@ public class Reservation {
         this.endDate = endDate;
         this.campsite = campsite;
     }
+
+    public boolean isCancelled() {
+        return this.status.equals("CANCELLED");
+    }
+
 }

@@ -1,4 +1,4 @@
-package com.camping.admin.dto;
+package com.camping.admin.service.dto;
 
 import com.camping.admin.domain.entity.RentalRecord;
 import java.time.LocalDateTime;
@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 public class RentalResponse {
-    private Long id;
-    private Long reservationId;
-    private Long productId;
-    private String productName;
-    private Integer quantity;
-    private Boolean isReturned;
-    private LocalDateTime createdAt;
+    private final Long id;
+    private final Long reservationId;
+    private final Long productId;
+    private final String productName;
+    private final Integer quantity;
+    private final Boolean isReturned;
+    private final LocalDateTime createdAt;
 
     public static RentalResponse from(RentalRecord rentalRecord) {
         return new RentalResponse(rentalRecord);

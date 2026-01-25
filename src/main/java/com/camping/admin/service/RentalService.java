@@ -3,18 +3,15 @@ package com.camping.admin.service;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.dto.RentalResponse;
-import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
-import com.camping.admin.repository.ReservationRepository;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import jakarta.annotation.Nullable;
+import com.camping.admin.service.dto.RentalRequest;
+import com.camping.admin.service.dto.RentalResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -22,8 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class RentalService {
 
     private final RentalRecordRepository rentalRecordRepository;
-    private final ProductRepository productRepository;
-    private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
     private final ProductService productService;
 
     public List<RentalResponse> findAll() {
@@ -33,34 +29,12 @@ public class RentalService {
     }
 
     @Transactional
-    public RentalResponse createRental(Long productId, Integer quantity, @Nullable Long reservationId) {
-        if (quantity == null || quantity <= 0) {
-            throw new IllegalArgumentException("Quantity must be greater than zero.");
-        }
+    public RentalResponse createRental(RentalRequest request) {
+        final Reservation reservation = reservationService.findActiveReservation(request.reservationId());
+        final Product product = productService.decreaseStock(request.productId(), request.quantity());
+        final RentalRecord rental = rentalRecordRepository.save(new RentalRecord(reservation, product, request.quantity()));
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
-
-        if (product.getProductType() != ProductType.RENTAL) {
-            throw new IllegalArgumentException("Product is not a rental item.");
-        }
-
-        productService.decreaseStock(productId, quantity);
-
-        Reservation reservation = null;
-        if (reservationId != null) {
-            reservation = reservationRepository.findById(reservationId)
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
-            
-            if ("CANCELLED".equals(reservation.getStatus())) {
-                throw new IllegalStateException("Cannot create rental for a cancelled reservation.");
-            }
-        }
-
-        RentalRecord rentalRecord = new RentalRecord(reservation, product, quantity);
-        RentalRecord savedRentalRecord = rentalRecordRepository.save(rentalRecord);
-
-        return RentalResponse.from(savedRentalRecord);
+        return RentalResponse.from(rental);
     }
 
     @Transactional

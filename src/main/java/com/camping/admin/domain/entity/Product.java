@@ -39,4 +39,22 @@ public class Product {
         this.productType = productType;
     }
 
+    public boolean isRental() {
+        return this.productType == ProductType.RENTAL;
+    }
+
+    public void decreaseStock(Integer quantity) {
+        if (!isRental()) {
+            throw new IllegalArgumentException("Product is not a rental item.");
+        }
+
+        if (!hasEnoughStock(quantity)) {
+            throw new IllegalStateException("Not enough stock for product " + name);
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public boolean hasEnoughStock(Integer quantity) {
+        return this.stockQuantity >= quantity;
+    }
 }
