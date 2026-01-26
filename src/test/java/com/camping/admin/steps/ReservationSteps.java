@@ -2,7 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.steps.client.AuthClient;
 import com.camping.admin.steps.client.ReservationAdminClient;
 import com.camping.admin.steps.fatory.CampsiteTestdataFactory;
 import com.camping.admin.steps.fatory.ReservationTestdataFactory;
@@ -29,9 +28,6 @@ public class ReservationSteps {
 
     @Autowired
     private TestContext testContext;
-
-    @Autowired
-    private AuthClient authClient;
 
     @Autowired
     private ReservationAdminClient reservationAdminClient;
