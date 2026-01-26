@@ -47,7 +47,7 @@ public class ReservationSteps extends CucumberSpringConfiguration {
         this.adminToken = jwtService.generateToken(adminUsername);
     }
 
-    @Given("사용자가 {long}번 사이트 예약을 했다")
+    @Given("사용자가 {long}번 사이트가 예약 되어있다")
     public void 사용자가_사이트를_예약했다(Long siteNo) {
         this.savedReservation = reservationRepository.findById(siteNo).orElseThrow(RuntimeException::new);
     }
