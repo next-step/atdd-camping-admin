@@ -48,7 +48,7 @@ public class ReservationAdminController {
 
     @PatchMapping("/{reservationId}/status")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
-            @PathVariable Long reservationId,
+            @PathVariable("reservationId") Long reservationId,
             @RequestBody Map<String, Object> body) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
