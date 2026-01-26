@@ -110,6 +110,11 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         assertDbStatus(ReservationStatus.CONFIRMED);
     }
 
+    @Then("예약은 확정 상태를 유지한다")
+    public void 예약은_확정_상태를_유지한다() {
+        assertDbStatus(ReservationStatus.CONFIRMED);
+    }
+
     @Then("예약은 취소 상태다")
     public void 예약은_취소_상태다() {
         var response = scenarioContext.getResponse();
@@ -139,6 +144,11 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         if (response.statusCode() == 200) {
             assertThat(response.jsonPath().getString("status")).isEqualTo("CHECKED_OUT");
         }
+        assertDbStatus(ReservationStatus.CHECKED_OUT);
+    }
+
+    @Then("예약은 체크아웃 상태를 유지한다")
+    public void 예약은_체크아웃_상태를_유지한다() {
         assertDbStatus(ReservationStatus.CHECKED_OUT);
     }
 
