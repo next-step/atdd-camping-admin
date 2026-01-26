@@ -1,4 +1,4 @@
-package com.camping.admin.steps.fatory;
+package com.camping.admin.fatory;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;

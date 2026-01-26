@@ -1,11 +1,11 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.client.ReservationAdminClient;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.steps.client.ReservationAdminClient;
-import com.camping.admin.steps.fatory.CampsiteTestdataFactory;
-import com.camping.admin.steps.fatory.ReservationTestdataFactory;
-import com.camping.admin.steps.utils.DatabaseCleaner;
+import com.camping.admin.fatory.CampsiteTestdataFactory;
+import com.camping.admin.fatory.ReservationTestdataFactory;
+import com.camping.admin.utils.DatabaseCleaner;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;

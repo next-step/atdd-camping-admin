@@ -1,4 +1,4 @@
-package com.camping.admin.steps.utils;
+package com.camping.admin.utils;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

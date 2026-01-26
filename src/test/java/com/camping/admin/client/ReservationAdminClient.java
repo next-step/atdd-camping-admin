@@ -1,4 +1,4 @@
-package com.camping.admin.steps.client;
+package com.camping.admin.client;
 
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
