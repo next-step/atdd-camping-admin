@@ -26,13 +26,8 @@ public class RentalSteps {
     // === Given: 상품 설정 ===
 
     @Given("대여 가능한 상품 {string}이 존재한다")
-    public void 대여_가능한_상품이_존재한다(String productName) {
-        this.productId = TestData.getProductId(productName);
-        TestContext.setProductId(this.productId);
-    }
-
     @Given("판매 전용 상품 {string}이 존재한다")
-    public void 판매_전용_상품이_존재한다(String productName) {
+    public void 상품이_존재한다(String productName) {
         this.productId = TestData.getProductId(productName);
         TestContext.setProductId(this.productId);
     }
@@ -49,77 +44,40 @@ public class RentalSteps {
 
     @When("관리자가 해당 고객에게 {string} {int}개를 대여하면")
     public void 관리자가_해당_고객에게_대여하면(String productName, int quantity) {
-        this.productId = TestData.getProductId(productName);
-        this.quantity = quantity;
-        Response response = RentalApi.대여를_생성한다(
-                TestContext.getAdminToken(),
-                productId,
-                quantity,
-                TestContext.getReservationId()
-        );
-        TestContext.setLastResponse(response);
+        대여를_실행한다(TestData.getProductId(productName), quantity, TestContext.getReservationId());
     }
 
     @When("관리자가 워크인 고객에게 {string} {int}개를 대여하면")
-    public void 관리자가_워크인_고객에게_대여하면(String productName, int quantity) {
-        this.productId = TestData.getProductId(productName);
-        this.quantity = quantity;
-        Response response = RentalApi.대여를_생성한다(
-                TestContext.getAdminToken(),
-                productId,
-                quantity,
-                null  // 워크인은 예약 없음
-        );
-        TestContext.setLastResponse(response);
-    }
-
-    @When("관리자가 존재하지 않는 상품으로 대여하면")
-    public void 관리자가_존재하지_않는_상품으로_대여하면() {
-        this.productId = TestData.PRODUCT_NOT_FOUND_ID;
-        this.quantity = 1;
-        Response response = RentalApi.대여를_생성한다(
-                TestContext.getAdminToken(),
-                productId,
-                quantity,
-                null
-        );
-        TestContext.setLastResponse(response);
+    @When("관리자가 {string} {int}개를 대여하면")
+    public void 관리자가_대여하면(String productName, int quantity) {
+        대여를_실행한다(TestData.getProductId(productName), quantity, null);
     }
 
     @When("관리자가 {string}으로 대여하면")
     public void 관리자가_상품으로_대여하면(String productName) {
-        this.productId = TestData.getProductId(productName);
-        this.quantity = 1;
-        Response response = RentalApi.대여를_생성한다(
-                TestContext.getAdminToken(),
-                productId,
-                quantity,
-                null
-        );
-        TestContext.setLastResponse(response);
+        대여를_실행한다(TestData.getProductId(productName), 1, null);
     }
 
-    @When("관리자가 {string} {int}개를 대여하면")
-    public void 관리자가_수량만큼_대여하면(String productName, int quantity) {
-        this.productId = TestData.getProductId(productName);
+    @When("관리자가 존재하지 않는 상품으로 대여하면")
+    public void 관리자가_존재하지_않는_상품으로_대여하면() {
+        대여를_실행한다(TestData.PRODUCT_NOT_FOUND_ID, 1, null);
+    }
+
+    @When("관리자가 존재하지 않는 예약으로 대여하면")
+    public void 관리자가_존재하지_않는_예약으로_대여하면() {
+        대여를_실행한다(productId, 1, TestData.RESERVATION_NOT_FOUND_ID);
+    }
+
+    // === Private Helper ===
+
+    private void 대여를_실행한다(Long productId, int quantity, Long reservationId) {
+        this.productId = productId;
         this.quantity = quantity;
         Response response = RentalApi.대여를_생성한다(
                 TestContext.getAdminToken(),
                 productId,
                 quantity,
-                null
-        );
-        TestContext.setLastResponse(response);
-    }
-
-    @When("관리자가 존재하지 않는 예약으로 대여하면")
-    public void 관리자가_존재하지_않는_예약으로_대여하면() {
-        this.quantity = 1;
-        Response response = RentalApi.대여를_생성한다(
-                TestContext.getAdminToken(),
-                productId,
-                quantity,
-                TestData.RESERVATION_NOT_FOUND_ID
+                reservationId
         );
         TestContext.setLastResponse(response);
     }
