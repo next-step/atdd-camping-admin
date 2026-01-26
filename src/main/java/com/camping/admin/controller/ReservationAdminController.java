@@ -1,7 +1,9 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.exception.BusinessException;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,18 +54,22 @@ public class ReservationAdminController {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         }
 
+        if (reservation.isCanceled()) {
+            throw new BusinessException("이미 취소된 예약입니다.", HttpStatus.BAD_REQUEST);
+        }
+
         Object statusObj = body.get("status");
         if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
-        } else {
-            String statusValue = statusObj.toString();
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
-            } else {
-                // 단순히 그대로 대입
-                reservation.setStatus(statusValue);
-            }
+            throw new BusinessException("상태값은 필수입니다.", HttpStatus.BAD_REQUEST);
         }
+
+        String statusValue = statusObj.toString();
+        if (statusValue.isBlank()) {
+            throw new BusinessException("상태값은 필수입니다.", HttpStatus.BAD_REQUEST);
+        }
+
+        ReservationStatus newStatus = ReservationStatus.valueOf(statusValue);
+        reservation.setStatus(newStatus);
 
         reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
