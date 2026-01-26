@@ -1,7 +1,7 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.client.AuthClient;
-import com.camping.admin.utils.DatabaseCleaner;
+import com.camping.admin.steps.client.AuthClient;
+import com.camping.admin.steps.utils.DatabaseCleaner;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import org.springframework.beans.factory.annotation.Autowired;
