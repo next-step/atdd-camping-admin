@@ -71,4 +71,16 @@ public class TestContext {
     public static Long getProductId() {
         return get(PRODUCT_ID, Long.class);
     }
+
+    // === 편의 메서드: Quantity ===
+
+    private static final String QUANTITY = "quantity";
+
+    public static void setQuantity(Integer quantity) {
+        set(QUANTITY, quantity);
+    }
+
+    public static Integer getQuantity() {
+        return get(QUANTITY, Integer.class);
+    }
 }

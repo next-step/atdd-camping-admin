@@ -13,9 +13,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RentalSteps {
 
-    private Long productId;
-    private Integer quantity;
-
     // === Background ===
 
     @Given("관리자가 로그인되어 있다")
@@ -28,8 +25,7 @@ public class RentalSteps {
     @Given("대여 가능한 상품 {string}이 존재한다")
     @Given("판매 전용 상품 {string}이 존재한다")
     public void 상품이_존재한다(String productName) {
-        this.productId = TestData.getProductId(productName);
-        TestContext.setProductId(this.productId);
+        TestContext.setProductId(TestData.getProductId(productName));
     }
 
     // === Given: 예약 설정 ===
@@ -65,14 +61,14 @@ public class RentalSteps {
 
     @When("관리자가 존재하지 않는 예약으로 대여하면")
     public void 관리자가_존재하지_않는_예약으로_대여하면() {
-        대여를_실행한다(productId, 1, TestData.RESERVATION_NOT_FOUND_ID);
+        대여를_실행한다(TestContext.getProductId(), 1, TestData.RESERVATION_NOT_FOUND_ID);
     }
 
     // === Private Helper ===
 
     private void 대여를_실행한다(Long productId, int quantity, Long reservationId) {
-        this.productId = productId;
-        this.quantity = quantity;
+        TestContext.setProductId(productId);
+        TestContext.setQuantity(quantity);
         Response response = RentalApi.대여를_생성한다(
                 TestContext.getAdminToken(),
                 productId,
@@ -88,8 +84,8 @@ public class RentalSteps {
     public void 대여가_성공적으로_생성된다() {
         Response response = TestContext.getLastResponse();
         assertThat(response.statusCode()).isEqualTo(201);
-        assertThat(response.jsonPath().getLong("productId")).isEqualTo(productId);
-        assertThat(response.jsonPath().getInt("quantity")).isEqualTo(quantity);
+        assertThat(response.jsonPath().getLong("productId")).isEqualTo(TestContext.getProductId());
+        assertThat(response.jsonPath().getInt("quantity")).isEqualTo(TestContext.getQuantity());
         assertThat(response.jsonPath().getBoolean("isReturned")).isFalse();
     }
 
