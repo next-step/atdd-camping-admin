@@ -1,10 +1,10 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.utils.DatabaseCleaner;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.utils.DatabaseCleaner;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
