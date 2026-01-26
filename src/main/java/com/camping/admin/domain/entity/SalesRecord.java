@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.vo.TotalAmount;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -24,16 +25,24 @@ public class SalesRecord {
     @Column(nullable = false)
     private Integer quantity;
 
-    @Column(name = "total_price", nullable = false)
-    private BigDecimal totalPrice;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "total_price", nullable = false))
+    private TotalAmount totalAmount;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public SalesRecord(Product product, Integer quantity, BigDecimal totalPrice) {
+    public SalesRecord(Product product, Integer quantity) {
+        product.validateSellable();
+        product.decreaseStock(quantity);
+
         this.product = product;
         this.quantity = quantity;
-        this.totalPrice = totalPrice;
+        this.totalAmount = new TotalAmount(product.getPrice(), quantity);
         this.createdAt = LocalDateTime.now();
+    }
+
+    public BigDecimal getTotalPrice() {
+        return totalAmount.getValue();
     }
 }

@@ -14,11 +14,7 @@ public class RentalResponse {
     private Boolean isReturned;
     private LocalDateTime createdAt;
 
-    public static RentalResponse from(RentalRecord rentalRecord) {
-        return new RentalResponse(rentalRecord);
-    }
-
-    private RentalResponse(RentalRecord rentalRecord) {
+    public RentalResponse(RentalRecord rentalRecord) {
         this.id = rentalRecord.getId();
         this.reservationId = rentalRecord.getReservation() != null ? rentalRecord.getReservation().getId() : null;
         this.productId = rentalRecord.getProduct().getId();

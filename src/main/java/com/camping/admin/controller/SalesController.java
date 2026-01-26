@@ -3,6 +3,7 @@ package com.camping.admin.controller;
 import com.camping.admin.dto.ProcessSaleRequest;
 import com.camping.admin.dto.SalesRecordResponse;
 import com.camping.admin.service.SalesService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,8 +26,8 @@ public class SalesController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<SalesRecordResponse>> listSales() {
-        java.util.List<SalesRecordResponse> records = salesService.findRecentSales(10);
+    public ResponseEntity<List<SalesRecordResponse>> listSales() {
+        List<SalesRecordResponse> records = salesService.findRecentSales(10);
         return ResponseEntity.ok(records);
     }
 }
