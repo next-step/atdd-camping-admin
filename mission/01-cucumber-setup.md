@@ -2,7 +2,7 @@
 
 ## 코드 리뷰
 > PR 링크:
-> **[]()**
+> **[https://github.com/next-step/atdd-camping-admin/pull/56](https://github.com/next-step/atdd-camping-admin/pull/56)**
 
 ## 요구사항
 
