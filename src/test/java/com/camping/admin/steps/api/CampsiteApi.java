@@ -27,4 +27,11 @@ public class CampsiteApi {
                 .then().log().all()
                 .extract();
     }
+    public ExtractableResponse<Response> 캠프사이트_목록_조회_요청(String accessToken) {
+        return RestAssured.given().log().all()
+                .header("Authorization", "Bearer " + accessToken)
+                .when().get("/admin/campsites")
+                .then().log().all()
+                .extract();
+    }
 }

@@ -1,0 +1,52 @@
+package com.camping.admin.service;
+
+import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.dto.ReservationResponse;
+import com.camping.admin.repository.ReservationRepository;
+import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class ReservationService {
+
+    private final ReservationRepository reservationRepository;
+
+    @Transactional
+    public ReservationResponse updateStatus(Long reservationId, String status) {
+        Reservation reservation = findById(reservationId);
+
+        reservation.changeStatus(status);
+        return ReservationResponse.from(reservation);
+    }
+
+    public @Nullable Reservation findActiveReservation(final Long reservationId) {
+        if (reservationId == null) {
+            return null;
+        }
+
+        final Reservation reservation = findById(reservationId);
+
+        if (reservation.isCancelled()) {
+            throw new IllegalStateException("Cannot create rental for a cancelled reservation.");
+        }
+
+        return reservation;
+    }
+
+    private Reservation findById(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+    }
+
+    public List<ReservationResponse> getAll() {
+        return reservationRepository.findAll().stream()
+                .map(ReservationResponse::from)
+                .toList();
+    }
+}

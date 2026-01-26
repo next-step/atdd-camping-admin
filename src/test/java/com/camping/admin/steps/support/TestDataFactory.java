@@ -37,19 +37,20 @@ public class TestDataFactory {
         return jwtService.generateToken(adminUsername);
     }
 
-    public Product createProduct(String name, int stockQuantity, BigDecimal price, ProductType productType) {
-        return productRepository.save(new Product(name, stockQuantity, price, productType));
+    public Long createProduct(String name, int stockQuantity, BigDecimal price, ProductType productType) {
+        return productRepository.save(new Product(name, stockQuantity, price, productType)).getId();
     }
 
-    public Campsite createCampsite(String siteNumber, String description, int maxPeople) {
-        return campsiteRepository.save(new Campsite(siteNumber, description, maxPeople));
+    public Long createCampsite(String siteNumber, String description, int maxPeople) {
+        return campsiteRepository.save(new Campsite(siteNumber, description, maxPeople)).getId();
     }
 
-    public Reservation createReservation(String customerName, String status) {
+    public Long createReservation(String customerName, String status) {
         String siteNumber = "A" + System.nanoTime();
-        Campsite campsite = createCampsite(siteNumber, "Test Site", 4);
+        Long campsiteId = createCampsite(siteNumber, "Test Site", 4);
+        Campsite campsite = campsiteRepository.findById(campsiteId).orElseThrow();
         Reservation reservation = new Reservation(customerName, LocalDate.now(), LocalDate.now().plusDays(1), campsite);
-        reservation.setStatus(status);
-        return reservationRepository.save(reservation);
+        reservation.changeStatus(status);
+        return reservationRepository.save(reservation).getId();
     }
 }

@@ -1,7 +1,7 @@
 package com.camping.admin.controller;
 
-import com.camping.admin.dto.CreateRentalRequest;
-import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.controller.dto.CreateRentalRequest;
+import com.camping.admin.service.dto.RentalResponse;
 import com.camping.admin.service.RentalService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +25,7 @@ public class RentalAdminController {
 
     @PostMapping
     public ResponseEntity<RentalResponse> createRental(@Validated @RequestBody CreateRentalRequest request) {
-        RentalResponse createdRental = rentalService.createRental(
-                request.getProductId(),
-                request.getQuantity(),
-                request.getReservationId()
-        );
+        RentalResponse createdRental = rentalService.createRental(request.toServiceDto());
         return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
     }
 

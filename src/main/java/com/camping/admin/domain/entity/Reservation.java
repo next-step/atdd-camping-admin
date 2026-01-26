@@ -3,7 +3,6 @@ package com.camping.admin.domain.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +10,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "reservations")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Reservation {
     
@@ -57,4 +55,16 @@ public class Reservation {
         this.endDate = endDate;
         this.campsite = campsite;
     }
+
+    public boolean isCancelled() {
+        return this.status.equals("CANCELLED");
+    }
+
+    public void changeStatus(String status) {
+        if (status == null || status.isBlank()) {
+            throw new IllegalArgumentException("Status must not be blank.");
+        }
+        this.status = status;
+    }
+
 }

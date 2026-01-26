@@ -25,8 +25,12 @@ public class ConsoleProductController {
     }
 
     @GetMapping
-    public String list(Model model) {
-        model.addAttribute("products", productRepository.findAll());
+    public String list(@RequestParam(required = false) String q, Model model) {
+        if (q != null && !q.isBlank()) {
+            model.addAttribute("products", productRepository.findByNameContaining(q));
+        } else {
+            model.addAttribute("products", productRepository.findAll());
+        }
         return "products/list";
     }
 

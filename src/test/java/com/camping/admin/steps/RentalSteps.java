@@ -1,28 +1,21 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Campsite;
-import com.camping.admin.domain.entity.Product;
-import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.repository.CampsiteRepository;
-import com.camping.admin.repository.ProductRepository;
-import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.steps.api.ProductApi;
 import com.camping.admin.steps.api.RentalApi;
 import com.camping.admin.steps.context.TestContext;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,13 +26,13 @@ public class RentalSteps {
     private int port;
 
     @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
     private TestContext testContext;
 
     @Autowired
     private RentalApi rentalApi;
+
+    @Autowired
+    private ProductApi productApi;
 
     @Before
     public void setup() {
@@ -88,7 +81,14 @@ public class RentalSteps {
 
     @Then("{string} 상품의 재고는 {int}개가 된다")
     public void productStockShouldBe(String productName, int expectedStock) {
-        Product product = productRepository.findById(testContext.getLastProductId()).orElseThrow();
-        assertThat(product.getStockQuantity()).isEqualTo(expectedStock);
+        ExtractableResponse<Response> response = productApi.상품_목록_조회_요청(testContext.getAdminToken());
+        List<Map<String, Object>> products = response.jsonPath().getList("");
+
+        Map<String, Object> product = products.stream()
+                .filter(p -> p.get("id").toString().equals(testContext.getLastProductId().toString()))
+                .findFirst()
+                .orElseThrow();
+
+        assertThat(product.get("stockQuantity")).isEqualTo(expectedStock);
     }
 }

@@ -1,14 +1,19 @@
 package com.camping.admin.controller;
 
+import com.camping.admin.controller.dto.CreateCampsiteRequest;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.repository.CampsiteRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.camping.admin.service.CampsiteService;
+import com.camping.admin.service.dto.CampsiteResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/admin/campsites")
@@ -16,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class CampsiteAdminController {
 
     private final CampsiteRepository campsiteRepository;
+    private final CampsiteService campsiteService;
 
     @GetMapping
     public ResponseEntity<List<Campsite>> getAllCampsites() {
@@ -38,60 +44,9 @@ public class CampsiteAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        String siteNumber;
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v == null) {
-                siteNumber = null;
-            } else {
-                siteNumber = v.toString();
-            }
-        } else {
-            siteNumber = null;
-        }
-
-        if (siteNumber == null || siteNumber.isBlank()) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        String description;
-        if (body.containsKey("description")) {
-            Object d = body.get("description");
-            description = d == null ? "" : d.toString();
-        } else {
-            description = "";
-        }
-
-        Integer maxPeople;
-        if (body.containsKey("maxPeople")) {
-            Object m = body.get("maxPeople");
-            if (m == null) {
-                maxPeople = null;
-            } else if (m instanceof Number) {
-                maxPeople = ((Number) m).intValue();
-            } else {
-                try {
-                    maxPeople = Integer.valueOf(m.toString());
-                } catch (Exception e) {
-                    maxPeople = null;
-                }
-            }
-        } else {
-            maxPeople = null;
-        }
-
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        }
+    public ResponseEntity<CampsiteResponse> createCampsite(@RequestBody @Valid CreateCampsiteRequest request) {
+        CampsiteResponse response = campsiteService.create(request.toCommand());
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
