@@ -2,7 +2,7 @@
 
 ## 미션 진행 단계별 문서
 - **[1단계 - Cucumber 적용하기](./mission/01-cucumber-setup.md)**
-- **[2단계 - 중복 제거와 구조화 적용하기]()**
+- **[2단계 - 중복 제거와 구조화](./mission/02-deduplication-structure.md)**
 - **[3단계 - 인수 테스트와 리팩터링 적용하기]()**
 
 ---
