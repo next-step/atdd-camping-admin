@@ -1,37 +1,22 @@
 package com.camping.admin.steps;
 
+import static com.camping.admin.steps.constant.AllContants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.factory.ReservationFactory;
 import com.camping.admin.support.TestApiSupport;
 import com.camping.admin.api.TestContext;
 import com.camping.admin.support.TestRepositorySupport;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class ReservationSteps {
-
-    public static final String 확정 = "CONFIRMED";
-    public static final String 대기 = "WAITING";
-    public static final String 보류 = "PENDING";
-    public static final String 취소 = "CANCELLED";
-    public static final String 체크인 = "CHECKED_IN";
-    public static final String 체크아웃 = "CHECKED_OUT";
-    public static final String 거절 = "REJECTED";
-    public static final String 이미_취소된_예약 = "이미 취소된 예약";
-    public static final String 체크인된_예약 = "체크인된 예약";
-    public static final String 완료된_예약 = "완료된 예약";
-    public static final String 거절된_예약 = "거절된 예약";
-    public static final String 찾을_수_없다 = "찾을 수 없다";
-    public static final String 필수 = "필수";
 
     @LocalServerPort
     private int port;

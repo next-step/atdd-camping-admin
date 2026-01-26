@@ -1,5 +1,8 @@
 package com.camping.admin.steps;
 
+import static com.camping.admin.steps.constant.AllContants.*;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ProductType;
@@ -8,24 +11,16 @@ import com.camping.admin.factory.ReservationFactory;
 import com.camping.admin.support.TestApiSupport;
 import com.camping.admin.api.TestContext;
 import com.camping.admin.support.TestRepositorySupport;
-import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.http.HttpStatus;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 
 public class RentalSteps {
-
-    public static final String SITE_NUMBER = "A-001";
-    public static final String CONFIRMED = "CONFIRMED";
-
 
     @LocalServerPort
     private int port;
@@ -116,7 +111,7 @@ public class RentalSteps {
     @And("{string} 상품의 재고가 {int}개로 감소한다")
     public void 상품의_재고가_감소한다(String productName, int expectedStock) {
         Product product = repository.product().findByName(productName)
-                .orElseThrow(() -> new AssertionError("상품을 찾을 수 없습니다: " + productName));
+                .orElseThrow(() -> new AssertionError(상품을_찾을_수_없습니다 + productName));
 
         assertThat(product.getStockQuantity())
                 .as("상품 재고")
@@ -126,7 +121,7 @@ public class RentalSteps {
     @And("{string} 상품의 재고는 {int}개로 유지된다")
     public void 상품의_재고가_유지된다(String productName, int expectedStock) {
         Product product = repository.product().findByName(productName)
-                .orElseThrow(() -> new AssertionError("상품을 찾을 수 없습니다: " + productName));
+                .orElseThrow(() -> new AssertionError(상품을_찾을_수_없습니다 + productName));
 
         assertThat(product.getStockQuantity())
                 .as("상품 재고")
@@ -135,22 +130,22 @@ public class RentalSteps {
 
     @Then("재고가 부족하다는 오류가 발생한다")
     public void 재고_부족_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "재고");
+        assertErrorResponse(HttpStatus.CONFLICT, 재고_부족);
     }
 
     @Then("대여 불가 상품이라는 오류가 발생한다")
     public void 대여_불가_상품_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "rental");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 대여_불가_상품);
     }
 
     @Then("상품을 찾을 수 없다는 오류가 발생한다")
     public void 상품을_찾을_수_없음_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "product");
+        assertErrorResponse(HttpStatus.NOT_FOUND, 상품을_찾을_수_없습니다);
     }
 
     @Then("수량은 1개 이상이어야 한다는 오류가 발생한다")
     public void 수량_오류() {
-        assertErrorResponse(HttpStatus.BAD_REQUEST, "수량");
+        assertErrorResponse(HttpStatus.BAD_REQUEST, 수량_오류);
     }
 
     // ==================== Helper Methods ====================
@@ -158,7 +153,7 @@ public class RentalSteps {
     private Long findProductIdByName(String productName) {
         return repository.product().findByName(productName)
                 .map(Product::getId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다: " + productName));
+                .orElseThrow(() -> new IllegalArgumentException(상품을_찾을_수_없습니다 + productName));
     }
 
     private void assertErrorResponse(HttpStatus expectedStatus, String expectedMessagePart) {
