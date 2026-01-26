@@ -6,11 +6,12 @@ import com.camping.admin.domain.entity.Reservation;
 import io.cucumber.spring.ScenarioScope;
 import io.restassured.response.ExtractableResponse;
 import io.restassured.response.Response;
-import java.util.HashMap;
-import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 @Getter

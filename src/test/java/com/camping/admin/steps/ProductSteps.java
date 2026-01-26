@@ -1,21 +1,21 @@
 package com.camping.admin.steps;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
-import java.math.BigDecimal;
-import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ProductSteps {
 
