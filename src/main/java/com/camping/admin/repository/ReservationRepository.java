@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
@@ -31,4 +32,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("from") LocalDate from,
             @Param("to") LocalDate to
     );
+
+    @Query("SELECT r FROM Reservation r WHERE r.confirmationCode.value = :code")
+    Optional<Reservation> findByConfirmationCode(@Param("code") String code);
 }

@@ -4,6 +4,7 @@ import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,4 +28,7 @@ public class ReservationService {
         return reservation;
     }
 
+    public Optional<Reservation> findByConfirmationCode(String code) {
+        return reservationRepository.findByConfirmationCode(code);
+    }
 }

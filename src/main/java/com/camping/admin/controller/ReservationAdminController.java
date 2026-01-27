@@ -33,4 +33,12 @@ public class ReservationAdminController {
         Reservation updated = reservationService.updateStatus(reservationId, request.getStatus());
         return ResponseEntity.ok(ReservationResponse.from(updated));
     }
+
+    @GetMapping("/lookup")
+    public ResponseEntity<ReservationResponse> findByConfirmationCode(@RequestParam String code) {
+        return reservationService.findByConfirmationCode(code)
+                .map(ReservationResponse::from)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }

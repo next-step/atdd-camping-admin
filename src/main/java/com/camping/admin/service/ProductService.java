@@ -37,4 +37,5 @@ public class ProductService {
         product.update(name, stockQuantity, price, productType);
         return product;
     }
+
 }
