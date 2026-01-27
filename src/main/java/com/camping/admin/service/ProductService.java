@@ -44,7 +44,7 @@ public class ProductService {
         return product;
     }
 
-    private Product findById(Long productId) {
+    public Product findById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
     }
