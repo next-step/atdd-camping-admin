@@ -69,8 +69,15 @@ public class ReservationSteps {
 
     @Given("사이트 번호가 {string}인 캠핑장에 {string} 이름으로 확정된 예약이 있다")
     public void 캠핑장에_확정된_예약이_있다(String siteNumber, String customerName) {
-        Campsite campsite = testContext.getCampsite(siteNumber);
-        Reservation reservation = reservationTestdataFactory.createReservationWithStatus(customerName, campsite, CONFIRMED.name());
+        var campsite = testContext.getCampsite(siteNumber);
+        var reservation = reservationTestdataFactory.createReservationWithStatus(customerName, campsite, CONFIRMED.name());
+        testContext.addReservation(customerName, reservation);
+    }
+
+    @Given("사이트 번호가 {string}인 캠핑장에 {string} 고객이 {string} 상태로 예약되어 있다")
+    public void 캠핑장에_고객의_이름으로_예약이_되어있다(String siteNumber, String customerName, String reservationStatus) {
+        var campsite = testContext.getCampsite(siteNumber);
+        var reservation = reservationTestdataFactory.createReservationWithStatus(customerName, campsite, reservationStatus);
         testContext.addReservation(customerName, reservation);
     }
 
@@ -80,26 +87,36 @@ public class ReservationSteps {
 
     @When("관리자가 {string}의 예약을 확정하면")
     public void 관리자가_고객의_예약을_확정하면(String customerName) {
-        Map<String, Object> requestBody = Map.of("status", CONFIRMED.name());
         var reservationId = testContext.getReservation(customerName).getId();
         var authToken = testContext.getAuthToken();
-        ExtractableResponse<Response> response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, requestBody);
+
+        var response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, Map.of("status", CONFIRMED.name()));
         testContext.setResponse(response);
     }
 
     @When("관리자가 존재하지 않는 예약\\(ID {long}\\)의 상태를 확정하려고 하면")
     public void 관리자가_존재하지_않는_예약의_상태를_확정하려고_하면(long reservationId) {
-        Map<String, Object> requestBody = Map.of("status", CONFIRMED.name());
         var authToken = testContext.getAuthToken();
-        ExtractableResponse<Response> response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, requestBody);
+
+        var response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, Map.of("status", CONFIRMED.name()));
         testContext.setResponse(response);
     }
 
     @When("관리자가 잘못된 본문\\({string}\\)으로 {string}의 예약 상태 변경을 요청하면")
-    public void 관리자가_잘못된_본문으로_예약_상태를_변경을_요청하면(String invalidBody, String customerName) {
+    public void 관리자가_잘못된_본문으로_예약_상태_변경을_요청하면(String invalidBody, String customerName) {
         var reservationId = testContext.getReservation(customerName).getId();
         var authToken = testContext.getAuthToken();
-        ExtractableResponse<Response> response = reservationAdminClient.잘못된_본문으로_예약_상태를_변경한다(authToken, reservationId, invalidBody);
+
+        var response = reservationAdminClient.잘못된_본문으로_예약_상태를_변경한다(authToken, reservationId, invalidBody);
+        testContext.setResponse(response);
+    }
+
+    @When("관리자가 {string}의 예약 상태를 {string}으로 변경하면")
+    public void 관리자가_상태를_변경하면(String customerName, String newStatus) {
+        var authToken = testContext.getAuthToken();
+        var reservationId = testContext.getReservation(customerName).getId();
+
+        var response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, Map.of("status", newStatus));
         testContext.setResponse(response);
     }
 
