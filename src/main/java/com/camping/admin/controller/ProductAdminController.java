@@ -2,7 +2,10 @@ package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.dto.CreateProductRequest;
+import com.camping.admin.dto.ProductResponse;
 import com.camping.admin.repository.ProductRepository;
+import com.camping.admin.service.ProductService;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 public class ProductAdminController {
 
     private final ProductRepository productRepository;
+    private final ProductService productService;
 
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
@@ -34,73 +38,9 @@ public class ProductAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody Map<String, Object> body) {
-        String name;
-        if (body.containsKey("name")) {
-            Object v = body.get("name");
-            name = v == null ? null : v.toString();
-        } else {
-            name = null;
-        }
-
-        Integer stockQuantity;
-        if (body.containsKey("stockQuantity")) {
-            Object v = body.get("stockQuantity");
-            if (v instanceof Number) {
-                stockQuantity = ((Number) v).intValue();
-            } else if (v == null) {
-                stockQuantity = 0;
-            } else {
-                try {
-                    stockQuantity = Integer.valueOf(v.toString());
-                } catch (Exception e) {
-                    stockQuantity = 0;
-                }
-            }
-        } else {
-            stockQuantity = 0;
-        }
-
-        BigDecimal price;
-        if (body.containsKey("price")) {
-            Object v = body.get("price");
-            if (v instanceof Number) {
-                price = new BigDecimal(((Number) v).toString());
-            } else if (v == null) {
-                price = BigDecimal.ZERO;
-            } else {
-                try {
-                    price = new BigDecimal(v.toString());
-                } catch (Exception e) {
-                    price = BigDecimal.ZERO;
-                }
-            }
-        } else {
-            price = BigDecimal.ZERO;
-        }
-
-        ProductType productType;
-        if (body.containsKey("productType")) {
-            Object v = body.get("productType");
-            if (v == null) {
-                productType = ProductType.SALE;
-            } else {
-                try {
-                    productType = ProductType.valueOf(v.toString());
-                } catch (Exception e) {
-                    productType = ProductType.SALE;
-                }
-            }
-        } else {
-            productType = ProductType.SALE;
-        }
-
-        Product newProduct = new Product(name, stockQuantity, price, productType);
-        Product saved = productRepository.save(newProduct);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody CreateProductRequest request) {
+        Product product = productService.createProduct(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(ProductResponse.from(product));
     }
 
     @PutMapping("/{productId}")
