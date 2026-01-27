@@ -2,14 +2,13 @@ package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
-@Setter
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,4 +38,23 @@ public class Product {
         this.productType = productType;
     }
 
+    public boolean isRentalType() {
+        return this.productType == ProductType.RENTAL;
+    }
+
+    public void decreaseStock(Integer quantity) {
+        if (!isRentalType()) {
+            throw new IllegalArgumentException("Product is not a rental item.");
+        }
+
+        if (this.stockQuantity < quantity) {
+            throw new IllegalStateException("Not enough stock for product " + name);
+        }
+
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(Integer quantity) {
+        this.stockQuantity += quantity;
+    }
 }
