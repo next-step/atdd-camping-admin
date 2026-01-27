@@ -1,5 +1,6 @@
 package com.camping.admin.support;
 
+import com.camping.admin.dto.CreateProductRequest;
 import com.camping.admin.dto.UpdateReservationStatusRequest;
 import com.camping.admin.security.JwtService;
 import io.cucumber.spring.ScenarioScope;
@@ -57,7 +58,7 @@ public class ApiClient {
                 .get(path);
     }
 
-    public Response post(String path, String body) {
+    public Response post(String path, Object body) {
         initialize();
         return RestAssured.given()
                 .header("Authorization", "Bearer " + adminToken)
