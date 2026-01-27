@@ -2,24 +2,20 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.SalesRecord;
-import com.camping.admin.dto.DailyRevenueReportResponse;
-import com.camping.admin.dto.RangeRevenueReportResponse;
-import com.camping.admin.dto.ProcessSaleRequest;
-import com.camping.admin.dto.RevenueEntryResponse;
-import com.camping.admin.dto.SaleItemResponse;
-import com.camping.admin.dto.SalesRecordResponse;
+import com.camping.admin.dto.*;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.repository.SalesRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,17 +26,16 @@ public class SalesService {
     private final SalesRecordRepository salesRecordRepository;
     private final ReservationRepository reservationRepository; // For reports
     private final RentalRecordRepository rentalRecordRepository; // For reports
-    private final ProductService productService; // To use decreaseStock
 
     @Transactional
     public void processSale(ProcessSaleRequest request) {
         for (SaleItemResponse itemDto : request.getItems()) {
-            productService.decreaseStock(itemDto.getProductId(), itemDto.getQuantity());
-
             Product product = productRepository.findById(itemDto.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + itemDto.getProductId()));
-            
-            BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
+
+            product.decreaseStock(itemDto.getQuantity());
+
+            BigDecimal totalPrice = product.totalPrice(itemDto.getQuantity());
             
             SalesRecord salesRecord = new SalesRecord(product, itemDto.getQuantity(), totalPrice);
             salesRecordRepository.save(salesRecord);
