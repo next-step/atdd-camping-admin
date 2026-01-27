@@ -49,7 +49,7 @@ class ReservationServiceUnitTest {
         // given
         long reservationId = 1L;
         Reservation reservation = new Reservation("테스터", LocalDate.now(), LocalDate.now().plusDays(1), new Campsite());
-        reservation.setStatus(from.name());
+        reservation.setStatus(from);
 
         when(reservationRepository.findById(reservationId))
                 .thenReturn(Optional.of(reservation));
@@ -80,7 +80,7 @@ class ReservationServiceUnitTest {
         // given
         long reservationId = 1L;
         Reservation reservation = new Reservation("테스터", LocalDate.now(), LocalDate.now().plusDays(1), new Campsite());
-        reservation.setStatus(from.name());
+        reservation.setStatus(from);
 
         when(reservationRepository.findById(reservationId))
                 .thenReturn(Optional.of(reservation));
