@@ -1,16 +1,8 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ReservationStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import com.camping.admin.exception.InvalidStatusTransitionException;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -69,10 +61,11 @@ public class Reservation {
     }
 
     public void updateStatus(String status) {
+        ReservationStatus oldStatus = ReservationStatus.valueOf(this.status);
         ReservationStatus newStatus = ReservationStatus.valueOf(status);
 
-        if(this.status == ReservationStatus.CANCELLED.name()) {
-            throw new IllegalStateException("이미 취소된 예약은 상태를 변경할 수 없습니다.");
+        if (!oldStatus.canTransitionTo(newStatus)) {
+            throw new InvalidStatusTransitionException(oldStatus, newStatus);
         }
 
         this.status = newStatus.name();
