@@ -16,17 +16,17 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r FROM Reservation r WHERE r.campsite.id = :campsiteId " +
            "AND r.status != 'CANCELLED' " +
-           "AND (r.startDate < :endDate AND r.endDate > :startDate)")
+           "AND (r.timing.stayPeriod.startDate < :endDate AND r.timing.stayPeriod.endDate > :startDate)")
     List<Reservation> findOverlappingReservations(
         @Param("campsiteId") Long campsiteId,
         @Param("startDate") LocalDate startDate,
         @Param("endDate") LocalDate endDate
     );
 
-    @Query("SELECT r FROM Reservation r WHERE r.reservationDate = :date")
+    @Query("SELECT r FROM Reservation r WHERE r.timing.reservationDate = :date")
     List<Reservation> findByReservationDate(@Param("date") LocalDate date);
 
-    @Query("SELECT r FROM Reservation r WHERE r.reservationDate >= :from AND r.reservationDate <= :to")
+    @Query("SELECT r FROM Reservation r WHERE r.timing.reservationDate >= :from AND r.timing.reservationDate <= :to")
     List<Reservation> findByReservationDateBetween(
             @Param("from") LocalDate from,
             @Param("to") LocalDate to

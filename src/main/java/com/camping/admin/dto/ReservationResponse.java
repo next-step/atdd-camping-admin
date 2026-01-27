@@ -24,7 +24,7 @@ public class ReservationResponse {
         this.customerName = reservation.getCustomerName();
         this.startDate = reservation.getStartDate();
         this.endDate = reservation.getEndDate();
-        this.status = reservation.getStatus();
+        this.status = String.valueOf(reservation.getStatus().name());
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
     }

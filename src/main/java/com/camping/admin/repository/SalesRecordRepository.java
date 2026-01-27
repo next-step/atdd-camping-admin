@@ -21,4 +21,7 @@ public interface SalesRecordRepository extends JpaRepository<SalesRecord, Long> 
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    @Query("SELECT s FROM SalesRecord s order by s.createdAt desc limit :limit")
+    List<SalesRecord> findRecentSalesRecords(int limit);
 }
