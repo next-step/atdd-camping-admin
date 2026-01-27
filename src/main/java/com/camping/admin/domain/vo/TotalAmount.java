@@ -1,5 +1,6 @@
 package com.camping.admin.domain.vo;
 
+import com.camping.admin.domain.exception.CommonErrorCode;
 import jakarta.persistence.Embeddable;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
@@ -23,10 +24,10 @@ public class TotalAmount {
 
     private static BigDecimal calculateTotal(BigDecimal price, int quantity) {
         if (price == null) {
-            throw new IllegalArgumentException("가격은 필수입니다");
+            throw CommonErrorCode.REQUIRED.withDomain("가격");
         }
         if (quantity < 1) {
-            throw new IllegalArgumentException("수량은 1 이상이어야 합니다");
+            throw CommonErrorCode.MIN_VALUE.withDomain("수량", 1);
         }
         return price.multiply(BigDecimal.valueOf(quantity));
     }
