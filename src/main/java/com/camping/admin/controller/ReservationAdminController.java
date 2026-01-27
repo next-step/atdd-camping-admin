@@ -1,6 +1,7 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.dto.ReservationResponse;
 import com.camping.admin.repository.ReservationRepository;
 import java.util.ArrayList;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/admin/reservations")
@@ -46,7 +48,10 @@ public class ReservationAdminController {
             @PathVariable Long reservationId,
             @RequestBody Map<String, Object> body) {
         Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "Cannot find reservation with id: " + reservationId
+                ));
 
         if (body == null || body.isEmpty()) {
             return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
@@ -54,18 +59,26 @@ public class ReservationAdminController {
 
         Object statusObj = body.get("status");
         if (statusObj == null) {
-            // 상태값이 없으면 아무 것도 하지 않음
+            return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
         } else {
             String statusValue = statusObj.toString();
-            if (statusValue.isBlank()) {
-                // 빈 문자열이면 기존 값 유지
+            if (statusValue.isBlank() || !isValidStatus(statusValue)) {
+                return new ResponseEntity<>(ReservationResponse.from(reservation), HttpStatus.BAD_REQUEST);
             } else {
-                // 단순히 그대로 대입
                 reservation.setStatus(statusValue);
             }
         }
 
         reservationRepository.save(reservation);
         return ResponseEntity.ok(ReservationResponse.from(reservation));
+    }
+
+    private boolean isValidStatus(String status) {
+        for (ReservationStatus rs : ReservationStatus.values()) {
+            if (rs.name().equals(status)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

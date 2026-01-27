@@ -1,92 +1,65 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.repository.ReservationRepository;
-import com.camping.admin.security.JwtService;
-import io.cucumber.java.Before;
-import io.cucumber.java.en.Given;
+import com.camping.admin.domain.enums.ReservationStatus;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import static com.camping.admin.TestConstants.예약상태_취소;
-import static org.assertj.core.api.Assertions.assertThat;
-
+/**
+ * 예약 상태 변경 기능의 인수 테스트 Step 정의
+ */
 public class ReservationSteps extends CucumberSpringConfiguration {
 
-    @LocalServerPort
-    private int port;
-
     @Autowired
-    private ReservationRepository reservationRepository;
+    private ReservationTestHelper helper;
 
-    @Autowired
-    private JwtService jwtService;
+    private static final Long 존재하지_않는_예약_ID = 999999L;
+    private static final String EMPTY = "";
 
-    @Value("${admin.username}")
-    private String adminUsername;
+    // ==================== When ====================
 
-    private String adminToken;
-
-    private Reservation savedReservation;
-
-    @Before(order = 0)
-    public void setupRestAssured() {
-        RestAssured.port = port;
+    @When("관리자가 확정된 예약을 {예약상태} 상태로 변경한다")
+    public void 관리자가_확정된_예약을_상태로_변경한다(String status) {
+        helper.확정된_예약을_찾는다();
+        helper.현재_예약의_상태를_변경한다(status);
     }
 
-    @Before(order = 1)
-    public void setupAdminToken() {
-        this.adminToken = jwtService.generateToken(adminUsername);
+    @When("관리자가 존재하지 않는 예약을 {예약상태} 상태로 변경한다")
+    public void 관리자가_존재하지_않는_예약을_상태로_변경한다(String status) {
+        helper.예약_상태를_변경한다(존재하지_않는_예약_ID, status);
     }
 
-    @Given("사용자가 {long}번 사이트가 예약 되어있다")
-    public void 사용자가_사이트를_예약했다(Long siteNo) {
-        this.savedReservation = reservationRepository.findById(siteNo).orElseThrow(RuntimeException::new);
+    @When("관리자가 해당 예약을 {예약상태} 상태로 변경한다")
+    public void 관리자가_해당_예약을_상태로_변경한다(String status) {
+        helper.현재_예약의_상태를_변경한다(status);
     }
 
-    @When("관리자가 해당 사이트 예약을 취소하면")
-    public void 관리자가_해당_사이트_예약을_취소한다() {
-        RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body("{\"status\":\"" + 예약상태_취소 + "\"}")
-                .when()
-                .patch("/admin/reservations/" + savedReservation.getId() + "/status");
+    @When("관리자가 확정된 예약의 상태값을 빈 값으로 예약 상태 변경을 요청한다")
+    public void 관리자가_확정된_예약의_상태값을_빈_값으로_예약_상태_변경을_요청한다() {
+        helper.확정된_예약을_찾는다();
+        helper.현재_예약의_상태를_변경한다(EMPTY);
     }
 
-    @Then("예약이 성공적으로 취소된다")
-    public void 예약이_성공적으로_취소된다() {
-        String status = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .when()
-                .get("/admin/reservations")
-                .then()
-                .statusCode(200)
-                .extract()
-                .jsonPath()
-                .getString("find { it.id == " + savedReservation.getId() + " }.status");
+    // ==================== Then ====================
 
-        assertThat(status).isEqualTo(예약상태_취소);
+    @Then("응답 상태 코드는 {int}이다")
+    public void 응답_상태_코드는_N이다(int expectedStatusCode) {
+        helper.응답_상태_코드를_검증한다(expectedStatusCode);
     }
 
-    @Then("해당 사이트는 다시 예약이 가능하다")
-    public void 해당_사이트는_다시_예약이_가능하다() {
-        Long campsiteId = savedReservation.getCampsite().getId();
-        LocalDate startDate = savedReservation.getStartDate();
-        LocalDate endDate = savedReservation.getEndDate();
-
-        List<Reservation> conflictingReservations = reservationRepository
-                .findOverlappingReservations(campsiteId, startDate, endDate);
-
-        assertThat(conflictingReservations).isEmpty();
+    @Then("예약이 {예약상태}된다")
+    public void 예약이_된다(String status) {
+        helper.예약_상태를_검증한다(status);
     }
+
+    @Then("해당 캠프사이트는 같은 날짜에 다시 예약이 가능하다")
+    public void 해당_캠프사이트는_같은_날짜에_다시_예약이_가능하다() {
+        helper.겹치는_예약이_없는지_검증한다();
+    }
+
+    @Then("예약은 {예약상태} 상태로 유지된다")
+    public void 예약은_상태로_유지된다(String status) {
+        helper.예약_상태를_검증한다(status);
+    }
+
 }
