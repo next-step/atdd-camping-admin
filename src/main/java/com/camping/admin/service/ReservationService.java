@@ -29,7 +29,7 @@ public class ReservationService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationNotFoundException(reservationId));
 
-        ReservationStatus oldStatus = ReservationStatus.valueOf(reservation.getStatus());
+        ReservationStatus oldStatus = reservation.getStatus();
         ReservationStatus newStatus = ReservationStatus.valueOf(status);
 
         reservation.updateStatus(status);
