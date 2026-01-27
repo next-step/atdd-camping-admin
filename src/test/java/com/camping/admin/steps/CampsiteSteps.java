@@ -31,7 +31,8 @@ public class CampsiteSteps {
 
     @When("관리자가 새 캠핑장을 등록한다")
     public void 관리자가새캠핑장을등록한다() {
-        String siteNumber = "B-" + System.currentTimeMillis();
+        // SiteNumber는 A-01 형식이어야 함
+        String siteNumber = "B-" + String.format("%02d", (int) (System.currentTimeMillis() % 100));
         scenario.setCreatedSiteNumber(siteNumber);
         scenario.setLastResponse(helper().createCampsite(siteNumber, "테스트 캠핑장", 4));
     }
