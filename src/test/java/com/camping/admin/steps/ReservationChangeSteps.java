@@ -78,14 +78,34 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         requestStatusChange(ReservationStatus.CANCELLED);
     }
 
-    @When("관리자가 예약을 체크인한다")
-    public void 관리자가_예약을_체크인한다() {
+    @When("관리자가 확정된 예약을 체크인한다")
+    public void 관리자가_확정된_예약을_체크인한다() {
+        setReservationWithStatus(ReservationStatus.CONFIRMED);
         requestStatusChange(ReservationStatus.CHECKED_IN);
     }
 
-    @When("관리자가 예약을 체크아웃한다")
-    public void 관리자가_예약을_체크아웃한다() {
+    @When("관리자가 취소된 예약을 체크인한다")
+    public void 관리자가_취소된_예약을_체크인한다() {
+        setReservationWithStatus(ReservationStatus.CANCELLED);
+        requestStatusChange(ReservationStatus.CHECKED_IN);
+    }
+
+    @When("관리자가 체크인된 예약을 체크아웃한다")
+    public void 관리자가_체크인된_예약을_체크아웃한다() {
+        setReservationWithStatus(ReservationStatus.CHECKED_IN);
         requestStatusChange(ReservationStatus.CHECKED_OUT);
+    }
+
+    @When("관리자가 확정된 예약을 체크아웃한다")
+    public void 관리자가_확정된_예약을_체크아웃한다() {
+        setReservationWithStatus(ReservationStatus.CONFIRMED);
+        requestStatusChange(ReservationStatus.CHECKED_OUT);
+    }
+
+    @When("관리자가 체크아웃된 예약을 취소한다")
+    public void 관리자가_체크아웃된_예약을_취소한다() {
+        setReservationWithStatus(ReservationStatus.CHECKED_OUT);
+        requestStatusChange(ReservationStatus.CANCELLED);
     }
 
     @When("관리자가 존재하지 않는 예약을 취소한다")
@@ -94,8 +114,9 @@ public class ReservationChangeSteps extends CucumberSpringConfiguration {
         requestStatusChange(ReservationStatus.CANCELLED);
     }
 
-    @When("관리자가 예약을 취소한다")
-    public void 관리자가_예약을_취소한다() {
+    @When("관리자가 취소된 예약을 다시 취소한다")
+    public void 관리자가_취소된_예약을_다시_취소한다() {
+        setReservationWithStatus(ReservationStatus.CANCELLED);
         requestStatusChange(ReservationStatus.CANCELLED);
     }
 
