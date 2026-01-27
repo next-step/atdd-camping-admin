@@ -1,10 +1,14 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.dto.CreateProductRequest;
+import com.camping.admin.dto.UpdateProductRequest;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,16 +17,31 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        product.decreaseStock(quantity);
+    public List<Product> findAll() {
+        return productRepository.findAll();
     }
 
     @Transactional
-    public void increaseStock(Long productId, Integer quantity) {
+    public Product createProduct(CreateProductRequest request) {
+        Product newProduct = new Product(
+                request.getName(),
+                request.getStockQuantity(),
+                request.getPrice(),
+                request.getProductType()
+        );
+        return productRepository.save(newProduct);
+    }
+
+    @Transactional
+    public Product updateProduct(Long productId, UpdateProductRequest request) {
         Product product = findById(productId);
-        product.increaseStock(quantity);
+        product.update(
+                request.getName(),
+                request.getStockQuantity(),
+                request.getPrice(),
+                request.getProductType()
+        );
+        return product;
     }
 
     private Product findById(Long productId) {
