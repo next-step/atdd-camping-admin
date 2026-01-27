@@ -20,7 +20,6 @@ import java.util.Map;
 @ScenarioScope
 public class TestContext {
     private String authToken;
-    private Long reservationId;
     private ExtractableResponse<Response> response;
 
     private Map<String, Campsite> campsites = new HashMap<>();
@@ -63,7 +62,6 @@ public class TestContext {
 
     public void addReservation(String customerName, Reservation reservation) {
         reservations.put(customerName, reservation);
-        setReservationId(reservation.getId());
     }
 
     public Reservation getReservation(String customerName) {

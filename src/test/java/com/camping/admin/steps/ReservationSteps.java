@@ -78,10 +78,10 @@ public class ReservationSteps {
     // When - API 행위 실행
     // ==========================================
 
-    @When("관리자가 예약을 확정하면")
-    public void 관리자가_예약을_확정하면() {
+    @When("관리자가 {string}의 예약을 확정하면")
+    public void 관리자가_고객의_예약을_확정하면(String customerName) {
         Map<String, Object> requestBody = Map.of("status", CONFIRMED.name());
-        var reservationId = testContext.getReservationId();
+        var reservationId = testContext.getReservation(customerName).getId();
         var authToken = testContext.getAuthToken();
         ExtractableResponse<Response> response = reservationAdminClient.예약_상태를_변경한다(authToken, reservationId, requestBody);
         testContext.setResponse(response);
@@ -95,9 +95,9 @@ public class ReservationSteps {
         testContext.setResponse(response);
     }
 
-    @When("관리자가 잘못된 본문\\({string}\\)으로 예약 상태 변경을 요청하면")
-    public void 관리자가_잘못된_본문으로_예약_상태를_변경을_요청하면(String invalidBody) {
-        var reservationId = testContext.getReservationId();
+    @When("관리자가 잘못된 본문\\({string}\\)으로 {string}의 예약 상태 변경을 요청하면")
+    public void 관리자가_잘못된_본문으로_예약_상태를_변경을_요청하면(String invalidBody, String customerName) {
+        var reservationId = testContext.getReservation(customerName).getId();
         var authToken = testContext.getAuthToken();
         ExtractableResponse<Response> response = reservationAdminClient.잘못된_본문으로_예약_상태를_변경한다(authToken, reservationId, invalidBody);
         testContext.setResponse(response);
