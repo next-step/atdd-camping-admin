@@ -39,6 +39,7 @@ public class ProductSteps {
 
         Map<String, Object> productRequest = Map.of(
             "name", name,
+            "stockQuantity", 10,
             "productType", type,
             "price", price
         );
