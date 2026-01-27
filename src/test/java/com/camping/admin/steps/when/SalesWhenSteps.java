@@ -1,4 +1,4 @@
-package com.camping.admin.steps;
+package com.camping.admin.steps.when;
 
 import com.camping.admin.support.AuthHelper;
 import com.camping.admin.support.RestAssuredConfig;
@@ -9,15 +9,13 @@ import io.restassured.RestAssured;
 import java.util.List;
 import java.util.Map;
 
-public class SalesSteps {
+public class SalesWhenSteps {
 
     private final SharedState state;
 
-    public SalesSteps(SharedState state) {
+    public SalesWhenSteps(SharedState state) {
         this.state = state;
     }
-
-    // === When ===
 
     @When("해당 상품을 {int}개 판매하면")
     public void 해당_상품을_N개_판매하면(int quantity) {
