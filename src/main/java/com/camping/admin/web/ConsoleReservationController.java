@@ -1,7 +1,7 @@
 package com.camping.admin.web;
 
 import com.camping.admin.dto.ReservationResponse;
-import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.service.ReservationService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,15 +15,15 @@ import java.util.stream.Collectors;
 @RequestMapping("/console/reservations")
 public class ConsoleReservationController {
 
-    private final ReservationRepository reservationRepository;
+    private final ReservationService reservationService;
 
-    public ConsoleReservationController(ReservationRepository reservationRepository) {
-        this.reservationRepository = reservationRepository;
+    public ConsoleReservationController(ReservationService reservationService) {
+        this.reservationService = reservationService;
     }
 
     @GetMapping
     public String list(Model model) {
-        List<ReservationResponse> response = reservationRepository.findAll().stream()
+        List<ReservationResponse> response = reservationService.findAll().stream()
                 .map(ReservationResponse::from)
                 .collect(Collectors.toList());
 
