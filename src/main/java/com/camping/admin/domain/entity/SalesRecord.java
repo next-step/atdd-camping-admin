@@ -1,5 +1,6 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.RevenueSource;
 import com.camping.admin.domain.vo.TotalAmount;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
@@ -12,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "sales_records")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class SalesRecord {
+public class SalesRecord implements RevenueSource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,5 +45,10 @@ public class SalesRecord {
 
     public BigDecimal getTotalPrice() {
         return totalAmount.getValue();
+    }
+
+    @Override
+    public BigDecimal calculateRevenue() {
+        return getTotalPrice();
     }
 }
