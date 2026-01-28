@@ -15,15 +15,22 @@ public class RentalSteps {
     private TestContext context = TestContext.getInstance();
 
     // Given
-    @Given("대여중인 장비 {int}이 있다")
-    public void 대여중인_장비가_있다(int id) {
-        given()
-                .spec(context.getAuthHelper().authorizedSpec())
-                .when()
-                .get("/admin/rentals")
-                .then()
-                .statusCode(200)
-                .body("find { it.id == " + id + " }", notNullValue());
+    @Given("반납할 대여가 등록되어 있다")
+    public void 반납할_대여가_등록되어_있다() {
+        // 새 대여를 등록하고 응답을 저장
+        context.setLastResponse(
+                given()
+                        .spec(context.getAuthHelper().authorizedSpec())
+                        .body(Map.of(
+                                "productId", 4,  // 의자 (RENTAL 타입)
+                                "quantity", 1,
+                                "reservationId", 1
+                        ))
+                        .when()
+                        .post("/admin/rentals")
+                        .then()
+                        .extract().response()
+        );
     }
 
     // When
@@ -63,6 +70,19 @@ public class RentalSteps {
                         .spec(context.getAuthHelper().authorizedSpec())
                         .when()
                         .patch("/admin/rentals/" + id + "/return")
+                        .then()
+                        .extract().response()
+        );
+    }
+
+    @When("관리자가 등록한 대여를 반납 처리한다")
+    public void 관리자가_등록한_대여를_반납_처리한다() {
+        Long createdId = context.getLastResponse().jsonPath().getLong("id");
+        context.setLastResponse(
+                given()
+                        .spec(context.getAuthHelper().authorizedSpec())
+                        .when()
+                        .patch("/admin/rentals/" + createdId + "/return")
                         .then()
                         .extract().response()
         );
