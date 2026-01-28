@@ -15,13 +15,13 @@ public class Hooks {
     }
 
     @Before(order = 1)
+    public void setUp() {
+        TestContext.clear();
+    }
+
+    @Before(order = 2)
     public void setupAdminToken() {
         String token = AuthApi.관리자_토큰을_발급한다();
         TestContext.setAdminToken(token);
-    }
-
-    @After
-    public void cleanup() {
-        TestContext.clear();
     }
 }

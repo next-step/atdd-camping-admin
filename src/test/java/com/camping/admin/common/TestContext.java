@@ -72,6 +72,17 @@ public class TestContext {
         return get(PRODUCT_ID, Long.class);
     }
 
+    // ===== 편의 메서드 : RentalRecord ID =====
+    private static final String RENTAL_RECORD_ID = "rentalRecordId";
+
+    public static void setRentalRecordId(Long id) {
+        set(RENTAL_RECORD_ID, id);
+    }
+
+    public static Long getRentalRecordId() {
+        return get(RENTAL_RECORD_ID, Long.class);
+    }
+
     // === 편의 메서드: Quantity ===
 
     private static final String QUANTITY = "quantity";

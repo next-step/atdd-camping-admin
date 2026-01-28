@@ -2,8 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.RentalApi;
 import com.camping.admin.common.TestContext;
-import com.camping.admin.common.TestData;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -13,85 +11,142 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class RentalSteps {
 
-    // === Background ===
+    // ===== Given =====
 
-    @Given("관리자가 로그인되어 있다")
-    public void 관리자가_로그인되어_있다() {
-        assertThat(TestContext.getAdminToken()).isNotNull();
+    @Given("고객의 예약이 존재한다")
+    public void 고객의_예약이_존재한다() {
+        TestContext.setReservationId(1L);
+        TestContext.setProductId(1L);
     }
 
-    // === Given: 상품 설정 ===
-
-    @Given("대여 가능한 상품 {string}이 존재한다")
-    @Given("판매 전용 상품 {string}이 존재한다")
-    public void 상품이_존재한다(String productName) {
-        TestContext.setProductId(TestData.getProductId(productName));
+    @Given("대여 중인 장비가 있다")
+    public void 대여_중인_장비가_있다() {
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 1);
+        TestContext.setRentalRecordId(response.jsonPath().getLong("id"));
     }
 
-    // === Given: 예약 설정 ===
-
-    @And("고객 {string}의 예약이 존재한다")
-    public void 고객의_예약이_존재한다(String customerName) {
-        Long reservationId = TestData.getReservationId(customerName);
-        TestContext.setReservationId(reservationId);
+    @Given("판매 상품이 존재한다")
+    public void 판매_상품이_존재한다() {
+        TestContext.setProductId(2L);
     }
 
-    // === When: 대여 생성 ===
-
-    @When("관리자가 해당 고객에게 {string} {int}개를 대여하면")
-    public void 관리자가_해당_고객에게_대여하면(String productName, int quantity) {
-        대여를_실행한다(TestData.getProductId(productName), quantity, TestContext.getReservationId());
+    @Given("반납 완료된 장비가 있다")
+    public void 반납_완료된_장비가_있다() {
+        Response createResponse = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 1);
+        Long rentalRecordId = createResponse.jsonPath().getLong("id");
+        RentalApi.반납(TestContext.getAdminToken(), rentalRecordId);
+        TestContext.setRentalRecordId(rentalRecordId);
     }
 
-    @When("관리자가 워크인 고객에게 {string} {int}개를 대여하면")
-    @When("관리자가 {string} {int}개를 대여하면")
-    public void 관리자가_대여하면(String productName, int quantity) {
-        대여를_실행한다(TestData.getProductId(productName), quantity, null);
-    }
+    // ===== When: 인증 O =====
 
-    @When("관리자가 {string}으로 대여하면")
-    public void 관리자가_상품으로_대여하면(String productName) {
-        대여를_실행한다(TestData.getProductId(productName), 1, null);
-    }
-
-    @When("관리자가 존재하지 않는 상품으로 대여하면")
-    public void 관리자가_존재하지_않는_상품으로_대여하면() {
-        대여를_실행한다(TestData.PRODUCT_NOT_FOUND_ID, 1, null);
-    }
-
-    @When("관리자가 존재하지 않는 예약으로 대여하면")
-    public void 관리자가_존재하지_않는_예약으로_대여하면() {
-        대여를_실행한다(TestContext.getProductId(), 1, TestData.RESERVATION_NOT_FOUND_ID);
-    }
-
-    // === Private Helper ===
-
-    private void 대여를_실행한다(Long productId, int quantity, Long reservationId) {
-        TestContext.setProductId(productId);
-        TestContext.setQuantity(quantity);
-        Response response = RentalApi.대여를_생성한다(
+    @When("관리자가 예약 고객에게 장비를 대여한다")
+    public void 관리자가_예약_고객에게_장비를_대여한다() {
+        Response response = RentalApi.대여_생성_with_예약(
                 TestContext.getAdminToken(),
-                productId,
-                quantity,
-                reservationId
-        );
+                TestContext.getProductId(),
+                1,
+                TestContext.getReservationId());
         TestContext.setLastResponse(response);
     }
 
-    // === Then: 결과 검증 ===
+    @When("관리자가 워크인 고객에게 장비를 대여한다")
+    public void 관리자가_워크인_고객에게_장비를_대여한다() {
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 1);
+        TestContext.setLastResponse(response);
+    }
 
-    @Then("대여가 성공적으로 생성된다")
-    public void 대여가_성공적으로_생성된다() {
-        Response response = TestContext.getLastResponse();
-        assertThat(response.statusCode()).isEqualTo(201);
-        assertThat(response.jsonPath().getLong("productId")).isEqualTo(TestContext.getProductId());
-        assertThat(response.jsonPath().getInt("quantity")).isEqualTo(TestContext.getQuantity());
-        assertThat(response.jsonPath().getBoolean("isReturned")).isFalse();
+    @When("관리자가 반납 처리한다")
+    public void 관리자가_반납_처리한다() {
+        Response response = RentalApi.반납(TestContext.getAdminToken(), TestContext.getRentalRecordId());
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 대여 목록을 조회한다")
+    public void 관리자가_대여_목록을_조회한다() {
+        Response response = RentalApi.목록_조회(TestContext.getAdminToken());
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 존재하지 않는 상품을 대여한다")
+    public void 관리자가_존재하지_않는_상품을_대여한다() {
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), 99999L, 1);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 판매 상품을 대여한다")
+    public void 관리자가_판매_상품을_대여한다() {
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), TestContext.getProductId(), 1);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 재고보다 많은 수량을 대여한다")
+    public void 관리자가_재고보다_많은_수량을_대여한다() {
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 99999);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 존재하지 않는 예약으로 대여한다")
+    public void 관리자가_존재하지_않는_예약으로_대여한다() {
+        Response response = RentalApi.대여_생성_with_예약(TestContext.getAdminToken(), 1L, 1, 99999L);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자가 존재하지 않는 대여이력을 반납한다")
+    public void 관리자가_존재하지_않는_대여이력을_반납한다() {
+        Response response = RentalApi.반납(TestContext.getAdminToken(), 99999L);
+        TestContext.setLastResponse(response);
+    }
+
+    // ===== When: 인증 X =====
+
+    @When("관리자 권한 없이 장비 대여를 등록한다")
+    public void 관리자_권한_없이_장비_대여를_등록한다() {
+        Response response = RentalApi.대여_생성_인증없이(1L, 1);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자 권한 없이 반납 처리한다")
+    public void 관리자_권한_없이_반납_처리한다() {
+        Response response = RentalApi.반납_인증없이(1L);
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자 권한 없이 대여 목록을 조회한다")
+    public void 관리자_권한_없이_대여_목록을_조회한다() {
+        Response response = RentalApi.목록_조회_인증없이();
+        TestContext.setLastResponse(response);
+    }
+
+    // ===== Then =====
+
+    @Then("대여가 완료된다")
+    public void 대여가_완료된다() {
+        TestContext.getLastResponse().then().statusCode(201);
+    }
+
+    @Then("반납이 완료된다")
+    public void 반납이_완료된다() {
+        TestContext.getLastResponse().then().statusCode(200);
+    }
+
+    @Then("대여 목록이 반환된다")
+    public void 대여_목록이_반환된다() {
+        TestContext.getLastResponse().then().statusCode(200);
+    }
+
+    @Then("인증 오류가 발생한다")
+    public void 인증_오류가_발생한다() {
+        TestContext.getLastResponse().then().statusCode(401);
     }
 
     @Then("대여가 실패한다")
     public void 대여가_실패한다() {
-        Response response = TestContext.getLastResponse();
-        assertThat(response.statusCode()).isGreaterThanOrEqualTo(400);
+        assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
+    }
+
+    @Then("반납이 실패한다")
+    public void 반납이_실패한다() {
+        assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
     }
 }
