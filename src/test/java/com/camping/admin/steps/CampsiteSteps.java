@@ -7,8 +7,13 @@ import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
 import java.util.Map;
+import java.util.UUID;
 
 public class CampsiteSteps {
+
+    private static String uniqueSiteNumber() {
+        return "SITE-" + UUID.randomUUID().toString().substring(0, 8);
+    }
 
     // ===== Given =====
 
@@ -16,7 +21,7 @@ public class CampsiteSteps {
     public void 등록된_캠프사이트가_있다() {
         Response response = CampsiteApi.캠프사이트_생성(
                 TestContext.getAdminToken(),
-                "A-001",
+                uniqueSiteNumber(),
                 "테스트 캠프사이트",
                 4
         );
@@ -29,7 +34,7 @@ public class CampsiteSteps {
     public void 관리자가_캠프사이트를_등록한다() {
         Response response = CampsiteApi.캠프사이트_생성(
                 TestContext.getAdminToken(),
-                "B-001",
+                uniqueSiteNumber(),
                 "신규 캠프사이트",
                 6
         );

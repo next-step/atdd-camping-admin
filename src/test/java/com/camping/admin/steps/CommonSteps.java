@@ -36,6 +36,16 @@ public class CommonSteps {
         TestContext.getLastResponse().then().statusCode(200);
     }
 
+    @Then("{word}이 반환된다")
+    public void 이_반환된다(String resource) {
+        TestContext.getLastResponse().then().statusCode(200);
+    }
+
+    @Then("{word}가 반환된다")
+    public void 가_반환된다(String resource) {
+        TestContext.getLastResponse().then().statusCode(200);
+    }
+
     @Then("{word} 목록이 반환된다")
     public void 목록이_반환된다(String resource) {
         TestContext.getLastResponse().then().statusCode(200);
