@@ -1,6 +1,5 @@
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.enums.ReservationStatus;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +40,6 @@ public class ReservationSteps extends CucumberSpringConfiguration {
     }
 
     // ==================== Then ====================
-
-    @Then("응답 상태 코드는 {int}이다")
-    public void 응답_상태_코드는_N이다(int expectedStatusCode) {
-        helper.응답_상태_코드를_검증한다(expectedStatusCode);
-    }
 
     @Then("예약이 {예약상태}된다")
     public void 예약이_된다(String status) {

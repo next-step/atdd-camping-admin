@@ -3,7 +3,6 @@ package com.camping.admin.steps;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.repository.ReservationRepository;
-import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -20,7 +19,6 @@ public class ReservationTestHelper {
     private ReservationRepository reservationRepository;
 
     private Reservation currentReservation;
-    private Response lastResponse;
 
     // ==================== 예약 조회 (Given/When) ====================
 
@@ -34,7 +32,7 @@ public class ReservationTestHelper {
     // ==================== API 호출 (When) ====================
 
     public void 예약_상태를_변경한다(Long reservationId, String status) {
-        this.lastResponse = 예약의_상태를_변경한다(reservationId, status);
+        CommonHooks.lastResponse = 예약의_상태를_변경한다(reservationId, status);
     }
 
     public void 현재_예약의_상태를_변경한다(String status) {
@@ -42,10 +40,6 @@ public class ReservationTestHelper {
     }
 
     // ==================== 검증 (Then) ====================
-
-    public void 응답_상태_코드를_검증한다(int expectedStatusCode) {
-        assertThat(lastResponse.statusCode()).isEqualTo(expectedStatusCode);
-    }
 
     public void 예약_상태를_검증한다(String status) {
         assertThat(현재_예약을_다시_조회한다().getStatus())

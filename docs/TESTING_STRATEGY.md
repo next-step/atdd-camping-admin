@@ -1,27 +1,23 @@
 # 인수 테스트 전략 (Acceptance Testing Strategy)
 
-## 목차
-1. [핵심 기술 스택](#1-핵심-기술-스택)
-2. [코딩 컨벤션](#2-코딩-컨벤션)
-3. [파일 위치 규칙](#3-파일-위치-규칙)
-4. [골든 샘플 코드](#4-골든-샘플-코드)
+이 문서는 캠핑장 관리 서비스의 인수 테스트(ATDD) 전략을 정의합니다.
 
 ---
 
 ## 1. 핵심 기술 스택
 
-| 기술 | 버전 | 용도 |
-|------|------|------|
-| **JUnit Platform Suite** | 1.10.0 | Cucumber 테스트 실행기 |
-| **Cucumber** | 7.14.0 | BDD 기반 인수 테스트 |
-| **RestAssured** | 5.3.2 | REST API 테스트 |
-| **AssertJ** | (Spring Boot 내장) | 가독성 높은 단언문 |
-| **Spring Boot Test** | 3.2.0 | 통합 테스트 환경 |
-| **H2 Database** | (Spring Boot 내장) | 인메모리 테스트 DB |
+| 구분 | 기술 | 버전 | 용도 |
+|------|------|------|------|
+| **테스트 프레임워크** | JUnit 5 | 1.10.0 | 테스트 실행 플랫폼 |
+| **BDD 프레임워크** | Cucumber | 7.14.0 | Gherkin 시나리오 기반 테스트 |
+| **API 테스트** | RestAssured | 5.3.2 | HTTP API 호출 및 검증 |
+| **Assertion** | AssertJ | (Spring Boot 내장) | 가독성 높은 검증문 작성 |
+| **Spring 통합** | cucumber-spring | 7.14.0 | Cucumber-Spring Context 연동 |
+| **데이터베이스** | H2 | (Spring Boot 내장) | 인메모리 테스트 DB |
 
-### 1.1 의존성 (build.gradle)
+### 의존성 설정 (build.gradle)
 
-```groovy
+```gradle
 ext {
     set('cucumberVersion', '7.14.0')
     set('restAssuredVersion', '5.3.2')
@@ -38,156 +34,212 @@ dependencies {
 
     // RestAssured
     testImplementation "io.rest-assured:rest-assured:${restAssuredVersion}"
-
-    // Spring Boot Test (AssertJ 포함)
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 ```
 
 ---
 
-## 2. 코딩 컨벤션
-
-### 2.1 네이밍 규칙
-
-| 대상 | 규칙 | 예시 |
-|------|------|------|
-| Feature 파일 | 기능명(영문, snake_case) | `reservation.feature`, `rental_create.feature` |
-| Steps 클래스 | `[기능명]Steps` | `ReservationSteps`, `RentalSteps` |
-| 상수 클래스 | `TestConstants` | `TestConstants.java` |
-| 상수명 | 한글 + snake_case | `예약상태_취소`, `상품유형_대여` |
-| Step 메서드 | Gherkin 문장과 동일 (한글) | `사용자가_사이트를_예약했다()` |
-
-### 2.2 Step 메서드 작성 규칙
-
-```java
-// ✅ 올바른 예시: 한글 메서드명, Gherkin 문장과 동일
-@Given("사용자가 {long}번 사이트가 예약 되어있다")
-public void 사용자가_사이트를_예약했다(Long siteNo) {
-    // ...
-}
-
-// ❌ 잘못된 예시: 영문 메서드명
-@Given("사용자가 {long}번 사이트가 예약 되어있다")
-public void userHasReservedSite(Long siteNo) {
-    // ...
-}
-```
-
-### 2.3 Import 규칙
-
-```java
-// Static Import 사용
-import static com.camping.admin.TestConstants.예약상태_취소;
-import static org.assertj.core.api.Assertions.assertThat;
-
-// RestAssured는 클래스명.메서드() 형식
-import io.restassured.RestAssured;
-RestAssured.given()...
-```
-
-### 2.4 주석 스타일
-
-```java
-// 클래스 레벨: 기능 설명 (선택)
-/**
- * 예약 관리 기능의 인수 테스트 Step 정의
- */
-public class ReservationSteps extends CucumberSpringConfiguration {
-
-    // 필드 레벨: 주석 없음 (자명한 경우)
-    @LocalServerPort
-    private int port;
-
-    // @Before 레벨: order 설명 (필요시)
-    @Before(order = 0)  // RestAssured 설정은 가장 먼저 실행
-    public void setupRestAssured() {
-        RestAssured.port = port;
-    }
-}
-```
-
-### 2.5 RestAssured 작성 스타일
-
-```java
-// Given-When-Then 체이닝으로 작성
-RestAssured.given()
-        .header("Authorization", "Bearer " + adminToken)  // 인증 헤더
-        .contentType(ContentType.JSON)                     // Content-Type
-        .body(requestBody)                                 // 요청 본문
-        .when()
-        .patch("/admin/reservations/" + id + "/status")    // HTTP 메서드 + URI
-        .then()
-        .statusCode(200)                                   // 상태 코드 검증
-        .extract()
-        .jsonPath()
-        .getString("status");                              // 응답 값 추출
-```
-
-### 2.6 단언문 (Assertion) 스타일
-
-```java
-// AssertJ 사용 (JUnit Assertions 사용 금지)
-// ✅ 올바른 예시
-assertThat(status).isEqualTo(예약상태_취소);
-assertThat(reservations).isEmpty();
-assertThat(result).isNotNull();
-
-// ❌ 잘못된 예시 (JUnit)
-assertEquals(예약상태_취소, status);
-assertTrue(reservations.isEmpty());
-```
-
----
-
-## 3. 파일 위치 규칙
-
-### 3.1 디렉토리 구조
+## 2. 파일 위치 규칙
 
 ```
 src/test/
 ├── java/com/camping/admin/
 │   ├── CucumberTestRunner.java          # Cucumber 실행 진입점
-│   ├── TestConstants.java               # 테스트 상수 정의
-│   └── steps/
-│       ├── CucumberSpringConfiguration.java  # Spring 연동 설정
-│       ├── ReservationSteps.java        # 예약 기능 Steps
-│       ├── RentalSteps.java             # 대여 기능 Steps
-│       ├── ProductSteps.java            # 상품 기능 Steps
-│       └── CampsiteSteps.java           # 캠프사이트 기능 Steps
-│
+│   ├── steps/                           # Step 정의 패키지
+│   │   ├── CucumberSpringConfiguration.java  # Spring Context 설정
+│   │   ├── CommonHooks.java             # 공통 Hooks & ParameterType
+│   │   ├── {Domain}Steps.java           # 도메인별 Step 정의
+│   │   └── {Domain}TestHelper.java      # 도메인별 헬퍼 클래스
+│   └── apiExtractableresponse/          # API 호출 유틸리티
+│       └── {Domain}ApiExtractableResponse.java
 └── resources/
-    └── features/
-        ├── reservation.feature          # 예약 시나리오
-        ├── rental.feature               # 대여 시나리오
-        ├── product.feature              # 상품 시나리오
-        └── campsite.feature             # 캠프사이트 시나리오
+    └── features/                        # Gherkin Feature 파일
+        └── {domain}.feature
 ```
 
-### 3.2 파일별 역할
+### 파일별 역할
 
-| 파일 | 역할 | 위치 |
-|------|------|------|
-| `CucumberTestRunner.java` | Cucumber 테스트 실행 진입점 | `src/test/java/.../` |
-| `CucumberSpringConfiguration.java` | Spring Context 연동 설정 | `src/test/java/.../steps/` |
-| `TestConstants.java` | 테스트 상수 (상태값, 메시지 등) | `src/test/java/.../` |
-| `[기능]Steps.java` | Gherkin Step 구현체 | `src/test/java/.../steps/` |
-| `[기능].feature` | Gherkin 시나리오 정의 | `src/test/resources/features/` |
-
-### 3.3 Feature 파일 ↔ Steps 클래스 매핑
-
-| Feature 파일 | Steps 클래스 |
-|--------------|-------------|
-| `reservation.feature` | `ReservationSteps.java` |
-| `rental.feature` | `RentalSteps.java` |
-| `product.feature` | `ProductSteps.java` |
-| `campsite.feature` | `CampsiteSteps.java` |
+| 파일 | 역할 |
+|------|------|
+| `CucumberTestRunner.java` | Cucumber 테스트 Suite 실행 진입점 |
+| `CucumberSpringConfiguration.java` | `@CucumberContextConfiguration` + `@SpringBootTest` 설정 |
+| `CommonHooks.java` | `@Before` 훅, `@ParameterType` 정의, 공통 `@Given` 스텝 |
+| `{Domain}Steps.java` | Gherkin과 Helper를 연결하는 Step 정의 |
+| `{Domain}TestHelper.java` | 테스트 상태 관리, Repository 접근, 검증 로직 |
+| `{Domain}ApiExtractableResponse.java` | RestAssured 기반 API 호출 메서드 |
+| `{domain}.feature` | Gherkin 시나리오 정의 |
 
 ---
 
-## 4. 골든 샘플 코드
+## 3. 코딩 컨벤션
 
-### 4.1 CucumberTestRunner.java
+### 3.1 클래스 네이밍
+
+| 유형 | 네이밍 규칙 | 예시 |
+|------|-------------|------|
+| Step 정의 클래스 | `{Domain}Steps` | `ReservationSteps` |
+| 헬퍼 클래스 | `{Domain}TestHelper` | `ReservationTestHelper` |
+| API 호출 클래스 | `{Domain}ApiExtractableResponse` | `ReservationApiExtractableResponse` |
+| Feature 파일 | `{domain}.feature` (소문자) | `reservation.feature` |
+
+### 3.2 메서드 네이밍
+
+**한글 메서드명을 사용하여 가독성을 극대화합니다.**
+
+| 유형 | 네이밍 패턴 | 예시 |
+|------|-------------|------|
+| Step 정의 | Gherkin 문장을 snake_case로 변환 | `관리자가_확정된_예약을_상태로_변경한다()` |
+| Helper - 조회 | `{대상}을_찾는다` | `확정된_예약을_찾는다()` |
+| Helper - API 호출 | `{행위}한다` | `현재_예약의_상태를_변경한다()` |
+| Helper - 검증 | `{조건}를_검증한다` | `응답_상태_코드를_검증한다()` |
+| API Response | `{행위}한다` | `예약의_상태를_변경한다()` |
+
+### 3.3 내부 주석 스타일
+
+섹션 구분을 위해 다음 형식의 주석을 사용합니다:
+
+```java
+// ==================== 섹션명 ====================
+```
+
+**표준 섹션 구분:**
+
+```java
+// Steps 클래스
+// ==================== When ====================
+// ==================== Then ====================
+
+// Helper 클래스
+// ==================== 예약 조회 (Given/When) ====================
+// ==================== API 호출 (When) ====================
+// ==================== 검증 (Then) ====================
+// ==================== Private ====================
+```
+
+### 3.4 Feature 파일 작성 규칙
+
+```gherkin
+Feature: {기능명}
+  {기능 설명}
+
+  Background: {공통 전제 조건}
+
+  # ==================== 정상 케이스 ====================
+
+  Scenario: {시나리오명}
+    When {행위}
+    Then {결과}
+
+  # ==================== 예외 케이스 ====================
+
+  Scenario: {예외 시나리오명}
+    When {행위}
+    Then {에러 결과}
+
+  # ==================== 엣지 케이스 ====================
+
+  Scenario: {엣지 시나리오명}
+    When {특수 행위}
+    Then {결과}
+```
+
+### 3.5 ParameterType 활용
+
+한글 표현을 영문 코드로 매핑하기 위해 `@ParameterType`을 사용합니다:
+
+```java
+@ParameterType("취소|확정|대기|유효하지 않음")
+public String 예약상태(String status) {
+    ReservationStatus found = ReservationStatus.fromDisplayName(status);
+    return found != null ? found.name() : status;
+}
+```
+
+Feature 파일에서 사용:
+```gherkin
+When 관리자가 확정된 예약을 취소 상태로 변경한다
+Then 예약은 확정 상태로 유지된다
+```
+
+---
+
+## 4. 아키텍처 원칙
+
+### 4.1 계층 분리
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Feature 파일 (.feature)                   │
+│              (비즈니스 언어로 시나리오 정의)                    │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Steps 클래스 (*Steps.java)                │
+│         (Gherkin ↔ Helper 연결, 비즈니스 로직 없음)            │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│                  Helper 클래스 (*TestHelper.java)            │
+│     (테스트 상태 관리, Repository 접근, 검증 로직 수행)          │
+└─────────────────────────────────────────────────────────────┘
+                              ↓
+┌─────────────────────────────────────────────────────────────┐
+│           API Response 클래스 (*ApiExtractableResponse.java) │
+│              (RestAssured 기반 HTTP 요청 수행)                │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 4.2 핵심 원칙
+
+1. **Steps는 얇게 유지**: Step 정의 클래스는 Gherkin과 Helper를 연결하는 역할만 수행
+2. **Helper에 로직 집중**: 테스트 상태 관리, Repository 접근, 검증 로직은 Helper에서 수행
+3. **API 호출 분리**: HTTP 요청은 ApiExtractableResponse 클래스에서 static 메서드로 제공
+4. **공통 설정은 Hooks에서**: RestAssured 설정, 인증 토큰 등은 CommonHooks에서 관리
+
+---
+
+## 5. 표준 샘플 코드 (Golden Sample)
+
+### 5.1 Feature 파일
+
+**`src/test/resources/features/reservation.feature`**
+
+```gherkin
+Feature: 예약 상태 변경
+  관리자가 예약의 상태를 변경하여 예약을 관리한다
+
+  Background: 관리자가 로그인을 했다
+
+  # ==================== 정상 케이스 ====================
+
+  Scenario: 예약을 취소하면 해당 사이트는 다시 예약 가능하다
+    When 관리자가 확정된 예약을 취소 상태로 변경한다
+    Then 응답 상태 코드는 200이다
+    And 예약이 취소된다
+    And 해당 캠프사이트는 같은 날짜에 다시 예약이 가능하다
+
+  # ==================== 예외 케이스 ====================
+
+  Scenario: 유효하지 않은 상태로 변경할 수 없다
+    When 관리자가 확정된 예약을 유효하지 않음 상태로 변경한다
+    Then 응답 상태 코드는 400이다
+    And 예약은 확정 상태로 유지된다
+
+  Scenario: 존재하지 않는 예약은 상태를 변경할 수 없다
+    When 관리자가 존재하지 않는 예약을 취소 상태로 변경한다
+    Then 응답 상태 코드는 404이다
+
+  # ==================== 엣지 케이스 ====================
+
+  Scenario: 빈 상태값으로 예약 상태를 변경할 수 없다
+    When 관리자가 확정된 예약의 상태값을 빈 값으로 예약 상태 변경을 요청한다
+    Then 응답 상태 코드는 400이다
+    And 예약은 확정 상태로 유지된다
+```
+
+### 5.2 Cucumber 실행 설정
+
+**`src/test/java/com/camping/admin/CucumberTestRunner.java`**
 
 ```java
 package com.camping.admin;
@@ -207,7 +259,9 @@ public class CucumberTestRunner {
 }
 ```
 
-### 4.2 CucumberSpringConfiguration.java
+### 5.3 Spring Context 설정
+
+**`src/test/java/com/camping/admin/steps/CucumberSpringConfiguration.java`**
 
 ```java
 package com.camping.admin.steps;
@@ -221,106 +275,30 @@ public class CucumberSpringConfiguration {
 }
 ```
 
-### 4.3 TestConstants.java
+### 5.4 공통 Hooks
 
-```java
-package com.camping.admin;
-
-/**
- * 테스트에서 사용하는 상수 정의
- * - 상태값, 에러 메시지 등을 한글 상수로 관리
- * - 실제 API 값과 매핑하여 가독성 향상
- */
-public class TestConstants {
-
-    // ==================== 예약 상태 ====================
-    public static final String 예약상태_대기 = "WAITING";
-    public static final String 예약상태_확정 = "CONFIRMED";
-    public static final String 예약상태_취소 = "CANCELLED";
-    public static final String 예약상태_체크인 = "CHECKED_IN";
-    public static final String 예약상태_체크아웃 = "CHECKED_OUT";
-
-    // ==================== 상품 유형 ====================
-    public static final String 상품유형_판매 = "SALE";
-    public static final String 상품유형_대여 = "RENTAL";
-
-    // ==================== API 경로 ====================
-    public static final String API_예약 = "/admin/reservations";
-    public static final String API_상품 = "/admin/products";
-    public static final String API_캠프사이트 = "/admin/campsites";
-    public static final String API_대여 = "/admin/rentals";
-}
-```
-
-### 4.4 Feature 파일 (rental.feature)
-
-```gherkin
-# language: ko
-
-Feature: 대여 생성
-  관리자가 대여용 상품을 고객에게 대여하고 재고를 관리한다
-
-  Scenario: 대여용 상품을 예약 고객에게 정상 대여한다
-    Given 대여용 상품이 재고 10개로 등록되어 있다
-    And 예약이 1건 존재한다
-    When 관리자가 해당 상품 3개를 예약에 연결하여 대여한다
-    Then 대여가 성공한다
-    And 대여 기록이 생성된다
-    And 상품 재고가 7개로 감소한다
-
-  Scenario: 재고보다 많은 수량을 대여하면 실패한다
-    Given 대여용 상품이 재고 5개로 등록되어 있다
-    When 관리자가 해당 상품 10개를 대여한다
-    Then 재고 부족으로 대여되지 않는다
-    And 상품 재고는 5개로 유지된다
-```
-
-### 4.5 Steps 클래스 (RentalSteps.java)
+**`src/test/java/com/camping/admin/steps/CommonHooks.java`**
 
 ```java
 package com.camping.admin.steps;
 
-import com.camping.admin.domain.entity.Product;
-import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.repository.ProductRepository;
-import com.camping.admin.repository.RentalRecordRepository;
-import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.security.JwtService;
 import io.cucumber.java.Before;
+import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
-import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
-import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-import java.math.BigDecimal;
-
-import static com.camping.admin.TestConstants.*;
-import static org.assertj.core.api.Assertions.assertThat;
-
 /**
- * 대여 기능 인수 테스트 Step 정의
+ * 모든 시나리오에서 공통으로 사용되는 Cucumber Hooks
  */
-public class RentalSteps extends CucumberSpringConfiguration {
-
-    // ==================== 인프라 설정 ====================
+public class CommonHooks extends CucumberSpringConfiguration {
 
     @LocalServerPort
     private int port;
-
-    @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
-
-    @Autowired
-    private RentalRecordRepository rentalRecordRepository;
 
     @Autowired
     private JwtService jwtService;
@@ -328,15 +306,8 @@ public class RentalSteps extends CucumberSpringConfiguration {
     @Value("${admin.username}")
     private String adminUsername;
 
-    // ==================== 테스트 상태 ====================
-
-    private String adminToken;
-    private Product savedProduct;
-    private Reservation savedReservation;
-    private Response response;
-    private int initialStock;
-
-    // ==================== 설정 (@Before) ====================
+    // 테스트 컨텍스트 공유용 (다른 Step 클래스에서 접근 가능)
+    public static String adminToken;
 
     @Before(order = 0)
     public void setupRestAssured() {
@@ -345,125 +316,211 @@ public class RentalSteps extends CucumberSpringConfiguration {
 
     @Before(order = 1)
     public void setupAdminToken() {
-        this.adminToken = jwtService.generateToken(adminUsername);
+        adminToken = jwtService.generateToken(adminUsername);
     }
 
-    @Before(order = 2)
-    public void cleanupDatabase() {
-        rentalRecordRepository.deleteAll();
+    @Given("관리자가 로그인을 했다")
+    public void 관리자가_로그인을_했다() {
+        // @Before 훅에서 이미 처리됨 - Background 문서화 목적
     }
 
-    // ==================== Given ====================
+    // ==================== Parameter Types ====================
 
-    @Given("대여용 상품이 재고 {int}개로 등록되어 있다")
-    public void 대여용_상품이_재고_N개로_등록되어_있다(int stockQuantity) {
-        Product product = new Product(
-                "테스트 대여 상품",
-                stockQuantity,
-                BigDecimal.valueOf(10000),
-                ProductType.RENTAL
-        );
-        this.savedProduct = productRepository.save(product);
-        this.initialStock = stockQuantity;
+    @ParameterType("취소|확정|대기|유효하지 않음")
+    public String 예약상태(String status) {
+        ReservationStatus found = ReservationStatus.fromDisplayName(status);
+        return found != null ? found.name() : status;
     }
+}
+```
 
-    @Given("예약이 {int}건 존재한다")
-    public void 예약이_N건_존재한다(int count) {
-        this.savedReservation = reservationRepository.findAll()
-                .stream()
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("예약 데이터가 필요합니다."));
-    }
+### 5.5 Step 정의 클래스
+
+**`src/test/java/com/camping/admin/steps/ReservationSteps.java`**
+
+```java
+package com.camping.admin.steps;
+
+import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
+import org.springframework.beans.factory.annotation.Autowired;
+
+/**
+ * 예약 상태 변경 기능의 인수 테스트 Step 정의
+ */
+public class ReservationSteps extends CucumberSpringConfiguration {
+
+    @Autowired
+    private ReservationTestHelper helper;
+
+    private static final Long 존재하지_않는_예약_ID = 999999L;
+    private static final String EMPTY = "";
 
     // ==================== When ====================
 
-    @When("관리자가 해당 상품 {int}개를 예약에 연결하여 대여한다")
-    public void 관리자가_해당_상품_N개를_예약에_연결하여_대여한다(int quantity) {
-        String requestBody = String.format("""
-                {
-                    "productId": %d,
-                    "quantity": %d,
-                    "reservationId": %d
-                }
-                """, savedProduct.getId(), quantity, savedReservation.getId());
-
-        this.response = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .post(API_대여);
+    @When("관리자가 확정된 예약을 {예약상태} 상태로 변경한다")
+    public void 관리자가_확정된_예약을_상태로_변경한다(String status) {
+        helper.확정된_예약을_찾는다();
+        helper.현재_예약의_상태를_변경한다(status);
     }
 
-    @When("관리자가 해당 상품 {int}개를 대여한다")
-    public void 관리자가_해당_상품_N개를_대여한다(int quantity) {
-        String requestBody = String.format("""
-                {
-                    "productId": %d,
-                    "quantity": %d
-                }
-                """, savedProduct.getId(), quantity);
+    @When("관리자가 존재하지 않는 예약을 {예약상태} 상태로 변경한다")
+    public void 관리자가_존재하지_않는_예약을_상태로_변경한다(String status) {
+        helper.예약_상태를_변경한다(존재하지_않는_예약_ID, status);
+    }
 
-        this.response = RestAssured.given()
-                .header("Authorization", "Bearer " + adminToken)
-                .contentType(ContentType.JSON)
-                .body(requestBody)
-                .when()
-                .post(API_대여);
+    @When("관리자가 확정된 예약의 상태값을 빈 값으로 예약 상태 변경을 요청한다")
+    public void 관리자가_확정된_예약의_상태값을_빈_값으로_예약_상태_변경을_요청한다() {
+        helper.확정된_예약을_찾는다();
+        helper.현재_예약의_상태를_변경한다(EMPTY);
     }
 
     // ==================== Then ====================
 
-    @Then("대여가 성공한다")
-    public void 대여가_성공한다() {
-        assertThat(response.statusCode()).isEqualTo(201);
+    @Then("응답 상태 코드는 {int}이다")
+    public void 응답_상태_코드는_N이다(int expectedStatusCode) {
+        helper.응답_상태_코드를_검증한다(expectedStatusCode);
     }
 
-    @Then("대여 기록이 생성된다")
-    public void 대여_기록이_생성된다() {
-        Long rentalId = response.jsonPath().getLong("id");
-        assertThat(rentalId).isNotNull();
-        assertThat(rentalRecordRepository.findById(rentalId)).isPresent();
+    @Then("예약이 {예약상태}된다")
+    public void 예약이_된다(String status) {
+        helper.예약_상태를_검증한다(status);
     }
 
-    @Then("상품 재고가 {int}개로 감소한다")
-    public void 상품_재고가_N개로_감소한다(int expectedStock) {
-        Product product = productRepository.findById(savedProduct.getId()).orElseThrow();
-        assertThat(product.getStockQuantity()).isEqualTo(expectedStock);
+    @Then("해당 캠프사이트는 같은 날짜에 다시 예약이 가능하다")
+    public void 해당_캠프사이트는_같은_날짜에_다시_예약이_가능하다() {
+        helper.겹치는_예약이_없는지_검증한다();
     }
 
-    @Then("재고 부족으로 대여되지 않는다")
-    public void 재고_부족으로_대여되지_않는다() {
-        assertThat(response.statusCode()).isIn(400, 500);
+    @Then("예약은 {예약상태} 상태로 유지된다")
+    public void 예약은_상태로_유지된다(String status) {
+        helper.예약_상태를_검증한다(status);
+    }
+}
+```
+
+### 5.6 헬퍼 클래스
+
+**`src/test/java/com/camping/admin/steps/ReservationTestHelper.java`**
+
+```java
+package com.camping.admin.steps;
+
+import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.domain.enums.ReservationStatus;
+import com.camping.admin.repository.ReservationRepository;
+import io.restassured.response.Response;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import static com.camping.admin.apiExtractableresponse.ReservationApiExtractableResponse.예약의_상태를_변경한다;
+import static org.assertj.core.api.Assertions.assertThat;
+
+/**
+ * 예약 관련 인수 테스트에서 공통으로 사용되는 헬퍼 클래스
+ */
+@Component
+public class ReservationTestHelper {
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
+    private Reservation currentReservation;
+    private Response lastResponse;
+
+    // ==================== 예약 조회 (Given/When) ====================
+
+    public void 확정된_예약을_찾는다() {
+        this.currentReservation = reservationRepository.findAll().stream()
+                .filter(r -> ReservationStatus.CONFIRMED.name().equals(r.getStatus()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("확정 상태인 예약이 존재하지 않습니다."));
     }
 
-    @Then("상품 재고는 {int}개로 유지된다")
-    public void 상품_재고는_N개로_유지된다(int expectedStock) {
-        Product product = productRepository.findById(savedProduct.getId()).orElseThrow();
-        assertThat(product.getStockQuantity()).isEqualTo(expectedStock);
+    // ==================== API 호출 (When) ====================
+
+    public void 예약_상태를_변경한다(Long reservationId, String status) {
+        this.lastResponse = 예약의_상태를_변경한다(reservationId, status);
+    }
+
+    public void 현재_예약의_상태를_변경한다(String status) {
+        예약_상태를_변경한다(currentReservation.getId(), status);
+    }
+
+    // ==================== 검증 (Then) ====================
+
+    public void 응답_상태_코드를_검증한다(int expectedStatusCode) {
+        assertThat(lastResponse.statusCode()).isEqualTo(expectedStatusCode);
+    }
+
+    public void 예약_상태를_검증한다(String status) {
+        assertThat(현재_예약을_다시_조회한다().getStatus())
+                .isEqualTo(status);
+    }
+
+    public void 겹치는_예약이_없는지_검증한다() {
+        assertThat(reservationRepository.findOverlappingReservations(
+                currentReservation.getCampsite().getId(),
+                currentReservation.getStartDate(),
+                currentReservation.getEndDate()
+        )).isEmpty();
+    }
+
+    // ==================== Private ====================
+
+    private Reservation 현재_예약을_다시_조회한다() {
+        return reservationRepository.findById(currentReservation.getId()).orElseThrow();
+    }
+}
+```
+
+### 5.7 API 호출 클래스
+
+**`src/test/java/com/camping/admin/apiExtractableresponse/ReservationApiExtractableResponse.java`**
+
+```java
+package com.camping.admin.apiExtractableresponse;
+
+import com.camping.admin.steps.CommonHooks;
+import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
+import io.restassured.response.Response;
+
+public class ReservationApiExtractableResponse {
+
+    public static Response 예약의_상태를_변경한다(Long id, String status) {
+        return RestAssured.given()
+                .header("Authorization", "Bearer " + CommonHooks.adminToken)
+                .contentType(ContentType.JSON)
+                .body("{\"status\":\"" + status + "\"}")
+                .when()
+                .patch("/admin/reservations/" + id + "/status");
     }
 }
 ```
 
 ---
 
-## 부록: 테스트 실행 방법
+## 6. 테스트 실행
 
-### Gradle 명령어
 ```bash
-# 전체 테스트 실행
-./gradlew test
+# 전체 인수 테스트 실행
+./gradlew test --tests "com.camping.admin.CucumberTestRunner"
 
-# 특정 Feature 실행
-./gradlew test --tests "CucumberTestRunner"
+# 특정 Feature 파일만 실행 (Cucumber 옵션 활용)
+./gradlew test -Dcucumber.filter.tags="@reservation"
 ```
-
-### IDE에서 실행
-1. `CucumberTestRunner.java` 파일 열기
-2. 클래스명 옆 실행 버튼 클릭
-3. 또는 `*.feature` 파일에서 Scenario 단위 실행
 
 ---
 
-*작성일: 2026-01-26*
-*기준 프로젝트: ATDD Camping Admin System*
+## 7. 체크리스트
+
+새로운 도메인의 인수 테스트를 추가할 때 다음을 확인하세요:
+
+- [ ] Feature 파일 생성 (`src/test/resources/features/{domain}.feature`)
+- [ ] Steps 클래스 생성 (`{Domain}Steps.java`)
+- [ ] Helper 클래스 생성 (`{Domain}TestHelper.java`)
+- [ ] API Response 클래스 생성 (`{Domain}ApiExtractableResponse.java`)
+- [ ] 필요시 CommonHooks에 ParameterType 추가
+- [ ] 한글 메서드명 규칙 준수
+- [ ] 섹션 주석 형식 준수
