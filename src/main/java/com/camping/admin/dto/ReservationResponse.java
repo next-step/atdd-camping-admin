@@ -3,6 +3,7 @@ package com.camping.admin.dto;
 import com.camping.admin.domain.entity.Reservation;
 import java.time.LocalDate;
 
+import com.camping.admin.domain.enums.ReservationStatus;
 import lombok.Getter;
 
 @Getter
@@ -11,7 +12,7 @@ public class ReservationResponse {
     private String customerName;
     private LocalDate startDate;
     private LocalDate endDate;
-    private String status;
+    private ReservationStatus status;
     private String campsiteSiteNumber;
     private LocalDate reservationDate;
 
