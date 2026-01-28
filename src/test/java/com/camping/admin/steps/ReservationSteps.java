@@ -2,6 +2,7 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.ReservationApi;
 import com.camping.admin.common.TestContext;
+import com.camping.admin.common.TestData;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -15,7 +16,7 @@ public class ReservationSteps {
     @Given("등록된 예약이 있다")
     public void 등록된_예약이_있다() {
         // data.sql에 있는 예약 사용
-        TestContext.set(RESERVATION_ID, 1L);
+        TestContext.set(RESERVATION_ID, TestData.RESERVATION_ID);
     }
 
     // ===== When: 인증 O =====
@@ -40,7 +41,7 @@ public class ReservationSteps {
     public void 관리자가_존재하지_않는_예약의_상태를_변경한다() {
         Response response = ReservationApi.상태_변경(
                 TestContext.getAdminToken(),
-                99999L,
+                TestData.NOT_FOUND_ID,
                 "CONFIRMED"
         );
         TestContext.setLastResponse(response);

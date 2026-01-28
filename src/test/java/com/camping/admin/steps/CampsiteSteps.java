@@ -2,6 +2,7 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.CampsiteApi;
 import com.camping.admin.common.TestContext;
+import com.camping.admin.common.TestData;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -63,7 +64,7 @@ public class CampsiteSteps {
     public void 관리자가_존재하지_않는_캠프사이트를_수정한다() {
         Response response = CampsiteApi.캠프사이트_수정(
                 TestContext.getAdminToken(),
-                99999L,
+                TestData.NOT_FOUND_ID,
                 Map.of("description", "수정")
         );
         TestContext.setLastResponse(response);

@@ -2,6 +2,7 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.ProductApi;
 import com.camping.admin.common.TestContext;
+import com.camping.admin.common.TestData;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -72,7 +73,7 @@ public class ProductSteps {
     public void 관리자가_존재하지_않는_상품을_수정한다() {
         Response response = ProductApi.상품_수정(
                 TestContext.getAdminToken(),
-                99999L,
+                TestData.NOT_FOUND_ID,
                 Map.of("name", "수정된 상품명")
         );
         TestContext.setLastResponse(response);

@@ -21,6 +21,9 @@ public class Hooks {
     @Before(order = 2)
     public void setupAdminToken() {
         String token = AuthApi.관리자_토큰을_발급한다();
+        if (token == null || token.isBlank()) {
+            throw new IllegalStateException("토큰 발급 실패 - 서버 상태 확인 필요");
+        }
         TestContext.setAdminToken(token);
     }
 }
