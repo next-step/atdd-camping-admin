@@ -33,6 +33,11 @@ public class EntityGivenSteps {
         state.setProductId(TestConfig.ProductIds.NOT_EXIST);
     }
 
+    @Given("삭제할 상품이 존재한다")
+    public void 삭제할_상품이_존재한다() {
+        state.setProductId(TestConfig.ProductIds.ICE_PACK);
+    }
+
     // === 대여 기록 ===
     @Given("반납되지 않은 대여 기록이 존재한다")
     public void 반납되지_않은_대여_기록이_존재한다() {

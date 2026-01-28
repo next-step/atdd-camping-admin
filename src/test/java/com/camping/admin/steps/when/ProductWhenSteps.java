@@ -68,4 +68,12 @@ public class ProductWhenSteps {
                 .when()
                 .put("/admin/products/" + state.getProductId()));
     }
+
+    @When("해당 상품을 삭제하면")
+    public void 해당_상품을_삭제하면() {
+        state.setResponse(RestAssured.given()
+                .spec(RestAssuredConfig.createAuthenticatedSpec(AuthHelper.getAdminToken()))
+                .when()
+                .delete("/admin/products/" + state.getProductId()));
+    }
 }
