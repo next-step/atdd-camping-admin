@@ -9,101 +9,36 @@ public class TestContext {
 
     private static final ThreadLocal<Map<String, Object>> context = ThreadLocal.withInitial(HashMap::new);
 
-    // === 기본 메서드 ===
+    public enum Key {
+        ADMIN_TOKEN,
+        LAST_RESPONSE,
+        CAMPSITE_ID,
+        PRODUCT_ID,
+        RESERVATION_ID,
+        RENTAL_RECORD_ID
+    }
 
-    public static void set(String key, Object value) {
-        context.get().put(key, value);
+    public static void set(Key key, Object value) {
+        context.get().put(key.name(), value);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T get(String key, Class<T> type) {
-        return (T) context.get().get(key);
+    public static <T> T get(Key key, Class<T> type) {
+        return (T) context.get().get(key.name());
     }
 
     public static void clear() {
         context.get().clear();
     }
 
-    // === 편의 메서드: Admin Token ===
+    // ===== 편의 메서드 =====
 
-    private static final String ADMIN_TOKEN = "adminToken";
+    public static void setId(Key key, Long id) { set(key, id); }
+    public static Long getId(Key key) { return get(key, Long.class); }
 
-    public static void setAdminToken(String token) {
-        set(ADMIN_TOKEN, token);
-    }
+    public static String getAdminToken() { return get(Key.ADMIN_TOKEN, String.class); }
+    public static void setAdminToken(String token) { set(Key.ADMIN_TOKEN, token); }
 
-    public static String getAdminToken() {
-        return get(ADMIN_TOKEN, String.class);
-    }
-
-    // === 편의 메서드: Last Response ===
-
-    private static final String LAST_RESPONSE = "lastResponse";
-
-    public static void setLastResponse(Response response) {
-        set(LAST_RESPONSE, response);
-    }
-
-    public static Response getLastResponse() {
-        return get(LAST_RESPONSE, Response.class);
-    }
-
-    // ===== 편의 메서드: Campsite ID =====
-
-    private static final String CAMPSITE_ID = "campsiteId";
-
-    public static void setCampsiteId(Long id) {
-        set(CAMPSITE_ID, id);
-    }
-
-    public static Long getCampsiteId() {
-        return get(CAMPSITE_ID, Long.class);
-    }
-
-    // === 편의 메서드: Product ID ===
-
-    private static final String PRODUCT_ID = "productId";
-
-    public static void setProductId(Long id) {
-        set(PRODUCT_ID, id);
-    }
-
-    public static Long getProductId() {
-        return get(PRODUCT_ID, Long.class);
-    }
-
-    // === 편의 메서드: Reservation ID ===
-
-    private static final String RESERVATION_ID = "reservationId";
-
-    public static void setReservationId(Long id) {
-        set(RESERVATION_ID, id);
-    }
-
-    public static Long getReservationId() {
-        return get(RESERVATION_ID, Long.class);
-    }
-
-    // ===== 편의 메서드 : RentalRecord ID =====
-    private static final String RENTAL_RECORD_ID = "rentalRecordId";
-
-    public static void setRentalRecordId(Long id) {
-        set(RENTAL_RECORD_ID, id);
-    }
-
-    public static Long getRentalRecordId() {
-        return get(RENTAL_RECORD_ID, Long.class);
-    }
-
-    // === 편의 메서드: Quantity ===
-
-    private static final String QUANTITY = "quantity";
-
-    public static void setQuantity(Integer quantity) {
-        set(QUANTITY, quantity);
-    }
-
-    public static Integer getQuantity() {
-        return get(QUANTITY, Integer.class);
-    }
+    public static Response getLastResponse() { return get(Key.LAST_RESPONSE, Response.class); }
+    public static void setLastResponse(Response response) { set(Key.LAST_RESPONSE, response); }
 }

@@ -9,6 +9,8 @@ import io.restassured.response.Response;
 import java.util.Map;
 import java.util.UUID;
 
+import static com.camping.admin.common.TestContext.Key.*;
+
 public class CampsiteSteps {
 
     private static String uniqueSiteNumber() {
@@ -25,7 +27,7 @@ public class CampsiteSteps {
                 "테스트 캠프사이트",
                 4
         );
-        TestContext.setCampsiteId(response.jsonPath().getLong("id"));
+        TestContext.set(CAMPSITE_ID, response.jsonPath().getLong("id"));
     }
 
     // ===== When: 인증 O =====
@@ -45,7 +47,7 @@ public class CampsiteSteps {
     public void 관리자가_캠프사이트_정보를_수정한다() {
         Response response = CampsiteApi.캠프사이트_수정(
                 TestContext.getAdminToken(),
-                TestContext.getCampsiteId(),
+                TestContext.getId(CAMPSITE_ID),
                 Map.of("description", "수정된 설명", "maxPeople", 8)
         );
         TestContext.setLastResponse(response);

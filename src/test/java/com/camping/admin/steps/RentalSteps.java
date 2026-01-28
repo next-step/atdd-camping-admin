@@ -6,25 +6,27 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
+import static com.camping.admin.common.TestContext.Key.*;
+
 public class RentalSteps {
 
     // ===== Given =====
 
     @Given("고객의 예약이 존재한다")
     public void 고객의_예약이_존재한다() {
-        TestContext.setReservationId(1L);
-        TestContext.setProductId(1L);
+        TestContext.set(RESERVATION_ID, 1L);
+        TestContext.set(PRODUCT_ID, 1L);
     }
 
     @Given("대여 중인 장비가 있다")
     public void 대여_중인_장비가_있다() {
         Response response = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 1);
-        TestContext.setRentalRecordId(response.jsonPath().getLong("id"));
+        TestContext.set(RENTAL_RECORD_ID, response.jsonPath().getLong("id"));
     }
 
     @Given("판매 상품이 존재한다")
     public void 판매_상품이_존재한다() {
-        TestContext.setProductId(2L);
+        TestContext.set(PRODUCT_ID, 2L);
     }
 
     @Given("반납 완료된 장비가 있다")
@@ -32,7 +34,7 @@ public class RentalSteps {
         Response createResponse = RentalApi.대여_생성(TestContext.getAdminToken(), 1L, 1);
         Long rentalRecordId = createResponse.jsonPath().getLong("id");
         RentalApi.반납(TestContext.getAdminToken(), rentalRecordId);
-        TestContext.setRentalRecordId(rentalRecordId);
+        TestContext.set(RENTAL_RECORD_ID, rentalRecordId);
     }
 
     // ===== When: 인증 O =====
@@ -41,9 +43,9 @@ public class RentalSteps {
     public void 관리자가_예약_고객에게_장비를_대여한다() {
         Response response = RentalApi.대여_생성_with_예약(
                 TestContext.getAdminToken(),
-                TestContext.getProductId(),
+                TestContext.getId(PRODUCT_ID),
                 1,
-                TestContext.getReservationId());
+                TestContext.getId(RESERVATION_ID));
         TestContext.setLastResponse(response);
     }
 
@@ -55,7 +57,7 @@ public class RentalSteps {
 
     @When("관리자가 반납 처리한다")
     public void 관리자가_반납_처리한다() {
-        Response response = RentalApi.반납(TestContext.getAdminToken(), TestContext.getRentalRecordId());
+        Response response = RentalApi.반납(TestContext.getAdminToken(), TestContext.getId(RENTAL_RECORD_ID));
         TestContext.setLastResponse(response);
     }
 
@@ -73,7 +75,7 @@ public class RentalSteps {
 
     @When("관리자가 판매 상품을 대여한다")
     public void 관리자가_판매_상품을_대여한다() {
-        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), TestContext.getProductId(), 1);
+        Response response = RentalApi.대여_생성(TestContext.getAdminToken(), TestContext.getId(PRODUCT_ID), 1);
         TestContext.setLastResponse(response);
     }
 

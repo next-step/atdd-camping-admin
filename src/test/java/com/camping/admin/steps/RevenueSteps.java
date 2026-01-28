@@ -2,7 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.RevenueApi;
 import com.camping.admin.common.TestContext;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 

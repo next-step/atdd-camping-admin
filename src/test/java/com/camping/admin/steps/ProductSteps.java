@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 
 import java.util.Map;
 
+import static com.camping.admin.common.TestContext.Key.*;
+
 public class ProductSteps {
 
     // ===== Given =====
@@ -21,7 +23,7 @@ public class ProductSteps {
                 10000,
                 "RENTAL"
         );
-        TestContext.setProductId(response.jsonPath().getLong("id"));
+        TestContext.set(PRODUCT_ID, response.jsonPath().getLong("id"));
     }
 
     // ===== When: 인증 O =====
@@ -54,7 +56,7 @@ public class ProductSteps {
     public void 관리자가_상품_정보를_수정한다() {
         Response response = ProductApi.상품_수정(
                 TestContext.getAdminToken(),
-                TestContext.getProductId(),
+                TestContext.getId(PRODUCT_ID),
                 Map.of("name", "수정된 상품명", "price", 20000)
         );
         TestContext.setLastResponse(response);
