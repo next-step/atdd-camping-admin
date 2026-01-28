@@ -1,25 +1,12 @@
 package com.camping.admin.api;
 
-import io.restassured.RestAssured;
-import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 
-import java.util.HashMap;
 import java.util.Map;
 
+import static com.camping.admin.api.ApiSupport.*;
+
 public class RentalApi {
-
-    // ===== 공통 =====
-    private static RequestSpecification baseRequest() {
-        return RestAssured.given()
-                .contentType(ContentType.JSON);
-    }
-
-    private static RequestSpecification authRequest(String token) {
-        return baseRequest()
-                .header("Authorization", "Bearer " + token);
-    }
 
     // ===== 대여 =====
 

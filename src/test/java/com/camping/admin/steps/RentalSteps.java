@@ -135,11 +135,6 @@ public class RentalSteps {
         TestContext.getLastResponse().then().statusCode(200);
     }
 
-    @Then("인증 오류가 발생한다")
-    public void 인증_오류가_발생한다() {
-        TestContext.getLastResponse().then().statusCode(401);
-    }
-
     @Then("대여가 실패한다")
     public void 대여가_실패한다() {
         assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
