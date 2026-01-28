@@ -2,9 +2,9 @@ package com.camping.admin.domain.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,8 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "campsites")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Campsite {
 
     @Id
@@ -35,5 +34,11 @@ public class Campsite {
         this.siteNumber = siteNumber;
         this.description = description;
         this.maxPeople = maxPeople;
+    }
+
+    public void update(String siteNumber, String description, Integer maxPeople) {
+        this.siteNumber = siteNumber != null ? siteNumber : this.siteNumber;
+        this.description = description != null ? description : this.description;
+        this.maxPeople = maxPeople != null ? maxPeople : this.maxPeople;
     }
 }

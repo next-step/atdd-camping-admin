@@ -2,14 +2,13 @@ package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
 import jakarta.persistence.*;
-import java.math.BigDecimal;
 import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Getter
-@Setter
 @Entity
 @Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -39,4 +38,21 @@ public class Product {
         this.productType = productType;
     }
 
+    public void update(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+        this.name = name != null ? name : this.name;
+        this.stockQuantity = stockQuantity != null ? stockQuantity : this.stockQuantity;
+        this.price = price != null ? price : this.price;
+        this.productType = productType != null ? productType : this.productType;
+    }
+
+    public void decreaseStock(Integer quantity) {
+        if (this.stockQuantity < quantity) {
+            throw new IllegalStateException("재고가 부족합니다");
+        }
+        this.stockQuantity -= quantity;
+    }
+
+    public void increaseStock(Integer quantity) {
+        this.stockQuantity += quantity;
+    }
 }
