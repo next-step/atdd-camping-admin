@@ -3,13 +3,10 @@ package com.camping.admin.steps;
 import com.camping.admin.api.CampsiteApi;
 import com.camping.admin.common.TestContext;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
 import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class CampsiteSteps {
 

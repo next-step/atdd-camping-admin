@@ -2,58 +2,59 @@ package com.camping.admin.steps;
 
 import com.camping.admin.api.ReservationApi;
 import com.camping.admin.common.TestContext;
-import com.camping.admin.common.TestData;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 public class ReservationSteps {
 
-    @Given("사용자가 캠핑장 예약을 했다")
-    public void 사용자가_캠핑장_예약을_했다() {
-        TestContext.setReservationId(TestData.RESERVATION_HONG_ID);
+    // ===== Given =====
+
+    @Given("등록된 예약이 있다")
+    public void 등록된_예약이_있다() {
+        // data.sql에 있는 예약 사용
+        TestContext.setReservationId(1L);
     }
 
-    @When("관리자가 해당 예약을 취소하면")
-    public void 관리자가_해당_예약을_취소하면() {
-        Response response = ReservationApi.예약을_취소한다(
+    // ===== When: 인증 O =====
+
+    @When("관리자가 예약 상태를 변경한다")
+    public void 관리자가_예약_상태를_변경한다() {
+        Response response = ReservationApi.상태_변경(
                 TestContext.getAdminToken(),
-                TestContext.getReservationId()
+                TestContext.getReservationId(),
+                "CONFIRMED"
         );
         TestContext.setLastResponse(response);
     }
 
-    @Then("예약이 성공적으로 취소된다")
-    public void 예약이_성공적으로_취소된다() {
-        Response response = TestContext.getLastResponse();
-        assertThat(response.statusCode()).isEqualTo(200);
-        assertThat(response.jsonPath().getString("status")).isEqualTo("CANCELLED");
+    @When("관리자가 예약 목록을 조회한다")
+    public void 관리자가_예약_목록을_조회한다() {
+        Response response = ReservationApi.목록_조회(TestContext.getAdminToken());
+        TestContext.setLastResponse(response);
     }
 
-    @And("관리자가 이미 해당 예약을 취소했다")
-    public void 관리자가_이미_해당_예약을_취소했다() {
-        ReservationApi.예약을_취소한다(
+    @When("관리자가 존재하지 않는 예약의 상태를 변경한다")
+    public void 관리자가_존재하지_않는_예약의_상태를_변경한다() {
+        Response response = ReservationApi.상태_변경(
                 TestContext.getAdminToken(),
-                TestContext.getReservationId()
-        );
-    }
-
-    @When("관리자가 다시 해당 예약을 취소하면")
-    public void 관리자가_다시_해당_예약을_취소하면() {
-        Response response = ReservationApi.예약을_취소한다(
-                TestContext.getAdminToken(),
-                TestContext.getReservationId()
+                99999L,
+                "CONFIRMED"
         );
         TestContext.setLastResponse(response);
     }
 
-    @Then("시스템 정책에 맞는 결과가 반환된다")
-    public void 시스템_정책에_맞는_결과가_반환된다() {
-        Response response = TestContext.getLastResponse();
-        assertThat(response.statusCode()).isEqualTo(200);
+    // ===== When: 인증 X =====
+
+    @When("관리자 권한 없이 예약 상태를 변경한다")
+    public void 관리자_권한_없이_예약_상태를_변경한다() {
+        Response response = ReservationApi.상태_변경_인증없이(1L, "CONFIRMED");
+        TestContext.setLastResponse(response);
+    }
+
+    @When("관리자 권한 없이 예약 목록을 조회한다")
+    public void 관리자_권한_없이_예약_목록을_조회한다() {
+        Response response = ReservationApi.목록_조회_인증없이();
+        TestContext.setLastResponse(response);
     }
 }
