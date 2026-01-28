@@ -1,9 +1,9 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.Reservation;
-import java.time.LocalDate;
-
 import lombok.Getter;
+
+import java.time.LocalDate;
 
 @Getter
 public class ReservationResponse {
@@ -24,7 +24,7 @@ public class ReservationResponse {
         this.customerName = reservation.getCustomerName();
         this.startDate = reservation.getStartDate();
         this.endDate = reservation.getEndDate();
-        this.status = reservation.getStatus();
+        this.status = reservation.getStatus().name();
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
     }

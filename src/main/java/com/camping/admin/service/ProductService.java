@@ -1,10 +1,14 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.dto.CreateProductRequest;
+import com.camping.admin.dto.UpdateProductRequest;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,22 +17,34 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
-    @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalStateException("Not enough stock for product " + product.getName());
-        }
-        product.setStockQuantity(product.getStockQuantity() - quantity);
+    public List<Product> findAll() {
+        return productRepository.findAll();
     }
 
     @Transactional
-    public void increaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        product.setStockQuantity(product.getStockQuantity() + quantity);
+    public Product createProduct(CreateProductRequest request) {
+        Product newProduct = new Product(
+                request.getName(),
+                request.getStockQuantity(),
+                request.getPrice(),
+                request.getProductType()
+        );
+        return productRepository.save(newProduct);
     }
 
-    private Product findById(Long productId) {
+    @Transactional
+    public Product updateProduct(Long productId, UpdateProductRequest request) {
+        Product product = findById(productId);
+        product.update(
+                request.getName(),
+                request.getStockQuantity(),
+                request.getPrice(),
+                request.getProductType()
+        );
+        return product;
+    }
+
+    public Product findById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
     }

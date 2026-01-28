@@ -1,19 +1,10 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ReservationStatus;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
+import com.camping.admin.exception.InvalidStatusTransitionException;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -21,7 +12,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "reservations")
 @Getter
-@Setter
 @NoArgsConstructor
 public class Reservation {
     
@@ -45,8 +35,9 @@ public class Reservation {
     private Campsite campsite;
     
     private String phoneNumber;
-    
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private ReservationStatus status;
     
     @Column(length = 6)
     private String confirmationCode;
@@ -57,7 +48,7 @@ public class Reservation {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "CONFIRMED";
+            this.status = ReservationStatus.CONFIRMED;
         }
     }
     
@@ -68,13 +59,18 @@ public class Reservation {
         this.campsite = campsite;
     }
 
+    public void setStatus(ReservationStatus status) {
+        this.status = status;
+    }
+
     public void updateStatus(String status) {
+        ReservationStatus oldStatus = this.status;
         ReservationStatus newStatus = ReservationStatus.valueOf(status);
 
-        if(this.status == ReservationStatus.CANCELLED.name()) {
-            throw new IllegalStateException("이미 취소된 예약은 상태를 변경할 수 없습니다.");
+        if (!oldStatus.canTransitionTo(newStatus)) {
+            throw new InvalidStatusTransitionException(oldStatus, newStatus);
         }
 
-        this.status = newStatus.name();
+        this.status = newStatus;
     }
 }

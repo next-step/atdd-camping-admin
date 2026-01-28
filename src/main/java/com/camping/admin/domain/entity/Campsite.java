@@ -34,4 +34,22 @@ public class Campsite {
         this.description = description;
         this.maxPeople = maxPeople;
     }
+
+    public void update(String siteNumber, String description, Integer maxPeople) {
+        if (siteNumber == null || siteNumber.isBlank()) {
+            throw new IllegalArgumentException("Site number is required.");
+        }
+
+        if (maxPeople != null && maxPeople <= 0) {
+            throw new IllegalArgumentException("Max people must be greater than zero.");
+        }
+
+        if (description != null && description.trim().length() < 5) {
+            throw new IllegalArgumentException("Description is too short (minimum 5 characters).");
+        }
+
+        this.siteNumber = siteNumber;
+        this.description = description;
+        this.maxPeople = maxPeople;
+    }
 }

@@ -42,7 +42,12 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
+    public void returnItem() {
+        if(Boolean.TRUE.equals(this.isReturned)) {
+            throw new IllegalStateException("This item has already been returned.");
+        }
+
+        this.isReturned = true;
+        this.product.increaseStock(this.quantity);
     }
 }

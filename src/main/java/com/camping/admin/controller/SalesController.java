@@ -5,11 +5,9 @@ import com.camping.admin.dto.SalesRecordResponse;
 import com.camping.admin.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/sales") // Public-facing API prefix
@@ -25,8 +23,8 @@ public class SalesController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<SalesRecordResponse>> listSales() {
-        java.util.List<SalesRecordResponse> records = salesService.findRecentSales(10);
+    public ResponseEntity<List<SalesRecordResponse>> listSales() {
+        List<SalesRecordResponse> records = salesService.findRecentSales(10);
         return ResponseEntity.ok(records);
     }
 }

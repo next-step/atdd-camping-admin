@@ -29,7 +29,7 @@ public class ReservationTestdataFactory {
 
     public Reservation createReservationWithStatus(String customerName, Campsite campsite, String status) {
         Reservation reservation = createReservation(customerName, campsite);
-        reservation.setStatus(ReservationStatus.valueOf(status).name());
+        reservation.setStatus(ReservationStatus.valueOf(status));
         return reservationRepository.save(reservation);
     }
 }
