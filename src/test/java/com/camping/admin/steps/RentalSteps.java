@@ -117,31 +117,4 @@ public class RentalSteps {
         Response response = RentalApi.목록_조회_인증없이();
         TestContext.setLastResponse(response);
     }
-
-    // ===== Then =====
-
-    @Then("대여가 완료된다")
-    public void 대여가_완료된다() {
-        TestContext.getLastResponse().then().statusCode(201);
-    }
-
-    @Then("반납이 완료된다")
-    public void 반납이_완료된다() {
-        TestContext.getLastResponse().then().statusCode(200);
-    }
-
-    @Then("대여 목록이 반환된다")
-    public void 대여_목록이_반환된다() {
-        TestContext.getLastResponse().then().statusCode(200);
-    }
-
-    @Then("대여가 실패한다")
-    public void 대여가_실패한다() {
-        assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
-    }
-
-    @Then("반납이 실패한다")
-    public void 반납이_실패한다() {
-        assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
-    }
 }

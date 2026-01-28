@@ -48,16 +48,16 @@ public class TestContext {
         return get(LAST_RESPONSE, Response.class);
     }
 
-    // === 편의 메서드: Reservation ID ===
+    // ===== 편의 메서드: Campsite ID =====
 
-    private static final String RESERVATION_ID = "reservationId";
+    private static final String CAMPSITE_ID = "campsiteId";
 
-    public static void setReservationId(Long id) {
-        set(RESERVATION_ID, id);
+    public static void setCampsiteId(Long id) {
+        set(CAMPSITE_ID, id);
     }
 
-    public static Long getReservationId() {
-        return get(RESERVATION_ID, Long.class);
+    public static Long getCampsiteId() {
+        return get(CAMPSITE_ID, Long.class);
     }
 
     // === 편의 메서드: Product ID ===
@@ -70,6 +70,18 @@ public class TestContext {
 
     public static Long getProductId() {
         return get(PRODUCT_ID, Long.class);
+    }
+
+    // === 편의 메서드: Reservation ID ===
+
+    private static final String RESERVATION_ID = "reservationId";
+
+    public static void setReservationId(Long id) {
+        set(RESERVATION_ID, id);
+    }
+
+    public static Long getReservationId() {
+        return get(RESERVATION_ID, Long.class);
     }
 
     // ===== 편의 메서드 : RentalRecord ID =====

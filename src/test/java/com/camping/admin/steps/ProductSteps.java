@@ -98,26 +98,4 @@ public class ProductSteps {
         Response response = ProductApi.목록_조회_인증없이();
         TestContext.setLastResponse(response);
     }
-
-    // ===== Then =====
-
-    @Then("상품이 등록된다")
-    public void 상품이_등록된다() {
-        TestContext.getLastResponse().then().statusCode(201);
-    }
-
-    @Then("상품이 수정된다")
-    public void 상품이_수정된다() {
-        TestContext.getLastResponse().then().statusCode(200);
-    }
-
-    @Then("상품 목록이 반환된다")
-    public void 상품_목록이_반환된다() {
-        TestContext.getLastResponse().then().statusCode(200);
-    }
-
-    @Then("수정이 실패한다")
-    public void 수정이_실패한다() {
-        assertThat(TestContext.getLastResponse().statusCode()).isGreaterThanOrEqualTo(400);
-    }
 }
