@@ -26,6 +26,7 @@ public class ScenarioContext {
 
     // === 예약 관련 ===
     private int targetReservationId;
+    private String targetConfirmationCode;
 
     // === Response ===
 
@@ -99,5 +100,13 @@ public class ScenarioContext {
 
     public void setTargetReservationId(int targetReservationId) {
         this.targetReservationId = targetReservationId;
+    }
+
+    public String getTargetConfirmationCode() {
+        return targetConfirmationCode;
+    }
+
+    public void setTargetConfirmationCode(String targetConfirmationCode) {
+        this.targetConfirmationCode = targetConfirmationCode;
     }
 }

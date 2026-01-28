@@ -31,9 +31,7 @@ public class SalesService {
     }
 
     public List<SalesRecordResponse> findRecentSales(int limit) {
-        return salesRecordRepository.findAll().stream()
-                .sorted(Comparator.comparing(SalesRecord::getCreatedAt).reversed())
-                .limit(limit)
+        return salesRecordRepository.findRecentSalesRecords(limit).stream()
                 .map(SalesRecordResponse::from)
                 .toList();
     }

@@ -1,6 +1,9 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.domain.exception.ProductErrorCode;
+import com.camping.admin.domain.vo.Stock;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.AccessLevel;
@@ -22,8 +25,10 @@ public class Product {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "stock_quantity", nullable = false)
-    private Integer stockQuantity;
+    @JsonIgnore
+    @Embedded
+    @AttributeOverride(name = "quantity", column = @Column(name = "stock_quantity", nullable = false))
+    private Stock stock;
 
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal price;
@@ -34,7 +39,7 @@ public class Product {
 
     public Product(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         this.name = name;
-        this.stockQuantity = stockQuantity != null ? stockQuantity : 0;
+        this.stock = stockQuantity != null ? new Stock(stockQuantity) : Stock.zero();
         this.price = price != null ? price : BigDecimal.ZERO;
         this.productType = productType != null ? productType : ProductType.SALE;
     }
@@ -44,7 +49,7 @@ public class Product {
             this.name = name;
         }
         if (stockQuantity != null) {
-            this.stockQuantity = stockQuantity;
+            this.stock = new Stock(stockQuantity);
         }
         if (price != null) {
             this.price = price;
@@ -55,32 +60,35 @@ public class Product {
     }
 
     public boolean isRentable() {
-        return this.productType == ProductType.RENTAL;
+        return this.productType.isRentable();
     }
 
     public void validateRentable() {
         if (!isRentable()) {
-            throw new IllegalStateException("대여 불가능한 상품입니다");
+            throw ProductErrorCode.NOT_RENTABLE.toException();
         }
     }
 
     public boolean isSellable() {
-        return this.productType == ProductType.SALE;
+        return this.productType.isSellable();
     }
 
     public void validateSellable() {
         if (!isSellable()) {
-            throw new IllegalStateException("판매 불가능한 상품입니다");
+            throw ProductErrorCode.NOT_SELLABLE.toException();
         }
     }
-  public void decreaseStock(int quantity) {
-        if (this.stockQuantity < quantity) {
-            throw new IllegalStateException("Not enough stock for product " + this.name);
-        }
-        this.stockQuantity -= quantity;
+
+    public void decreaseStock(int quantity) {
+        this.stock = this.stock.decrease(quantity);
     }
 
     public void increaseStock(int quantity) {
-        this.stockQuantity += quantity;
+        this.stock = this.stock.increase(quantity);
+    }
+
+    // 기존 API 호환을 위한 위임 메서드
+    public Integer getStockQuantity() {
+        return stock != null ? stock.getQuantity() : 0;
     }
 }

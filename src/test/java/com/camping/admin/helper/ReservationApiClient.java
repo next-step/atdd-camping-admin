@@ -50,4 +50,18 @@ public class ReservationApiClient {
         return response.jsonPath()
             .getString("find { it.id == " + reservationId + " }.status");
     }
+
+    public String getConfirmationCode(int reservationId) {
+        Response response = getReservations();
+        return response.jsonPath()
+            .getString("find { it.id == " + reservationId + " }.confirmationCode");
+    }
+
+    public Response findByConfirmationCode(String confirmationCode) {
+        return RestAssured.given()
+            .spec(requestSpec)
+            .queryParam("code", confirmationCode)
+            .when()
+            .get("/admin/reservations/lookup");
+    }
 }

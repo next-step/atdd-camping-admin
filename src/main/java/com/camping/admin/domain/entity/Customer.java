@@ -1,5 +1,7 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.vo.Email;
+import com.camping.admin.domain.vo.PhoneNumber;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -18,15 +20,17 @@ public class Customer {
     @Column(nullable = false)
     private String name;
 
-    @Column(unique = true, nullable = false)
-    private String email;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "email", unique = true, nullable = false))
+    private Email email;
 
-    @Column(name = "phone_number")
-    private String phoneNumber;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "phone_number"))
+    private PhoneNumber phoneNumber;
 
     public Customer(String name, String email, String phoneNumber) {
         this.name = name;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
+        this.email = new Email(email);
+        this.phoneNumber = phoneNumber != null ? new PhoneNumber(phoneNumber) : null;
     }
 }

@@ -1,17 +1,20 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.RevenueSource;
+import com.camping.admin.domain.exception.RentalErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
 @Entity
 @Table(name = "rental_records")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class RentalRecord {
+public class RentalRecord implements RevenueSource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -45,12 +48,16 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-
     public void markAsReturned() {
         if (this.isReturned) {
-            throw new IllegalStateException("이미 반납된 대여 기록입니다");
+            throw RentalErrorCode.ALREADY_RETURNED.toException();
         }
         this.isReturned = true;
         this.product.increaseStock(this.quantity);
+    }
+
+    @Override
+    public BigDecimal calculateRevenue() {
+        return product.getPrice().multiply(BigDecimal.valueOf(quantity));
     }
 }

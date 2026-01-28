@@ -18,6 +18,11 @@ public class CampsiteService {
         return campsiteRepository.findAll();
     }
 
+    public Campsite findById(Long id) {
+        return campsiteRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + id));
+    }
+
     @Transactional
     public Campsite create(String siteNumber, String description, Integer maxPeople) {
         return campsiteRepository.save(new Campsite(siteNumber, description, maxPeople));

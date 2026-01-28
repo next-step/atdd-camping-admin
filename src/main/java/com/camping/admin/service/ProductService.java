@@ -20,6 +20,11 @@ public class ProductService {
         return productRepository.findAll();
     }
 
+    public Product findById(Long id) {
+        return productRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + id));
+    }
+
     @Transactional
     public Product create(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
         return productRepository.save(new Product(name, stockQuantity, price, productType));
@@ -27,14 +32,10 @@ public class ProductService {
 
     @Transactional
     public Product update(Long productId, String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
-        Product product = findById(productId);
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
         product.update(name, stockQuantity, price, productType);
         return product;
     }
 
-
-    private Product findById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
-    }
 }

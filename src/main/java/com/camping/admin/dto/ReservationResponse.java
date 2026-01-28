@@ -14,6 +14,7 @@ public class ReservationResponse {
     private String status;
     private String campsiteSiteNumber;
     private LocalDate reservationDate;
+    private String confirmationCode;
 
     public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(reservation);
@@ -24,8 +25,10 @@ public class ReservationResponse {
         this.customerName = reservation.getCustomerName();
         this.startDate = reservation.getStartDate();
         this.endDate = reservation.getEndDate();
-        this.status = reservation.getStatus();
+        this.status = String.valueOf(reservation.getStatus().name());
         this.campsiteSiteNumber = reservation.getCampsite().getSiteNumber();
         this.reservationDate = reservation.getReservationDate();
+        this.confirmationCode = reservation.getConfirmationCode() != null
+            ? reservation.getConfirmationCode().getValue() : null;
     }
 }

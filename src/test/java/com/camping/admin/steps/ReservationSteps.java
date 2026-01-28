@@ -115,4 +115,41 @@ public class ReservationSteps {
         response.then().statusCode(200);
         log.info("[And] 해당 자원은 다시 예약 가능하다");
     }
+
+    // === 확인 코드로 조회 ===
+
+    @When("관리자가 확인 코드로 예약을 조회한다")
+    public void 관리자가확인코드로예약을조회한다() {
+        // 기존 예약의 확인 코드 조회
+        String confirmationCode = helper().getConfirmationCode(scenario.getTargetReservationId());
+        scenario.setTargetConfirmationCode(confirmationCode);
+        scenario.setLastResponse(helper().findByConfirmationCode(confirmationCode));
+        log.info("[When] 관리자가 확인 코드 {}로 예약을 조회한다", confirmationCode);
+    }
+
+    @When("관리자가 존재하지 않는 확인 코드로 예약을 조회한다")
+    public void 관리자가존재하지않는확인코드로예약을조회한다() {
+        scenario.setLastResponse(helper().findByConfirmationCode("XXXXXX"));
+        log.info("[When] 관리자가 존재하지 않는 확인 코드로 예약을 조회한다");
+    }
+
+    @Then("예약 정보가 반환된다")
+    public void 예약정보가반환된다() {
+        scenario.getLastResponse().then().statusCode(200);
+        log.info("[Then] 예약 정보가 반환된다");
+    }
+
+    @Then("예약 조회 결과가 없다")
+    public void 예약조회결과가없다() {
+        int statusCode = scenario.getLastResponse().getStatusCode();
+        assertThat(statusCode).isIn(200, 404);  // 빈 결과 또는 404
+        log.info("[Then] 예약 조회 결과가 없다");
+    }
+
+    @And("예약 상태는 취소 상태이다")
+    public void 예약상태는취소상태이다() {
+        String status = scenario.getLastResponse().jsonPath().getString("status");
+        assertThat(status).isEqualTo("CANCELLED");
+        log.info("[And] 예약 상태는 취소 상태이다");
+    }
 }

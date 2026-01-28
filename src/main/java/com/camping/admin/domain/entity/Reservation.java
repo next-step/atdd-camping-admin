@@ -1,21 +1,27 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.domain.RevenueSource;
 import com.camping.admin.domain.enums.ReservationStatus;
+import com.camping.admin.domain.exception.CommonErrorCode;
+import com.camping.admin.domain.exception.ReservationErrorCode;
+import com.camping.admin.domain.vo.ConfirmationCode;
+import com.camping.admin.domain.vo.PhoneNumber;
+import com.camping.admin.domain.vo.ReservationTiming;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Set;
 
 @Entity
 @Table(name = "reservations")
 @Getter
 @Setter
 @NoArgsConstructor
-public class Reservation {
+public class Reservation implements RevenueSource {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,24 +30,29 @@ public class Reservation {
     @Column(nullable = false)
     private String customerName;
 
-    @Column(nullable = false)
-    private LocalDate startDate;
-
-    @Column(nullable = false)
-    private LocalDate endDate;
-
-    private LocalDate reservationDate;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "reservationDate", column = @Column(name = "reservation_date")),
+        @AttributeOverride(name = "stayPeriod.startDate", column = @Column(name = "start_date", nullable = false)),
+        @AttributeOverride(name = "stayPeriod.endDate", column = @Column(name = "end_date", nullable = false))
+    })
+    private ReservationTiming timing;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campsite_id", nullable = false)
     private Campsite campsite;
 
-    private String phoneNumber;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "phone_number"))
+    private PhoneNumber phoneNumber;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
 
-    @Column(length = 6)
-    private String confirmationCode;
+    @Embedded
+    @AttributeOverride(name = "value", column = @Column(name = "confirmation_code", length = 6))
+    private ConfirmationCode confirmationCode;
 
     private LocalDateTime createdAt;
 
@@ -49,30 +60,57 @@ public class Reservation {
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         if (this.status == null) {
-            this.status = "CONFIRMED";
+            this.status = ReservationStatus.CONFIRMED;
+        }
+        if (this.confirmationCode == null) {
+            this.confirmationCode = ConfirmationCode.generate();
         }
     }
 
     public Reservation(String customerName, LocalDate startDate, LocalDate endDate, Campsite campsite) {
         this.customerName = customerName;
-        this.startDate = startDate;
-        this.endDate = endDate;
+        this.timing = new ReservationTiming(LocalDate.now(), startDate, endDate);
         this.campsite = campsite;
     }
 
+    // 기존 코드 호환을 위한 위임 메서드
+    public LocalDate getStartDate() {
+        return timing != null ? timing.getStartDate() : null;
+    }
+
+    public LocalDate getEndDate() {
+        return timing != null ? timing.getEndDate() : null;
+    }
+
+    public LocalDate getReservationDate() {
+        return timing != null ? timing.getReservationDate() : null;
+    }
+
+    public void updateStatus(ReservationStatus newStatus) {
+        if (newStatus == null) {
+            throw CommonErrorCode.REQUIRED.withDomain("상태");
+        }
+        if (this.status.isFinal()) {
+            throw ReservationErrorCode.ALREADY_FINAL.with(this.status);
+        }
+        this.status = newStatus;
+    }
+
     public void updateStatus(String newStatus) {
-        ReservationStatus validatedStatus;
         try {
-            validatedStatus = ReservationStatus.valueOf(newStatus);
+            updateStatus(ReservationStatus.valueOf(newStatus));
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("유효하지 않은 예약 상태입니다: " + newStatus);
+            throw ReservationErrorCode.INVALID_STATUS.with(newStatus);
         }
+    }
 
-        Set<String> finalStatuses = Set.of("CANCELLED", "CHECKED_OUT");
-        if (finalStatuses.contains(this.status)) {
-            throw new IllegalStateException("이미 " + this.status + " 상태인 예약은 변경할 수 없습니다");
-        }
+    public long calculateNights() {
+        return timing.calculateNights();
+    }
 
-        this.status = validatedStatus.name();
+    @Override
+    public BigDecimal calculateRevenue() {
+        return BigDecimal.valueOf(calculateNights())
+                         .multiply(new BigDecimal("50000"));
     }
 }
