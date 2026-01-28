@@ -77,6 +77,21 @@ public class CampsiteAdminController {
             maxPeople = null;
         }
 
+        // 유효성 검사: 사이트번호가 null 또는 빈 문자열이면 등록 불가
+        if (siteNumber == null || siteNumber.trim().isEmpty()) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        // 유효성 검사: 최대인원이 0 이하이면 등록 불가
+        if (maxPeople == null || maxPeople <= 0) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        }
+
+        // 유효성 검사: 이미 존재하는 사이트번호이면 등록 불가
+        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
+            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
+        }
+
         Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
         Campsite saved = campsiteRepository.save(newCampsite);
         if (saved == null) {
