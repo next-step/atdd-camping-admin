@@ -2,6 +2,7 @@ package com.camping.admin.controller;
 
 import com.camping.admin.dto.CreateRentalRequest;
 import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.exception.NotFoundException;
 import com.camping.admin.service.RentalService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -36,5 +37,15 @@ public class RentalAdminController {
     public ResponseEntity<RentalResponse> markAsReturned(@PathVariable Long rentalRecordId) {
         RentalResponse updatedRental = rentalService.markAsReturned(rentalRecordId);
         return ResponseEntity.ok(updatedRental);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Void> handleNotFoundException(NotFoundException e) {
+        return ResponseEntity.notFound().build();
     }
 }
