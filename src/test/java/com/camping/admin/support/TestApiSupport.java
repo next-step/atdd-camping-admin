@@ -18,6 +18,9 @@ public class TestApiSupport {
     @Autowired
     private ReservationAPI reservationAPI;
 
+    @Autowired
+    private CustomerAPI customerAPI;
+
     public AuthAPI auth() {
         return authAPI;
     }
@@ -28,5 +31,9 @@ public class TestApiSupport {
 
     public ReservationAPI reservation() {
         return reservationAPI;
+    }
+
+    public CustomerAPI customer() {
+        return customerAPI;
     }
 }

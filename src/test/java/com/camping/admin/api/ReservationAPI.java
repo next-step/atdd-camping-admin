@@ -12,6 +12,22 @@ import java.util.Map;
 public class ReservationAPI {
 
     /**
+     * 예약 생성 API 호출
+     * POST /admin/reservations
+     */
+    public ExtractableResponse<Response> 예약_생성(String token, Map<String, Object> params) {
+        return RestAssured
+                .given()
+                    .header("Authorization", "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .body(params)
+                .when()
+                    .post("/admin/reservations")
+                .then()
+                    .extract();
+    }
+
+    /**
      * 예약 상태 변경 API 호출
      * PATCH /admin/reservations/{id}/status
      */
