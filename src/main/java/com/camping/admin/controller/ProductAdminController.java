@@ -3,6 +3,7 @@ package com.camping.admin.controller;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.dto.ProductCreateRequest;
+import com.camping.admin.dto.ProductUpdateRequest;
 import com.camping.admin.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -50,49 +51,21 @@ public class ProductAdminController {
     @PutMapping("/{productId}")
     public ResponseEntity<Product> updateProduct(
             @PathVariable Long productId,
-            @RequestBody Map<String, Object> body) {
+            @RequestBody ProductUpdateRequest updateReq) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
 
-        if (body != null) {
-            if (body.containsKey("name")) {
-                Object v = body.get("name");
-                if (v != null) {
-                    product.setName(v.toString());
-                }
-            }
-            if (body.containsKey("stockQuantity")) {
-                Object v = body.get("stockQuantity");
-                if (v instanceof Number) {
-                    product.setStockQuantity(((Number) v).intValue());
-                } else if (v != null) {
-                    try {
-                        product.setStockQuantity(Integer.valueOf(v.toString()));
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-            if (body.containsKey("price")) {
-                Object v = body.get("price");
-                if (v instanceof Number) {
-                    product.setPrice(new BigDecimal(((Number) v).toString()));
-                } else if (v != null) {
-                    try {
-                        product.setPrice(new BigDecimal(v.toString()));
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-            if (body.containsKey("productType")) {
-                Object v = body.get("productType");
-                if (v != null) {
-                    try {
-                        product.setProductType(ProductType.valueOf(v.toString()));
-                    } catch (Exception ignore) {
-                    }
-                }
-            }
-        }
+        String name = requireNonNullElse(updateReq.name(), product.getName());
+        Integer stockQuantity = requireNonNullElse(updateReq.stockQuantity(), product.getStockQuantity());
+        BigDecimal price = requireNonNullElse(updateReq.price(), product.getPrice());
+        ProductType productType = requireNonNullElse(updateReq.productType(), product.getProductType());
+
+        product.setName(name);
+        product.setStockQuantity(stockQuantity);
+        product.setPrice(price);
+        product.setProductType(productType);
+
+        productRepository.save(product);
 
         return ResponseEntity.ok(product);
     }

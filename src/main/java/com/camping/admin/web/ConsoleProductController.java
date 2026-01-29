@@ -3,16 +3,12 @@ package com.camping.admin.web;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.dto.ProductCreateRequest;
+import com.camping.admin.dto.ProductUpdateRequest;
 import com.camping.admin.repository.ProductRepository;
 import java.math.BigDecimal;
-import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import static java.util.Objects.*;
@@ -45,8 +41,8 @@ public class ConsoleProductController {
         BigDecimal price = requireNonNullElse(createReq.price(), BigDecimal.ZERO);
         ProductType productType = requireNonNullElse(createReq.productType(), ProductType.SALE);
 
-        Product entity = new Product(createReq.name(), stockQuantity, price, productType);
-        productRepository.save(entity);
+        Product newProduct = new Product(createReq.name(), stockQuantity, price, productType);
+        productRepository.save(newProduct);
 
         redirectAttributes.addFlashAttribute("success", "상품이 등록되었습니다.");
         return "redirect:/console/products";
@@ -62,28 +58,21 @@ public class ConsoleProductController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
+    public String update(@PathVariable Long id, @ModelAttribute ProductUpdateRequest updateReq, RedirectAttributes redirectAttributes) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + id));
 
-        if (params.containsKey("name")) {
-            product.setName(params.get("name"));
-        }
-        if (params.containsKey("stockQuantity")) {
-            try {
-                product.setStockQuantity(Integer.valueOf(params.get("stockQuantity")));
-            } catch (Exception ignore) {}
-        }
-        if (params.containsKey("price")) {
-            try {
-                product.setPrice(new BigDecimal(params.get("price")));
-            } catch (Exception ignore) {}
-        }
-        if (params.containsKey("productType")) {
-            try {
-                product.setProductType(ProductType.valueOf(params.get("productType")));
-            } catch (Exception ignore) {}
-        }
+        String name = requireNonNullElse(updateReq.name(), product.getName());
+        Integer stockQuantity = requireNonNullElse(updateReq.stockQuantity(), product.getStockQuantity());
+        BigDecimal price = requireNonNullElse(updateReq.price(), product.getPrice());
+        ProductType productType = requireNonNullElse(updateReq.productType(), product.getProductType());
+
+        product.setName(name);
+        product.setStockQuantity(stockQuantity);
+        product.setPrice(price);
+        product.setProductType(productType);
+
+        productRepository.save(product);
 
         redirectAttributes.addFlashAttribute("success", "상품이 수정되었습니다.");
         return "redirect:/console/products";
