@@ -1,6 +1,7 @@
 package com.camping.admin.support;
 
 import com.camping.admin.api.AuthAPI;
+import com.camping.admin.api.CustomerAPI;
 import com.camping.admin.api.RentalAPI;
 import com.camping.admin.api.ReservationAPI;
 import org.springframework.beans.factory.annotation.Autowired;

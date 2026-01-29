@@ -6,10 +6,8 @@ import com.camping.admin.api.TestContext;
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.domain.entity.Customer;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.repository.CampsiteRepository;
-import com.camping.admin.repository.CustomerRepository;
-import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.support.TestApiSupport;
+import com.camping.admin.support.TestRepositorySupport;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -30,13 +28,7 @@ public class CustomerSteps {
     private TestApiSupport api;
 
     @Autowired
-    private CustomerRepository customerRepository;
-
-    @Autowired
-    private CampsiteRepository campsiteRepository;
-
-    @Autowired
-    private ReservationRepository reservationRepository;
+    private TestRepositorySupport repository;
 
     // ==================== Given Steps ====================
 
@@ -49,7 +41,7 @@ public class CustomerSteps {
             String phoneNumber = customerData.get("phoneNumber");
 
             Customer customer = new Customer(name, email, phoneNumber);
-            customerRepository.save(customer);
+            repository.customer().save(customer);
 
             // 테스트 컨텍스트에 마지막 고객 정보 저장 (필요 시)
             testContext.getCustomer().setId(customer.getId());
@@ -60,26 +52,19 @@ public class CustomerSteps {
     @Given("{string} 캠핑장 사이트가 등록되어 있다")
     public void 캠핑장_사이트_등록(String siteNumber) {
         Campsite campsite = new Campsite(siteNumber, "테스트용 사이트", 4);
-        campsiteRepository.save(campsite);
+        repository.campsite().save(campsite);
     }
 
     @Given("{string} 고객이 {string}부터 {string}까지 {string} 사이트를 예약했다")
     public void 고객이_사이트_예약(String customerName, String startDate, String endDate, String siteNumber) {
-        Customer customer = customerRepository.findAll().stream()
-                .filter(c -> c.getName().equals(customerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다: " + customerName));
-
-        Campsite campsite = campsiteRepository.findAll().stream()
-                .filter(c -> c.getSiteNumber().equals(siteNumber))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("사이트를 찾을 수 없습니다: " + siteNumber));
+        Customer customer = findCustomerByName(customerName);
+        Campsite campsite = findCampsiteByNumber(siteNumber);
 
         Reservation reservation = new Reservation(customerName, LocalDate.parse(startDate), LocalDate.parse(endDate), campsite);
         reservation.setPhoneNumber(customer.getPhoneNumber());
         // 실제 구현에서는 Reservation에 Customer 연관관계 설정 필요
         // reservation.setCustomer(customer);
-        reservationRepository.save(reservation);
+        repository.reservation().save(reservation);
 
         testContext.getReservation().setId(reservation.getId());
     }
@@ -88,18 +73,16 @@ public class CustomerSteps {
 
     @When("관리자가 {string} 고객의 정보로 {string} 사이트에 예약을 생성한다")
     public void 기존_고객_정보로_예약_생성(String customerName, String siteNumber) {
-        Customer customer = customerRepository.findAll().stream()
-                .filter(c -> c.getName().equals(customerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다: " + customerName));
+        Customer customer = findCustomerByName(customerName);
 
-        Map<String, Object> params = new HashMap<>();
-        params.put("siteNumber", siteNumber);
-        params.put("startDate", LocalDate.now().plusDays(1).toString());
-        params.put("endDate", LocalDate.now().plusDays(2).toString());
-        params.put("customerName", customer.getName());
-        params.put("email", customer.getEmail());
-        params.put("phoneNumber", customer.getPhoneNumber());
+        Map<String, Object> params = api.customer().예약_요청_파라미터_생성(
+                siteNumber,
+                LocalDate.now().plusDays(1).toString(),
+                LocalDate.now().plusDays(2).toString(),
+                customer.getName(),
+                customer.getEmail(),
+                customer.getPhoneNumber()
+        );
 
         var response = api.reservation().예약_생성(testContext.getAccessToken(), params);
         testContext.setResponse(response);
@@ -107,12 +90,14 @@ public class CustomerSteps {
 
     @When("관리자가 이메일 {string}을 입력하여 예약을 시도한다")
     public void 이메일로_예약_시도(String email) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("siteNumber", "A1"); // 기본 사이트
-        params.put("startDate", LocalDate.now().plusDays(3).toString());
-        params.put("endDate", LocalDate.now().plusDays(4).toString());
-        params.put("email", email);
-        // 이름과 전화번호는 입력하지 않음 (자동 매핑 테스트)
+        Map<String, Object> params = api.customer().예약_요청_파라미터_생성(
+                "A1",
+                LocalDate.now().plusDays(3).toString(),
+                LocalDate.now().plusDays(4).toString(),
+                null,
+                email,
+                null
+        );
 
         var response = api.reservation().예약_생성(testContext.getAccessToken(), params);
         testContext.setResponse(response);
@@ -120,13 +105,14 @@ public class CustomerSteps {
 
     @When("관리자가 등록되지 않은 이메일 {string}과 이름 {string}로 예약을 생성한다")
     public void 미등록_이메일로_예약_생성(String email, String name) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("siteNumber", "A1");
-        params.put("startDate", LocalDate.now().plusDays(5).toString());
-        params.put("endDate", LocalDate.now().plusDays(6).toString());
-        params.put("email", email);
-        params.put("customerName", name);
-        params.put("phoneNumber", "010-0000-0000"); // 임의 번호
+        Map<String, Object> params = api.customer().예약_요청_파라미터_생성(
+                "A1",
+                LocalDate.now().plusDays(5).toString(),
+                LocalDate.now().plusDays(6).toString(),
+                name,
+                email,
+                "010-0000-0000"
+        );
 
         var response = api.reservation().예약_생성(testContext.getAccessToken(), params);
         testContext.setResponse(response);
@@ -134,13 +120,10 @@ public class CustomerSteps {
 
     @When("관리자가 {string} 고객의 상세 페이지를 조회한다")
     public void 고객_상세_페이지_조회(String customerName) {
-        Customer customer = customerRepository.findAll().stream()
-                .filter(c -> c.getName().equals(customerName))
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다: " + customerName));
+        Customer customer = findCustomerByName(customerName);
 
-//        var response = api.customer().고객_상세_조회(testContext.getAccessToken(), customer.getId());
-//        testContext.setResponse(response);
+        var response = api.customer().고객_상세_조회(testContext.getAccessToken(), customer.getId());
+        testContext.setResponse(response);
     }
 
     // ==================== Then Steps ====================
@@ -159,8 +142,7 @@ public class CustomerSteps {
     @Then("해당 예약은 {string} 고객과 연결되어야 한다")
     public void 예약_고객_연결_확인(String customerName) {
         Long reservationId = testContext.getReservation().getId();
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다"));
+        Reservation reservation = findReservationById(reservationId);
 
         // Reservation 엔티티에 Customer 필드가 추가되었다고 가정하고 검증 로직 작성
         // 현재는 엔티티 수정 전이므로 주석으로 남기거나 리플렉션/쿼리 등으로 확인해야 함
@@ -170,10 +152,7 @@ public class CustomerSteps {
     @Then("{string} 고객의 예약 목록에 방금 생성한 예약이 포함되어야 한다")
     public void 고객_예약_목록_포함_확인(String customerName) {
         // Customer 엔티티나 연관관계를 통해 확인
-        Customer customer = customerRepository.findAll().stream()
-                .filter(c -> c.getName().equals(customerName))
-                .findFirst()
-                .orElseThrow();
+        Customer customer = findCustomerByName(customerName);
         
         // 예: assertThat(customer.getReservations()).extracting("id").contains(testContext.getReservation().getId());
     }
@@ -181,7 +160,7 @@ public class CustomerSteps {
     @Then("시스템은 자동으로 {string} 고객 정보를 찾아 예약에 연결한다")
     public void 자동_고객_연결_확인(String customerName) {
         Long reservationId = testContext.getResponse().jsonPath().getLong("id");
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        Reservation reservation = findReservationById(reservationId);
         
         // 검증 로직 (엔티티 수정 후 활성화)
         // assertThat(reservation.getCustomer().getName()).isEqualTo(customerName);
@@ -190,7 +169,7 @@ public class CustomerSteps {
     @Then("예약된 고객명은 {string}, 전화번호는 {string}로 저장된다")
     public void 예약_고객_정보_확인(String name, String phoneNumber) {
         Long reservationId = testContext.getResponse().jsonPath().getLong("id");
-        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow();
+        Reservation reservation = findReservationById(reservationId);
 
         assertThat(reservation.getCustomerName()).isEqualTo(name);
         assertThat(reservation.getPhoneNumber()).isEqualTo(phoneNumber);
@@ -198,7 +177,7 @@ public class CustomerSteps {
 
     @Then("시스템에 {string} 고객이 자동으로 신규 등록된다")
     public void 신규_고객_자동_등록_확인(String name) {
-        boolean exists = customerRepository.findAll().stream()
+        boolean exists = repository.customer().findAll().stream()
                 .anyMatch(c -> c.getName().equals(name));
         assertThat(exists).as("신규 고객 등록 여부").isTrue();
     }
@@ -214,5 +193,26 @@ public class CustomerSteps {
         
         List<String> reservedSites = testContext.getResponse().jsonPath().getList("reservations.siteNumber");
         assertThat(reservedSites).contains(siteNumber);
+    }
+
+    // ==================== Helper Methods ====================
+
+    private Customer findCustomerByName(String name) {
+        return repository.customer().findAll().stream()
+                .filter(c -> c.getName().equals(name))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("고객을 찾을 수 없습니다: " + name));
+    }
+
+    private Reservation findReservationById(Long id) {
+        return repository.reservation().findById(id)
+                .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다: " + id));
+    }
+
+    private Campsite findCampsiteByNumber(String siteNumber) {
+        return repository.campsite().findAll().stream()
+                .filter(c -> c.getSiteNumber().equals(siteNumber))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("사이트를 찾을 수 없습니다: " + siteNumber));
     }
 }
