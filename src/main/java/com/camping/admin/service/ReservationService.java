@@ -27,11 +27,12 @@ public class ReservationService {
 
 
     @Transactional
-    public ReservationResponse updateStatus(Long reservationId, ReservationStatus newStatus) {
+    public ReservationResponse updateStatus(Long reservationId, String newStatus) {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new BusinessException("예약을 찾을 수 없습니다: " + reservationId, HttpStatus.NOT_FOUND));
 
-        reservation.changeStatus(newStatus);
+        ReservationStatus reservationStatus = ReservationStatus.valueOf(newStatus);
+        reservation.changeStatus(reservationStatus);
 
         return ReservationResponse.from(reservation);
     }

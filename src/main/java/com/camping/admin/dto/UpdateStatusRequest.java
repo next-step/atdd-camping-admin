@@ -1,6 +1,8 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.enums.ReservationStatus;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +16,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UpdateStatusRequest {
 
-    @NotNull(message = "상태값은 필수입니다.")
-    private ReservationStatus status;
+    @NotBlank(message = "상태값은 필수입니다.")
+    private String status;
 }
