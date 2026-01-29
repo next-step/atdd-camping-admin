@@ -14,18 +14,6 @@ public class ProductSteps {
 
     private TestContext context = TestContext.getInstance();
 
-    // Given
-    @Given("등록된 상품 {int}이 있다")
-    public void 등록된_상품이_있다(int id) {
-        given()
-                .spec(context.getAuthHelper().authorizedSpec())
-                .when()
-                .get("/admin/products")
-                .then()
-                .statusCode(200)
-                .body("find { it.id == " + id + " }", notNullValue());
-    }
-
     // When
     @When("관리자가 상품 목록을 조회한다")
     public void 관리자가_상품_목록을_조회한다() {
@@ -57,8 +45,17 @@ public class ProductSteps {
         );
     }
 
-    @When("관리자가 상품 {int}을 수정한다")
-    public void 관리자가_상품을_수정한다(int id) {
+    @When("관리자가 등록된 상품 {int}을 수정한다")
+    public void 관리자가_등록된_상품을_수정한다(int id) {
+        given()
+                .spec(context.getAuthHelper().authorizedSpec())
+                .when()
+                .get("/admin/products")
+                .then()
+                .statusCode(200)
+                .body("find { it.id == " + id + " }", notNullValue());
+
+
         context.setLastResponse(
                 given()
                         .spec(context.getAuthHelper().authorizedSpec())
