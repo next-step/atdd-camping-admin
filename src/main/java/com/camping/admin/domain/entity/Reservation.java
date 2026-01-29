@@ -8,8 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import static com.camping.admin.domain.enums.ReservationStatus.*;
 
@@ -87,5 +89,20 @@ public class Reservation {
         if (this.status == REJECTED && newStatus == CANCELLED) {
             throw new BusinessException("이미 거절된 예약은 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
         }
+    }
+
+    public boolean isCanceled() {
+        return status == CANCELLED;
+    }
+
+    /**
+     * 예약 수익 계산 (1박당 50,000원)
+     */
+    public BigDecimal calculateRevenue() {
+        long nights = ChronoUnit.DAYS.between(this.startDate, this.endDate);
+        if (nights < 1) {
+            nights = 1;
+        }
+        return new BigDecimal(nights).multiply(new BigDecimal("50000"));
     }
 }

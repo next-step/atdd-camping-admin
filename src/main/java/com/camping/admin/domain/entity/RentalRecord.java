@@ -1,10 +1,13 @@
 package com.camping.admin.domain.entity;
 
+import com.camping.admin.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatus;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -42,7 +45,20 @@ public class RentalRecord {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void setReturned(Boolean returned) {
-        isReturned = returned;
+    /**
+     * 반납 처리 (검증 포함)
+     */
+    public void markAsReturned() {
+        if (this.isReturned) {
+            throw new BusinessException("이미 반납된 상품입니다.", HttpStatus.CONFLICT);
+        }
+        this.isReturned = true;
+    }
+
+    /**
+     * 대여 총 가격 계산
+     */
+    public BigDecimal calculateTotalPrice() {
+        return this.product.calculatePrice(this.quantity);
     }
 }

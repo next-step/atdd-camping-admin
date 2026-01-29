@@ -25,10 +25,7 @@ public class ReservationService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 예약 상태 변경
-     * - 도메인 규칙 검증은 Reservation 엔티티에 위임 (Tell, Don't Ask)
-     */
+
     @Transactional
     public ReservationResponse updateStatus(Long reservationId, ReservationStatus newStatus) {
         Reservation reservation = reservationRepository.findById(reservationId)
