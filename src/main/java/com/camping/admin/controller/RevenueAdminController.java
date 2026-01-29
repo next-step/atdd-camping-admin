@@ -3,7 +3,7 @@ package com.camping.admin.controller;
 import com.camping.admin.dto.DailyRevenueReportResponse;
 import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.RevenueEntryResponse;
-import com.camping.admin.service.SalesService;
+import com.camping.admin.service.RevenueService;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -18,12 +18,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class RevenueAdminController {
 
-    private final SalesService salesService;
+    private final RevenueService revenueService;
 
     @GetMapping("/daily")
     public ResponseEntity<DailyRevenueReportResponse> getDailyRevenueReport(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        DailyRevenueReportResponse report = salesService.generateDailyRevenueReport(date);
+        DailyRevenueReportResponse report = revenueService.generateDailyRevenueReport(date);
         return ResponseEntity.ok(report);
     }
 
@@ -31,7 +31,7 @@ public class RevenueAdminController {
     public ResponseEntity<RangeRevenueReportResponse> getRangeRevenueReport(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        RangeRevenueReportResponse report = salesService.generateRangeRevenueReport(from, to);
+        RangeRevenueReportResponse report = revenueService.generateRangeRevenueReport(from, to);
         return ResponseEntity.ok(report);
     }
 
@@ -39,7 +39,7 @@ public class RevenueAdminController {
     public ResponseEntity<java.util.List<RevenueEntryResponse>> getRangeRevenueEntries(
             @RequestParam("from") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate from,
             @RequestParam("to") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate to) {
-        java.util.List<RevenueEntryResponse> entries = salesService.generateRangeRevenueEntries(from, to);
+        java.util.List<RevenueEntryResponse> entries = revenueService.generateRangeRevenueEntries(from, to);
         return ResponseEntity.ok(entries);
     }
 }
