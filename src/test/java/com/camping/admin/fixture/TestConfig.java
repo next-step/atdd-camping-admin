@@ -17,6 +17,7 @@ public class TestConfig {
         public static final Long CHAIR = 4L;             // 의자 (RENTAL)
         public static final Long TABLE = 5L;             // 테이블 (RENTAL)
         public static final Long BURNER = 6L;            // 버너 (RENTAL)
+        public static final Long ICE_PACK = 12L;         // 아이스팩 (SALE) - 삭제 테스트용
         public static final Long NOT_EXIST = 99999L;     // 존재하지 않는 상품
 
         private ProductIds() {}
@@ -37,7 +38,7 @@ public class TestConfig {
         private RentalRecordIds() {}
     }
 
-    public static class CampsiteIds {
+    public static final class CampsiteIds {
         public static final Long EXISTING = 1L;
         public static final Long NOT_EXIST = 99999L;
     }

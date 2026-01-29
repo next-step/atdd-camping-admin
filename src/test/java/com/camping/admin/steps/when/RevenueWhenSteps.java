@@ -1,4 +1,4 @@
-package com.camping.admin.steps;
+package com.camping.admin.steps.when;
 
 import com.camping.admin.support.AuthHelper;
 import com.camping.admin.support.RestAssuredConfig;
@@ -9,15 +9,13 @@ import io.restassured.RestAssured;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-public class RevenueSteps {
+public class RevenueWhenSteps {
 
     private final SharedState state;
 
-    public RevenueSteps(SharedState state) {
+    public RevenueWhenSteps(SharedState state) {
         this.state = state;
     }
-
-    // === When ===
 
     @When("일별 매출을 조회하면")
     public void 일별_매출을_조회하면() {

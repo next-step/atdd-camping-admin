@@ -1,31 +1,20 @@
-package com.camping.admin.steps;
+package com.camping.admin.steps.when;
 
-import com.camping.admin.fixture.TestConfig;
 import com.camping.admin.support.AuthHelper;
 import com.camping.admin.support.RestAssuredConfig;
 import com.camping.admin.support.SharedState;
-import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 
 import java.util.Map;
 
-public class ProductSteps {
+public class ProductWhenSteps {
 
     private final SharedState state;
 
-    public ProductSteps(SharedState state) {
+    public ProductWhenSteps(SharedState state) {
         this.state = state;
     }
-
-    // === Given ===
-
-    @Given("수정할 상품이 존재한다")
-    public void 수정할_상품이_존재한다() {
-        state.setProductId(TestConfig.ProductIds.LANTERN);
-    }
-
-    // === When ===
 
     @When("상품을 생성하면")
     public void 상품을_생성하면() {
@@ -78,5 +67,13 @@ public class ProductSteps {
                 .body(request)
                 .when()
                 .put("/admin/products/" + state.getProductId()));
+    }
+
+    @When("해당 상품을 삭제하면")
+    public void 해당_상품을_삭제하면() {
+        state.setResponse(RestAssured.given()
+                .spec(RestAssuredConfig.createAuthenticatedSpec(AuthHelper.getAdminToken()))
+                .when()
+                .delete("/admin/products/" + state.getProductId()));
     }
 }
