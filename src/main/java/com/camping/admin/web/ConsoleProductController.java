@@ -2,6 +2,7 @@ package com.camping.admin.web;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.dto.ProductCreateRequest;
 import com.camping.admin.repository.ProductRepository;
 import java.math.BigDecimal;
 import java.util.Map;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import static java.util.Objects.*;
 
 @Controller
 @RequestMapping("/console/products")
@@ -37,29 +40,14 @@ public class ConsoleProductController {
     }
 
     @PostMapping
-    public String create(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        String name = params.getOrDefault("name", null);
-        Integer stockQuantity;
-        try {
-            stockQuantity = params.containsKey("stockQuantity") ? Integer.valueOf(params.get("stockQuantity")) : 0;
-        } catch (Exception e) {
-            stockQuantity = 0;
-        }
-        BigDecimal price;
-        try {
-            price = params.containsKey("price") ? new BigDecimal(params.get("price")) : BigDecimal.ZERO;
-        } catch (Exception e) {
-            price = BigDecimal.ZERO;
-        }
-        ProductType type;
-        try {
-            type = params.containsKey("productType") ? ProductType.valueOf(params.get("productType")) : ProductType.SALE;
-        } catch (Exception e) {
-            type = ProductType.SALE;
-        }
+    public String create(@RequestParam ProductCreateRequest createReq, RedirectAttributes redirectAttributes) {
+        Integer stockQuantity = requireNonNullElse(createReq.stockQuantity(), 0);
+        BigDecimal price = requireNonNullElse(createReq.price(), BigDecimal.ZERO);
+        ProductType productType = requireNonNullElse(createReq.productType(), ProductType.SALE);
 
-        Product entity = new Product(name, stockQuantity, price, type);
+        Product entity = new Product(createReq.name(), stockQuantity, price, productType);
         productRepository.save(entity);
+
         redirectAttributes.addFlashAttribute("success", "상품이 등록되었습니다.");
         return "redirect:/console/products";
     }

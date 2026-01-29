@@ -13,6 +13,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static java.util.Objects.requireNonNullElse;
+
 @RestController
 @RequestMapping("/admin/products")
 @RequiredArgsConstructor
@@ -36,15 +38,9 @@ public class ProductAdminController {
 
     @PostMapping
     public ResponseEntity<Product> createProduct(@RequestBody ProductCreateRequest createReq) {
-
-        Integer stockQuantity = createReq.stockQuantity();
-        if (stockQuantity == null) stockQuantity = 0;
-
-        BigDecimal price = createReq.price();
-        if (price == null) price = BigDecimal.ZERO;
-
-        ProductType productType = createReq.productType();
-        if (productType == null) productType = ProductType.SALE;
+        Integer stockQuantity = requireNonNullElse(createReq.stockQuantity(), 0);
+        BigDecimal price = requireNonNullElse(createReq.price(), BigDecimal.ZERO);
+        ProductType productType = requireNonNullElse(createReq.productType(), ProductType.SALE);
 
         Product newProduct = new Product(createReq.name(), stockQuantity, price, productType);
         Product saved = productRepository.save(newProduct);
