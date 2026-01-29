@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.helper.RentalTestHelper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

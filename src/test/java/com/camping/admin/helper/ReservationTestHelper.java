@@ -1,8 +1,9 @@
-package com.camping.admin.steps;
+package com.camping.admin.helper;
 
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.common.CommonHooks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -1,7 +1,9 @@
-package com.camping.admin.steps;
+package com.camping.admin.helper;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.repository.CampsiteRepository;
+import com.camping.admin.common.CommonHooks;
+import io.cucumber.datatable.DataTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,8 +34,13 @@ public class CampsiteTestHelper {
 
     // ==================== API 호출 (When) ====================
 
-    public void 캠프사이트_정보로_등록을_요청한다(String siteNumber, String description, int maxPeople) {
+    public void 캠프사이트_정보로_등록을_요청한다(DataTable dataTable) {
         this.campsiteCountBeforeRequest = campsiteRepository.count();
+
+        Map<String, String> row = dataTable.asMaps().get(0);
+        String siteNumber = row.get("사이트번호");
+        String description = row.get("설명");
+        int maxPeople = Integer.parseInt(row.get("최대인원"));
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("siteNumber", siteNumber);

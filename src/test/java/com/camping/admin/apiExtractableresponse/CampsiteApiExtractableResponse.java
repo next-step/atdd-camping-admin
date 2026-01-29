@@ -1,6 +1,6 @@
 package com.camping.admin.apiExtractableresponse;
 
-import com.camping.admin.steps.CommonHooks;
+import com.camping.admin.common.CommonHooks;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;

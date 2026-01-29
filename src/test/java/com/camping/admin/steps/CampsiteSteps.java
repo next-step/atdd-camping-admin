@@ -1,13 +1,11 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.helper.CampsiteTestHelper;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * 캠프사이트 생성 기능의 인수 테스트 Step 정의
@@ -28,14 +26,7 @@ public class CampsiteSteps extends CucumberSpringConfiguration {
 
     @When("관리자가 다음 정보로 캠프사이트를 등록한다")
     public void 관리자가_다음_정보로_캠프사이트를_등록한다(DataTable dataTable) {
-        List<Map<String, String>> rows = dataTable.asMaps();
-        Map<String, String> row = rows.get(0);
-
-        String siteNumber = row.get("사이트번호");
-        String description = row.get("설명");
-        int maxPeople = Integer.parseInt(row.get("최대인원"));
-
-        helper.캠프사이트_정보로_등록을_요청한다(siteNumber, description, maxPeople);
+        helper.캠프사이트_정보로_등록을_요청한다(dataTable);
     }
 
     @When("관리자가 사이트번호 없이 캠프사이트 등록을 요청한다")

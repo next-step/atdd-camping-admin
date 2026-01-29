@@ -1,4 +1,4 @@
-package com.camping.admin.steps;
+package com.camping.admin.helper;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
@@ -7,6 +7,7 @@ import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
+import com.camping.admin.common.CommonHooks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
