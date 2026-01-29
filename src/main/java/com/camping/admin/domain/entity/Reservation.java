@@ -1,13 +1,17 @@
 package com.camping.admin.domain.entity;
 
 import com.camping.admin.domain.enums.ReservationStatus;
+import com.camping.admin.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import static com.camping.admin.domain.enums.ReservationStatus.*;
 
 @Entity
 @Table(name = "reservations")
@@ -60,7 +64,28 @@ public class Reservation {
         this.campsite = campsite;
     }
 
-    public boolean isCanceled() {
-        return status == ReservationStatus.CANCELLED;
+
+    /**
+     * 예약 상태 변경
+     * - 도메인 규칙을 엔티티가 직접 보호 (Tell, Don't Ask)
+     */
+    public void changeStatus(ReservationStatus newStatus) {
+        validateStatusChange(newStatus);
+        this.status = newStatus;
+    }
+
+    private void validateStatusChange(ReservationStatus newStatus) {
+        if (this.status == CANCELLED) {
+            throw new BusinessException("이미 취소된 예약은 복구할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (this.status == CHECKED_IN && newStatus == CANCELLED) {
+            throw new BusinessException("체크인된 예약은 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (this.status == CHECKED_OUT && newStatus == CANCELLED) {
+            throw new BusinessException("이미 완료된 예약은 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
+        if (this.status == REJECTED && newStatus == CANCELLED) {
+            throw new BusinessException("이미 거절된 예약은 취소할 수 없습니다.", HttpStatus.BAD_REQUEST);
+        }
     }
 }
