@@ -2,6 +2,8 @@ package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -13,9 +15,15 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class CreateProductRequest {
 
+    @NotBlank
     private String name;
+
+    @PositiveOrZero
     private Integer stockQuantity;
+
+    @PositiveOrZero
     private BigDecimal price;
+
     private ProductType productType;
 
     public CreateProductRequest(String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
@@ -23,10 +31,6 @@ public class CreateProductRequest {
         this.stockQuantity = stockQuantity;
         this.price = price;
         this.productType = productType;
-    }
-
-    public CreateProductRequest(String name) {
-        this.name = name;
     }
 
     public Product toEntity() {

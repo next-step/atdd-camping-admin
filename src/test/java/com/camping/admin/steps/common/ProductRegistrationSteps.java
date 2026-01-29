@@ -104,10 +104,10 @@ public class ProductRegistrationSteps {
         assertThat(response.statusCode()).isEqualTo(201);
     }
 
-    @Then("상품 등록이 실패한다")
-    public void 상품_등록이_실패한다() {
+    @Then("클라이언트 오류로 상품 등록이 실패한다")
+    public void 클라이언트_오류로_상품_등록이_실패한다() {
         Response response = scenarioContext.getResponse();
-        assertThat(response.statusCode()).isIn(400, 500);
+        assertThat(response.statusCode()).isIn(400);
     }
 
     @And("등록된 상품의 이름은 {string}이다")

@@ -15,7 +15,6 @@ public class ScenarioContext {
     private Reservation reservation;
     private Long reservationId;
     private Response response;
-    private UpdateReservationStatusRequest updateReservationRequest;
     private Campsite campsite;
 
     public Reservation getReservation() {
@@ -49,11 +48,4 @@ public class ScenarioContext {
         this.campsite = campsite;
     }
 
-    public void setUpdateReservationRequestStatus(ReservationStatus status) {
-        this.updateReservationRequest = new UpdateReservationStatusRequest(status);
-    }
-
-    public UpdateReservationStatusRequest getUpdateReservationRequest() {
-        return updateReservationRequest;
-    }
 }
