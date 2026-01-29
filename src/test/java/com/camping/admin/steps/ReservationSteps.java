@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.helper.ReservationTestHelper;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;

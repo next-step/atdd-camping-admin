@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.helper.CampsiteTestHelper;
 import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;

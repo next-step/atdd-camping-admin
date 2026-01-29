@@ -1,5 +1,6 @@
 package com.camping.admin.steps;
 
+import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.helper.RentalTestHelper;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -16,10 +17,10 @@ public class RentalSteps extends CucumberSpringConfiguration {
 
     // ==================== Given ====================
 
-    @Given("관리자가 로그인되어 있다")
-    public void 관리자가_로그인되어_있다() {
-        // @Before 훅에서 이미 처리됨 - Background 문서화 목적
-    }
+//    @Given("관리자가 로그인되어 있다")
+//    public void 관리자가_로그인되어_있다() {
+//        // @Before 훅에서 이미 처리됨 - Background 문서화 목적
+//    }
 
     @Given("대여용 상품이 재고 {int}개로 등록되어 있다")
     public void 대여용_상품이_재고_N개로_등록되어_있다(int stockQuantity) {

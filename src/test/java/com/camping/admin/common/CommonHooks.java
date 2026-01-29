@@ -1,8 +1,8 @@
 package com.camping.admin.common;
 
+import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.domain.enums.ReservationStatus;
 import com.camping.admin.security.JwtService;
-import com.camping.admin.steps.CucumberSpringConfiguration;
 import io.cucumber.java.Before;
 import io.cucumber.java.ParameterType;
 import io.cucumber.java.en.Given;
@@ -81,8 +81,8 @@ public class CommonHooks extends CucumberSpringConfiguration {
         adminToken = jwtService.generateToken(adminUsername);
     }
 
-    @Given("관리자가 로그인을 했다")
-    public void 관리자가_로그인을_했다() {
+    @Given("관리자가 로그인되어 있다")
+    public void 관리자가_로그인되어_있다() {
         // @Before 훅에서 이미 처리됨 - Background 문서화 목적
     }
 
