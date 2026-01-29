@@ -130,7 +130,7 @@ public class ReservationSteps {
                 .findById(testContext.getReservation().getId())
                 .orElseThrow(() -> new AssertionError("예약을 찾을 수 없습니다"));
 
-        assertThat(reservation.getStatus())
+        assertThat(reservation.getStatus().name())
                 .as("DB에 저장된 예약 상태")
                 .isEqualTo(취소);
     }
