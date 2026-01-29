@@ -79,11 +79,9 @@ public class CampsiteRegistrationSteps {
     }
 
     // ===== When =====
-
-    @When("다음 정보로 캠핑장 사이트 등록을 요청한다:")
-    public void 다음_정보로_캠핑장_사이트_등록을_요청한다(DataTable dataTable) {
-        Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String body = buildCampsiteJson(data);
+    @When("사이트 번호 {string}, 설명 {string}, 최대 인원 {int}명으로 캠핑장 사이트 등록을 요청한다")
+    public void 사이트_번호_설명_최대_인원_명으로_캠핑장_사이트_등록을_요청한다(String siteNumber, String description, int maxPeople) {
+        String body = String.format("{\"siteNumber\":\"%s\",\"description\":\"%s\",\"maxPeople\":%d}", siteNumber, description, maxPeople);
         requestCampsiteRegistration(body);
     }
 
@@ -100,6 +98,18 @@ public class CampsiteRegistrationSteps {
     @When("최대 인원에 {string}을 입력하여 캠핑장 사이트 등록을 요청한다")
     public void 최대_인원에_을_입력하여_캠핑장_사이트_등록을_요청한다(String maxPeople) {
         String body = String.format("{\"siteNumber\":\"A-1\",\"description\":\"테스트\",\"maxPeople\":\"%s\"}", maxPeople);
+        requestCampsiteRegistration(body);
+    }
+
+    @When("사이트 번호 {string}로 캠핑장 사이트 등록을 요청한다")
+    public void 사이트_번호_로_캠핑장_사이트_등록을_요청한다(String siteNumber) {
+        String body = String.format("{\"siteNumber\":\"%s\"}", siteNumber);
+        requestCampsiteRegistration(body);
+    }
+
+    @When("최대 인원 {int}명으로 캠핑장 사이트 등록을 요청한다")
+    public void 최대_인원_명으로_캠핑장_사이트_등록을_요청한다(int maxPeople) {
+        String body = String.format("{\"siteNumber\":\"AUTO-%d\",\"maxPeople\":%d}", System.currentTimeMillis(), maxPeople);
         requestCampsiteRegistration(body);
     }
 
