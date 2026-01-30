@@ -29,6 +29,7 @@ public class TestContext {
     private final ReservationData reservation = new ReservationData();
     private final ProductData product = new ProductData();
     private final RentalData rental = new RentalData();
+    private final CustomerData customer = new CustomerData();
 
     @Getter
     @Setter
@@ -49,5 +50,14 @@ public class TestContext {
     @Setter
     public static class RentalData {
         private Long id;
+    }
+
+    @Getter
+    @Setter
+    public static class CustomerData {
+        private Long id;
+        private String name;
+        private String email;
+        private String phoneNumber;
     }
 }

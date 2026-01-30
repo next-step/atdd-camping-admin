@@ -34,4 +34,19 @@ public class Campsite {
         this.description = description;
         this.maxPeople = maxPeople;
     }
+
+    /**
+     * 캠프사이트 정보 업데이트
+     */
+    public void update(String siteNumber, String description, Integer maxPeople) {
+        if (siteNumber != null) {
+            this.siteNumber = siteNumber;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+        if (maxPeople != null) {
+            this.maxPeople = maxPeople;
+        }
+    }
 }

@@ -30,10 +30,10 @@ public class SalesRecord {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public SalesRecord(Product product, Integer quantity, BigDecimal totalPrice) {
+    public SalesRecord(Product product, Integer quantity) {
         this.product = product;
         this.quantity = quantity;
-        this.totalPrice = totalPrice;
+        this.totalPrice = product.calculatePrice(quantity);
         this.createdAt = LocalDateTime.now();
     }
 }
