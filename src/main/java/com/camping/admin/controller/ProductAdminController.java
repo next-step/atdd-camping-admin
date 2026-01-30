@@ -39,8 +39,11 @@ public class ProductAdminController {
         if (body.containsKey("name")) {
             Object v = body.get("name");
             name = v == null ? null : v.toString();
+            if (name == null || name.trim().isEmpty()) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
         } else {
-            name = null;
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         Integer stockQuantity;
@@ -49,16 +52,19 @@ public class ProductAdminController {
             if (v instanceof Number) {
                 stockQuantity = ((Number) v).intValue();
             } else if (v == null) {
-                stockQuantity = 0;
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else {
                 try {
                     stockQuantity = Integer.valueOf(v.toString());
                 } catch (Exception e) {
-                    stockQuantity = 0;
+                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
                 }
             }
+            if (stockQuantity < 0) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
         } else {
-            stockQuantity = 0;
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         BigDecimal price;
@@ -67,16 +73,19 @@ public class ProductAdminController {
             if (v instanceof Number) {
                 price = new BigDecimal(((Number) v).toString());
             } else if (v == null) {
-                price = BigDecimal.ZERO;
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
             } else {
                 try {
                     price = new BigDecimal(v.toString());
                 } catch (Exception e) {
-                    price = BigDecimal.ZERO;
+                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
                 }
             }
+            if (price.compareTo(BigDecimal.ZERO) < 0) {
+                return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+            }
         } else {
-            price = BigDecimal.ZERO;
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
 
         ProductType productType;
@@ -88,12 +97,13 @@ public class ProductAdminController {
                 try {
                     productType = ProductType.valueOf(v.toString());
                 } catch (Exception e) {
-                    productType = ProductType.SALE;
+                    return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
                 }
             }
         } else {
-            productType = ProductType.SALE;
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
         }
+
 
         Product newProduct = new Product(name, stockQuantity, price, productType);
         Product saved = productRepository.save(newProduct);

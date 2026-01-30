@@ -5,6 +5,7 @@ import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.exception.NotFoundException;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
@@ -32,11 +33,21 @@ public class RentalService {
 
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
+        // 수량 검증
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("Quantity must be greater than 0.");
+        }
+
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
+                .orElseThrow(() -> new NotFoundException("Cannot find product with id: " + productId));
 
         if (product.getProductType() != ProductType.RENTAL) {
             throw new IllegalArgumentException("Product is not a rental item.");
+        }
+
+        // 재고 검증
+        if (product.getStockQuantity() < quantity) {
+            throw new IllegalArgumentException("Not enough stock. Available: " + product.getStockQuantity() + ", Requested: " + quantity);
         }
 
         productService.decreaseStock(productId, quantity);
