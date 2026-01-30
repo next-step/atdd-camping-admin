@@ -1,9 +1,7 @@
 package com.camping.admin.web;
 
-import com.camping.admin.domain.entity.Product;
 import com.camping.admin.dto.ProductCreateRequest;
 import com.camping.admin.dto.ProductUpdateRequest;
-
 import com.camping.admin.service.ProductService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -42,10 +40,10 @@ public class ConsoleProductController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        Product product = productService.get(id);
+        var response = productService.get(id);
 
         model.addAttribute("formAction", "/console/products/" + id);
-        model.addAttribute("product", product);
+        model.addAttribute("product", response);
         return "products/form";
     }
 

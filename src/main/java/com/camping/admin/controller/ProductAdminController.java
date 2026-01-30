@@ -1,7 +1,7 @@
 package com.camping.admin.controller;
 
-import com.camping.admin.domain.entity.Product;
 import com.camping.admin.dto.ProductCreateRequest;
+import com.camping.admin.dto.ProductResponse;
 import com.camping.admin.dto.ProductUpdateRequest;
 import java.util.List;
 
@@ -19,22 +19,24 @@ public class ProductAdminController {
     private final ProductService productService;
 
     @GetMapping
-    public ResponseEntity<List<Product>> getAllProducts() {
-        var result = productService.getAll();
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        var responses = productService.getAll();
+        return ResponseEntity.ok(responses);
     }
 
     @PostMapping
-    public ResponseEntity<Product> createProduct(@RequestBody ProductCreateRequest createReq) {
-        var result = productService.create(createReq);
-        return new ResponseEntity<>(result, HttpStatus.CREATED);
+    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductCreateRequest createReq) {
+        Long productId = productService.create(createReq);
+        var response = productService.get(productId);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{productId}")
-    public ResponseEntity<Product> updateProduct(
+    public ResponseEntity<ProductResponse> updateProduct(
             @PathVariable Long productId,
             @RequestBody ProductUpdateRequest updateReq) {
-        var result = productService.update(productId, updateReq);
-        return ResponseEntity.ok(result);
+        productService.update(productId, updateReq);
+        var response = productService.get(productId);
+        return ResponseEntity.ok(response);
     }
 }

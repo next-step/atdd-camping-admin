@@ -2,6 +2,7 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.dto.ProductCreateRequest;
+import com.camping.admin.dto.ProductResponse;
 import com.camping.admin.dto.ProductUpdateRequest;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,48 +21,50 @@ public class ProductService {
     // ===== Command =====
 
     @Transactional
-    public Product create(ProductCreateRequest createReq) {
-
-        Product newProduct = Product.create(
+    public Long create(ProductCreateRequest createReq) {
+        var newProduct = Product.create(
                 createReq.name(),
                 createReq.stockQuantity(),
                 createReq.price(),
                 createReq.productType());
-        return productRepository.save(newProduct);
+        productRepository.save(newProduct);
+
+        return newProduct.getId();
     }
 
     @Transactional
-    public Product update(Long productId, ProductUpdateRequest updateReq) {
-        Product product = findById(productId);
+    public void update(Long productId, ProductUpdateRequest updateReq) {
+        var product = findById(productId);
         product.update(
                 updateReq.name(),
                 updateReq.stockQuantity(),
                 updateReq.price(),
                 updateReq.productType());
-
-        return product;
     }
 
     @Transactional
     public void decreaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
+        var product = findById(productId);
         product.decreaseStock(quantity);
     }
 
     @Transactional
     public void increaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
+        var product = findById(productId);
         product.increaseStock(quantity);
     }
 
     // ===== Query =====
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public List<ProductResponse> getAll() {
+        return productRepository.findAll().stream()
+                .map(ProductResponse::from)
+                .toList();
     }
 
-    public Product get(Long productId) {
-        return findById(productId);
+    public ProductResponse get(Long productId) {
+        var product = findById(productId);
+        return ProductResponse.from(product);
     }
 
     // ===== Helper =====
