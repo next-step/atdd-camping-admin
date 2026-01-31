@@ -1,11 +1,11 @@
 package com.camping.admin.steps;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CreateCampsiteRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import com.camping.admin.support.ApiClient;
 import com.camping.admin.support.ScenarioContext;
 import com.camping.admin.support.TestDataFactory;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.Before;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -15,7 +15,6 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,35 +39,14 @@ public class CampsiteRegistrationSteps {
         long nextId = jdbcTemplate.queryForObject(
                 "SELECT COALESCE(MAX(id), 0) + 1 FROM campsites", Long.class
         );
-//        jdbcTemplate.execute("DELETE FROM campsites");
         jdbcTemplate.execute("ALTER TABLE campsites ALTER COLUMN id RESTART WITH " + nextId);
     }
 
     // ===== 공통 헬퍼 메서드 =====
 
-    private void requestCampsiteRegistration(String body) {
-        Response response = apiClient.post("/admin/campsites", body);
+    private void requestCampsiteRegistration(CreateCampsiteRequest request) {
+        Response response = apiClient.post("/admin/campsites", request);
         scenarioContext.setResponse(response);
-    }
-
-    private String buildCampsiteJson(Map<String, String> data) {
-        StringBuilder json = new StringBuilder("{");
-        boolean first = true;
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            if (!first) json.append(",");
-            String key = entry.getKey();
-            String value = entry.getValue();
-
-            if (key.equals("maxPeople")) {
-                json.append("\"").append(key).append("\":").append(value);
-            } else {
-                json.append("\"").append(key).append("\":\"").append(value).append("\"");
-            }
-
-            first = false;
-        }
-        json.append("}");
-        return json.toString();
     }
 
     // ==== Given =====
@@ -81,36 +59,26 @@ public class CampsiteRegistrationSteps {
     // ===== When =====
     @When("사이트 번호 {string}, 설명 {string}, 최대 인원 {int}명으로 캠핑장 사이트 등록을 요청한다")
     public void 사이트_번호_설명_최대_인원_명으로_캠핑장_사이트_등록을_요청한다(String siteNumber, String description, int maxPeople) {
-        String body = String.format("{\"siteNumber\":\"%s\",\"description\":\"%s\",\"maxPeople\":%d}", siteNumber, description, maxPeople);
-        requestCampsiteRegistration(body);
+        CreateCampsiteRequest request = new CreateCampsiteRequest(siteNumber, description, maxPeople);
+        requestCampsiteRegistration(request);
     }
 
     @When("사이트 번호 없이 캠핑장 사이트 등록을 요청한다")
     public void 사이트_번호_없이_캠핑장_사이트_등록을_요청한다() {
-        requestCampsiteRegistration("{\"description\":\"테스트\",\"maxPeople\":4}");
-    }
-
-    @When("빈 요청 본문으로 캠핑장 사이트 등록을 요청한다")
-    public void 빈_요청_본문으로_캠핑장_사이트_등록을_요청한다() {
-        requestCampsiteRegistration("{}");
-    }
-
-    @When("최대 인원에 {string}을 입력하여 캠핑장 사이트 등록을 요청한다")
-    public void 최대_인원에_을_입력하여_캠핑장_사이트_등록을_요청한다(String maxPeople) {
-        String body = String.format("{\"siteNumber\":\"A-1\",\"description\":\"테스트\",\"maxPeople\":\"%s\"}", maxPeople);
-        requestCampsiteRegistration(body);
+        CreateCampsiteRequest request = new CreateCampsiteRequest(null, "테스트", 4);
+        requestCampsiteRegistration(request);
     }
 
     @When("사이트 번호 {string}로 캠핑장 사이트 등록을 요청한다")
     public void 사이트_번호_로_캠핑장_사이트_등록을_요청한다(String siteNumber) {
-        String body = String.format("{\"siteNumber\":\"%s\"}", siteNumber);
-        requestCampsiteRegistration(body);
+        CreateCampsiteRequest request = new CreateCampsiteRequest(siteNumber, null, null);
+        requestCampsiteRegistration(request);
     }
 
     @When("최대 인원 {int}명으로 캠핑장 사이트 등록을 요청한다")
     public void 최대_인원_명으로_캠핑장_사이트_등록을_요청한다(int maxPeople) {
-        String body = String.format("{\"siteNumber\":\"AUTO-%d\",\"maxPeople\":%d}", System.currentTimeMillis(), maxPeople);
-        requestCampsiteRegistration(body);
+        CreateCampsiteRequest request = new CreateCampsiteRequest("AUTO-" + System.currentTimeMillis(), null, maxPeople);
+        requestCampsiteRegistration(request);
     }
 
     // ===== Then =====
