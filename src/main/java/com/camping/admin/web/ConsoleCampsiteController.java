@@ -1,15 +1,14 @@
 package com.camping.admin.web;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteCreateRequest;
+import com.camping.admin.dto.CampsiteUpdateRequest;
 import com.camping.admin.repository.CampsiteRepository;
-import java.util.Map;
+import java.util.Objects;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -35,19 +34,10 @@ public class ConsoleCampsiteController {
     }
 
     @PostMapping
-    public String create(@RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        String siteNumber = params.containsKey("siteNumber") ? params.get("siteNumber") : null;
-        String description = params.containsKey("description") ? params.get("description") : "";
-        Integer maxPeople;
-        if (params.containsKey("maxPeople")) {
-            try {
-                maxPeople = Integer.valueOf(params.get("maxPeople"));
-            } catch (Exception e) {
-                maxPeople = null;
-            }
-        } else {
-            maxPeople = null;
-        }
+    public String create(@ModelAttribute CampsiteCreateRequest createReq, RedirectAttributes redirectAttributes) {
+        String siteNumber = createReq.siteNumber();
+        String description = Objects.requireNonNull(createReq.description(), "");
+        Integer maxPeople = createReq.maxPeople();
 
         Campsite entity = new Campsite(siteNumber, description, maxPeople);
         campsiteRepository.save(entity);
@@ -65,21 +55,19 @@ public class ConsoleCampsiteController {
     }
 
     @PostMapping("/{id}")
-    public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
+    public String update(@PathVariable Long id, @ModelAttribute CampsiteUpdateRequest updateReq, RedirectAttributes redirectAttributes) {
         Campsite campsite = campsiteRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + id));
 
-        if (params.containsKey("siteNumber")) {
-            campsite.setSiteNumber(params.get("siteNumber"));
-        }
-        if (params.containsKey("description")) {
-            campsite.setDescription(params.get("description"));
-        }
-        if (params.containsKey("maxPeople")) {
-            try {
-                campsite.setMaxPeople(Integer.valueOf(params.get("maxPeople")));
-            } catch (Exception ignore) {}
-        }
+        String siteNumber = Objects.requireNonNullElse(updateReq.siteNumber(), campsite.getSiteNumber());
+        String description = Objects.requireNonNullElse(updateReq.description(), campsite.getDescription());
+        Integer maxPeople = Objects.requireNonNullElse(updateReq.maxPeople(), campsite.getMaxPeople());
+
+        campsite.setSiteNumber(siteNumber);
+        campsite.setDescription(description);
+        campsite.setMaxPeople(maxPeople);
+
+        campsiteRepository.save(campsite);
 
         redirectAttributes.addFlashAttribute("success", "캠프사이트가 수정되었습니다.");
         return "redirect:/console/campsites";
