@@ -89,10 +89,16 @@ public class CampsiteRegistrationSteps {
         assertThat(response.statusCode()).isEqualTo(201);
     }
 
-    @Then("캠핑장 사이트 등록이 실패한다")
-    public void 캠핑장_사이트_등록이_실패한다() {
+    @Then("클라이언트 오류로 캠핑장 사이트 등록이 실패한다")
+    public void 클라이언트_오류로_캠핑장_사이트_등록이_실패한다() {
         Response response = scenarioContext.getResponse();
-        assertThat(response.statusCode()).isIn(400, 500);
+        assertThat(response.statusCode()).isIn(400);
+    }
+
+    @Then("중복 오류로 캠핑장 사이트 등록이 실패한다")
+    public void 중복_오류로_캠핑장_사이트_등록이_실패한다() {
+        Response response = scenarioContext.getResponse();
+        assertThat(response.statusCode()).isIn(409);
     }
 
     // ===== And =====
