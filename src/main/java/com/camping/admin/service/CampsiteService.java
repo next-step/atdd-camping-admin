@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -22,25 +21,20 @@ public class CampsiteService {
 
     @Transactional
     public Campsite create(CampsiteCreateRequest createReq) {
-        String siteNumber = createReq.siteNumber();
-        String description = Objects.requireNonNullElse(createReq.description(), "");
-        Integer maxPeople = createReq.maxPeople();
-
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
+        Campsite newCampsite = Campsite.create(
+                createReq.siteNumber(),
+                createReq.description(),
+                createReq.maxPeople());
         return campsiteRepository.save(newCampsite);
     }
 
     @Transactional
     public Campsite update(Long campsiteId, CampsiteUpdateRequest updateReq) {
         Campsite campsite = findById(campsiteId);
-
-        String siteNumber = Objects.requireNonNullElse(updateReq.siteNumber(), campsite.getSiteNumber());
-        String description = Objects.requireNonNullElse(updateReq.description(), campsite.getDescription());
-        Integer maxPeople = Objects.requireNonNullElse(updateReq.maxPeople(), campsite.getMaxPeople());
-
-        campsite.setSiteNumber(siteNumber);
-        campsite.setDescription(description);
-        campsite.setMaxPeople(maxPeople);
+        campsite.update(
+                updateReq.siteNumber(),
+                updateReq.description(),
+                updateReq.maxPeople());
 
         return campsite;
     }
