@@ -1,7 +1,10 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
+import com.camping.admin.dto.CampsiteResponse;
+import com.camping.admin.dto.CreateCampsiteRequest;
 import com.camping.admin.repository.CampsiteRepository;
+import com.camping.admin.service.CampsiteService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class CampsiteAdminController {
 
     private final CampsiteRepository campsiteRepository;
+    private final CampsiteService campsiteService;
 
     @GetMapping
     public ResponseEntity<List<Campsite>> getAllCampsites() {
@@ -38,52 +42,9 @@ public class CampsiteAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        String siteNumber;
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v == null) {
-                siteNumber = null;
-            } else {
-                siteNumber = v.toString();
-            }
-        } else {
-            siteNumber = null;
-        }
-
-        String description;
-        if (body.containsKey("description")) {
-            Object d = body.get("description");
-            description = d == null ? "" : d.toString();
-        } else {
-            description = "";
-        }
-
-        Integer maxPeople;
-        if (body.containsKey("maxPeople")) {
-            Object m = body.get("maxPeople");
-            if (m == null) {
-                maxPeople = null;
-            } else if (m instanceof Number) {
-                maxPeople = ((Number) m).intValue();
-            } else {
-                try {
-                    maxPeople = Integer.valueOf(m.toString());
-                } catch (Exception e) {
-                    maxPeople = null;
-                }
-            }
-        } else {
-            maxPeople = null;
-        }
-
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        }
+    public ResponseEntity<CampsiteResponse> createCampsite(@RequestBody CreateCampsiteRequest request) {
+        Campsite campsite = campsiteService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(CampsiteResponse.from(campsite));
     }
 
     @PutMapping("/{campsiteId}")
