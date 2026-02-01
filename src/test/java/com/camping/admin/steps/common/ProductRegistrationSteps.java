@@ -96,6 +96,13 @@ public class ProductRegistrationSteps {
         requestProductRegistration(request);
     }
 
+    @When("상품 유형이 {string}인 상품의 가격을 {int}원으로 등록 요청한다")
+    public void 상품_유형이_인_상품의_가격을_원으로_등록_요청한다(String productType, int price) {
+        CreateProductRequest request = new CreateProductRequest("상품명", 10, BigDecimal.valueOf(price), ProductType.valueOf(productType));
+
+        requestProductRegistration(request);
+    }
+
     @When("상품명 없이 상품 등록을 요청한다")
     public void 상품명_없이_상품_등록을_요청한다() {
         CreateProductRequest request = new CreateProductRequest();
@@ -117,6 +124,13 @@ public class ProductRegistrationSteps {
     public void 클라이언트_오류로_상품_등록이_실패한다() {
         Response response = scenarioContext.getResponse();
         assertThat(response.statusCode()).isIn(400);
+    }
+
+    @And("오류 메세지는 {string}를 포함한다")
+    public void 오류_메세지는_을_를_포함한다(String expectedMessage) {
+        Response response = scenarioContext.getResponse();
+        String actualMessage = response.jsonPath().getString("message");
+        assertThat(actualMessage).contains(expectedMessage);
     }
 
     @And("등록된 상품의 이름은 {string}이다")

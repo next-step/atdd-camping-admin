@@ -7,6 +7,8 @@ import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 
@@ -34,11 +36,37 @@ public class CreateProductRequest {
     }
 
     public Product toEntity() {
+        ProductType resolvedType = resolveProductType();
+        BigDecimal resolvedPrice = resolvePrice(resolvedType);
+        int resolvedStock = resolveStock();
+
         return new Product(
                 name,
-                stockQuantity != null ? stockQuantity : 0,
-                price != null ? price : BigDecimal.ZERO,
-                productType != null ? productType : ProductType.SALE
+                resolvedStock,
+                resolvedPrice,
+                resolvedType
         );
+    }
+
+    private ProductType resolveProductType() {
+        return productType != null ? productType : ProductType.SALE;
+    }
+
+    public BigDecimal resolvePrice(ProductType productType) {
+        BigDecimal resolvedPrice = price != null ? price : BigDecimal.valueOf(1000);
+
+        if (productType == ProductType.SALE &&
+                resolvedPrice.compareTo(BigDecimal.ONE) < 0) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "가격은 1원 이상이어야 합니다"
+            );
+        }
+
+        return resolvedPrice;
+    }
+
+    private int resolveStock() {
+        return stockQuantity != null ? stockQuantity : 0;
     }
 }
