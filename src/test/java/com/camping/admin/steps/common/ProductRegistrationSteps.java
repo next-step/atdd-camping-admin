@@ -1,5 +1,8 @@
 package com.camping.admin.steps.common;
 
+import com.camping.admin.domain.enums.ProductType;
+import com.camping.admin.dto.CreateProductRequest;
+import com.camping.admin.dto.ProductResponse;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.support.ApiClient;
 import com.camping.admin.support.ScenarioContext;
@@ -12,6 +15,7 @@ import io.restassured.response.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,27 +44,24 @@ public class ProductRegistrationSteps {
 
     // ===== 공통 헬퍼 메서드 =====
 
-    private void requestProductRegistration(String body) {
+    private void requestProductRegistration(CreateProductRequest body) {
         Response response = apiClient.post("/admin/products", body);
         scenarioContext.setResponse(response);
     }
 
-    private String buildProductJson(Map<String, String> data) {
-        StringBuilder json = new StringBuilder("{");
-        boolean first = true;
-        for (Map.Entry<String, String> entry : data.entrySet()) {
-            if (!first) json.append(",");
-            String key = entry.getKey();
-            String value = entry.getValue();
-            if (key.equals("stockQuantity") || key.equals("price")) {
-                json.append("\"").append(key).append("\":").append(value);
-            } else {
-                json.append("\"").append(key).append("\":\"").append(value).append("\"");
-            }
-            first = false;
+    private CreateProductRequest buildCreateProductRequest(Map<String, String> data) {
+        CreateProductRequest request = new CreateProductRequest();
+        request.setName(data.get("name"));
+        if (data.containsKey("stockQuantity")) {
+            request.setStockQuantity(Integer.parseInt(data.get("stockQuantity")));
         }
-        json.append("}");
-        return json.toString();
+        if (data.containsKey("price")) {
+            request.setPrice(BigDecimal.valueOf(Integer.parseInt(data.get("price"))));
+        }
+        if (data.containsKey("productType")) {
+            request.setProductType(ProductType.valueOf(data.get("productType")));
+        }
+        return request;
     }
 
     // ===== When =====
@@ -68,30 +69,47 @@ public class ProductRegistrationSteps {
     @When("다음 정보로 상품 등록을 요청한다:")
     public void 다음_정보로_상품_등록을_요청한다(DataTable dataTable) {
         Map<String, String> data = dataTable.asMap(String.class, String.class);
-        String body = buildProductJson(data);
-        requestProductRegistration(body);
+        CreateProductRequest request = buildCreateProductRequest(data);
+
+        requestProductRegistration(request);
     }
 
     @When("상품명 {string}만 입력하여 상품 등록을 요청한다")
     public void 상품명_만_입력하여_상품_등록을_요청한다(String name) {
-        String body = String.format("{\"name\":\"%s\"}", name);
-        requestProductRegistration(body);
+        CreateProductRequest request = new CreateProductRequest();
+        request.setName(name);
+
+        requestProductRegistration(request);
+    }
+
+    @When("상품의 재고를 {int}개로 상품 등록을 요청한다")
+    public void 상품의_재고를_개로_상품_등록을_요청한다(int stockQuantity) {
+        CreateProductRequest request = new CreateProductRequest("상품명", stockQuantity, BigDecimal.valueOf(10000), ProductType.SALE);
+
+        requestProductRegistration(request);
+    }
+
+    @When("상품의 가격을 {int}원으로 상품 등록을 요청한다")
+    public void 상품의_가격을_원으로_상품_등록을_요청한다(int price) {
+        CreateProductRequest request = new CreateProductRequest("상품명", 10, BigDecimal.valueOf(price), ProductType.SALE);
+
+        requestProductRegistration(request);
+    }
+
+    @When("상품 유형이 {string}인 상품의 가격을 {int}원으로 등록 요청한다")
+    public void 상품_유형이_인_상품의_가격을_원으로_등록_요청한다(String productType, int price) {
+        CreateProductRequest request = new CreateProductRequest("상품명", 10, BigDecimal.valueOf(price), ProductType.valueOf(productType));
+
+        requestProductRegistration(request);
     }
 
     @When("상품명 없이 상품 등록을 요청한다")
     public void 상품명_없이_상품_등록을_요청한다() {
-        requestProductRegistration("{\"stockQuantity\":10,\"price\":10000}");
-    }
+        CreateProductRequest request = new CreateProductRequest();
+        request.setStockQuantity(10);
+        request.setPrice(BigDecimal.valueOf(10000));
 
-    @When("빈 요청 본문으로 상품 등록을 요청한다")
-    public void 빈_요청_본문으로_상품_등록을_요청한다() {
-        requestProductRegistration("{}");
-    }
-
-    @When("재고에 {string}을 입력하여 상품 등록을 요청한다")
-    public void 재고에_을_입력하여_상품_등록을_요청한다(String stockQuantity) {
-        String body = String.format("{\"name\":\"테스트 상품\",\"stockQuantity\":%s}", stockQuantity);
-        requestProductRegistration(body);
+        requestProductRegistration(request);
     }
 
     // ===== Then =====
@@ -102,10 +120,17 @@ public class ProductRegistrationSteps {
         assertThat(response.statusCode()).isEqualTo(201);
     }
 
-    @Then("상품 등록이 실패한다")
-    public void 상품_등록이_실패한다() {
+    @Then("클라이언트 오류로 상품 등록이 실패한다")
+    public void 클라이언트_오류로_상품_등록이_실패한다() {
         Response response = scenarioContext.getResponse();
-        assertThat(response.statusCode()).isIn(400, 500);
+        assertThat(response.statusCode()).isIn(400);
+    }
+
+    @And("오류 메세지는 {string}를 포함한다")
+    public void 오류_메세지는_을_를_포함한다(String expectedMessage) {
+        Response response = scenarioContext.getResponse();
+        String actualMessage = response.jsonPath().getString("message");
+        assertThat(actualMessage).contains(expectedMessage);
     }
 
     @And("등록된 상품의 이름은 {string}이다")
