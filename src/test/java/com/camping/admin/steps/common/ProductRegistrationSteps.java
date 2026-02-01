@@ -82,6 +82,20 @@ public class ProductRegistrationSteps {
         requestProductRegistration(request);
     }
 
+    @When("상품의 재고를 {int}개로 상품 등록을 요청한다")
+    public void 상품의_재고를_개로_상품_등록을_요청한다(int stockQuantity) {
+        CreateProductRequest request = new CreateProductRequest("상품명", stockQuantity, BigDecimal.valueOf(10000), ProductType.SALE);
+
+        requestProductRegistration(request);
+    }
+
+    @When("상품의 가격을 {int}원으로 상품 등록을 요청한다")
+    public void 상품의_가격을_원으로_상품_등록을_요청한다(int price) {
+        CreateProductRequest request = new CreateProductRequest("상품명", 10, BigDecimal.valueOf(price), ProductType.SALE);
+
+        requestProductRegistration(request);
+    }
+
     @When("상품명 없이 상품 등록을 요청한다")
     public void 상품명_없이_상품_등록을_요청한다() {
         CreateProductRequest request = new CreateProductRequest();
@@ -89,11 +103,6 @@ public class ProductRegistrationSteps {
         request.setPrice(BigDecimal.valueOf(10000));
 
         requestProductRegistration(request);
-    }
-
-    @When("빈 요청 본문으로 상품 등록을 요청한다")
-    public void 빈_요청_본문으로_상품_등록을_요청한다() {
-        requestProductRegistration(new CreateProductRequest());
     }
 
     // ===== Then =====
