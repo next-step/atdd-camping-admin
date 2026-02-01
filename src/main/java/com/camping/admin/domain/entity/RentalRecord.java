@@ -36,14 +36,6 @@ public class RentalRecord {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public RentalRecord(Reservation reservation, Product product, Integer quantity) {
-        this.reservation = reservation;
-        this.product = product;
-        this.quantity = quantity;
-        this.isReturned = false;
-        this.createdAt = LocalDateTime.now();
-    }
-
     public static RentalRecord create(Reservation reservation, Product product, Integer quantity, LocalDateTime now) {
         var rentalRecord = new RentalRecord();
 
