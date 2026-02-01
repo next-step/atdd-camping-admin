@@ -1,6 +1,5 @@
 package com.camping.admin.web;
 
-import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CampsiteCreateRequest;
 import com.camping.admin.dto.CampsiteUpdateRequest;
 
@@ -42,9 +41,9 @@ public class ConsoleCampsiteController {
 
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model) {
-        Campsite campsite = campsiteService.get(id);
+        var response = campsiteService.get(id);
         model.addAttribute("formAction", "/console/campsites/" + id);
-        model.addAttribute("campsite", campsite);
+        model.addAttribute("campsite", response);
         return "campsites/form";
     }
 

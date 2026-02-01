@@ -2,6 +2,7 @@ package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CampsiteCreateRequest;
+import com.camping.admin.dto.CampsiteResponse;
 import com.camping.admin.dto.CampsiteUpdateRequest;
 import com.camping.admin.repository.CampsiteRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,33 +21,35 @@ public class CampsiteService {
     // ===== Command =====
 
     @Transactional
-    public Campsite create(CampsiteCreateRequest createReq) {
-        Campsite newCampsite = Campsite.create(
+    public Long create(CampsiteCreateRequest createReq) {
+        var newCampsite = Campsite.create(
                 createReq.siteNumber(),
                 createReq.description(),
                 createReq.maxPeople());
-        return campsiteRepository.save(newCampsite);
+        campsiteRepository.save(newCampsite);
+
+        return newCampsite.getId();
     }
 
     @Transactional
-    public Campsite update(Long campsiteId, CampsiteUpdateRequest updateReq) {
-        Campsite campsite = findById(campsiteId);
+    public void update(Long campsiteId, CampsiteUpdateRequest updateReq) {
+        var campsite = findById(campsiteId);
         campsite.update(
                 updateReq.siteNumber(),
                 updateReq.description(),
                 updateReq.maxPeople());
-
-        return campsite;
     }
 
     // ===== Query =====
 
-    public List<Campsite> getAll() {
-        return campsiteRepository.findAll();
+    public List<CampsiteResponse> getAll() {
+        return campsiteRepository.findAll().stream()
+                .map(CampsiteResponse::from)
+                .toList();
     }
 
-    public Campsite get(Long campsiteId) {
-        return findById(campsiteId);
+    public CampsiteResponse get(Long campsiteId) {
+        return CampsiteResponse.from(findById(campsiteId));
     }
 
     // ===== Helper =====

@@ -1,7 +1,7 @@
 package com.camping.admin.controller;
 
-import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.dto.CampsiteCreateRequest;
+import com.camping.admin.dto.CampsiteResponse;
 import com.camping.admin.dto.CampsiteUpdateRequest;
 import java.util.List;
 
@@ -19,22 +19,24 @@ public class CampsiteAdminController {
     private final CampsiteService campsiteService;
 
     @GetMapping
-    public ResponseEntity<List<Campsite>> getAllCampsites() {
+    public ResponseEntity<List<CampsiteResponse>> getAllCampsites() {
         var responses = campsiteService.getAll();
         return ResponseEntity.ok(responses);
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody CampsiteCreateRequest createReq) {
-        var response = campsiteService.create(createReq);
+    public ResponseEntity<CampsiteResponse> createCampsite(@RequestBody CampsiteCreateRequest createReq) {
+        Long campsiteId = campsiteService.create(createReq);
+        var response = campsiteService.get(campsiteId);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
-    public ResponseEntity<Campsite> updateCampsite(
+    public ResponseEntity<CampsiteResponse> updateCampsite(
             @PathVariable Long campsiteId,
             @RequestBody CampsiteUpdateRequest updateReq) {
-        var response = campsiteService.update(campsiteId, updateReq);
+        campsiteService.update(campsiteId, updateReq);
+        var response = campsiteService.get(campsiteId);
         return ResponseEntity.ok(response);
     }
 }
