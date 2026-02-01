@@ -1,15 +1,16 @@
 package com.camping.admin.service;
 
-import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.dto.RentalCreateRequest;
+import com.camping.admin.dto.RentalRecordResponse;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
+
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,49 +23,61 @@ public class RentalService {
     private final RentalRecordRepository rentalRecordRepository;
     private final ProductRepository productRepository;
     private final ReservationRepository reservationRepository;
-    private final ProductService productService;
 
-    public List<RentalResponse> findAll() {
-        return rentalRecordRepository.findAll().stream()
-                .map(RentalResponse::from)
-                .collect(Collectors.toList());
-    }
+    // ===== Command =====
 
     @Transactional
-    public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
+    public Long create(RentalCreateRequest createReq) {
+        var product = productRepository.findById(createReq.productId())
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + createReq.productId()));
 
-        if (product.getProductType() != ProductType.RENTAL) {
+        if (!product.isRental()) {
             throw new IllegalArgumentException("Product is not a rental item.");
         }
 
-        productService.decreaseStock(productId, quantity);
+        product.decreaseStock(createReq.quantity());
 
-        Reservation reservation = null;
-        if (reservationId != null) {
-            reservation = reservationRepository.findById(reservationId)
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
-        }
+        Reservation reservation = hasReservation(createReq.reservationId())
+                ? findReservation(createReq.reservationId())
+                : null;
 
-        RentalRecord rentalRecord = new RentalRecord(reservation, product, quantity);
-        RentalRecord savedRentalRecord = rentalRecordRepository.save(rentalRecord);
+        var newRentalRecord = RentalRecord.create(reservation, product, createReq.quantity(), LocalDateTime.now());
+        rentalRecordRepository.save(newRentalRecord);
 
-        return RentalResponse.from(savedRentalRecord);
+        return newRentalRecord.getId();
     }
 
     @Transactional
-    public RentalResponse markAsReturned(Long rentalRecordId) {
-        RentalRecord rentalRecord = rentalRecordRepository.findById(rentalRecordId)
+    public void returnItem(Long rentalRecordId) {
+        var rentalRecord = findById(rentalRecordId);
+        rentalRecord.returnItem();
+    }
+
+    // ===== Query =====
+
+    public List<RentalRecordResponse> getAll() {
+        return rentalRecordRepository.findAll().stream()
+                .map(RentalRecordResponse::from)
+                .toList();
+    }
+
+    public RentalRecordResponse get(Long rentalRecordId) {
+        return RentalRecordResponse.from(findById(rentalRecordId));
+    }
+
+    // ===== Helper =====
+
+    private boolean hasReservation(Long reservationId) {
+        return reservationId != null;
+    }
+
+    private Reservation findReservation(Long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new IllegalArgumentException("Cannot find reservation with id: " + reservationId));
+    }
+
+    private RentalRecord findById(Long rentalRecordId) {
+        return rentalRecordRepository.findById(rentalRecordId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find rental record with id: " + rentalRecordId));
-        
-        if (rentalRecord.getIsReturned()) {
-            throw new IllegalStateException("This item has already been returned.");
-        }
-        rentalRecord.setReturned(true);
-        
-        productService.increaseStock(rentalRecord.getProduct().getId(), rentalRecord.getQuantity());
-        
-        return RentalResponse.from(rentalRecord);
     }
 }

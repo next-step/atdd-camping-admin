@@ -59,4 +59,8 @@ public class Product {
     public void increaseStock(Integer quantity) {
         stockQuantity += quantity;
     }
+
+    public boolean isRental() {
+        return productType == ProductType.RENTAL;
+    }
 }

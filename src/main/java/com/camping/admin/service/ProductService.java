@@ -42,18 +42,6 @@ public class ProductService {
                 updateReq.productType());
     }
 
-    @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
-        var product = findById(productId);
-        product.decreaseStock(quantity);
-    }
-
-    @Transactional
-    public void increaseStock(Long productId, Integer quantity) {
-        var product = findById(productId);
-        product.increaseStock(quantity);
-    }
-
     // ===== Query =====
 
     public List<ProductResponse> getAll() {
