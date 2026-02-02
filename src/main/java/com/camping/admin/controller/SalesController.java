@@ -5,6 +5,7 @@ import com.camping.admin.dto.SalesRecordResponse;
 import com.camping.admin.service.SalesService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,7 +22,7 @@ public class SalesController {
     private final SalesService salesService;
 
     @PostMapping
-    public ResponseEntity<Void> processSale(@RequestBody ProcessSaleRequest request) {
+    public ResponseEntity<Void> processSale(@Valid @RequestBody ProcessSaleRequest request) {
         salesService.processSale(request);
         return ResponseEntity.ok().build();
     }

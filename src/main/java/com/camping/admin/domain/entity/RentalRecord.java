@@ -37,6 +37,10 @@ public class RentalRecord {
     private LocalDateTime createdAt;
 
     public static RentalRecord create(Reservation reservation, Product product, Integer quantity, LocalDateTime now) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1");
+        }
+
         var rentalRecord = new RentalRecord();
 
         rentalRecord.reservation = reservation;

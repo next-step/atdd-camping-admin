@@ -33,6 +33,10 @@ public class SalesRecord {
     private LocalDateTime createdAt;
 
     public static SalesRecord create(Product product, int quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1");
+        }
+
         var salesRecord = new SalesRecord();
         salesRecord.product = product;
         salesRecord.quantity = quantity;

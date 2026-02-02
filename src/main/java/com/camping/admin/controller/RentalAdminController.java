@@ -3,6 +3,7 @@ package com.camping.admin.controller;
 import com.camping.admin.dto.RentalCreateRequest;
 import com.camping.admin.dto.RentalRecordResponse;
 import com.camping.admin.service.RentalService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class RentalAdminController {
     }
 
     @PostMapping
-    public ResponseEntity<RentalRecordResponse> createRental(@RequestBody RentalCreateRequest createReq) {
+    public ResponseEntity<RentalRecordResponse> createRental(@Valid @RequestBody RentalCreateRequest createReq) {
         Long rentalRecordId = rentalService.create(createReq);
         var response = rentalService.get(rentalRecordId);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
