@@ -1,128 +1,103 @@
 package com.camping.admin.service;
 
-import com.camping.admin.domain.entity.Product;
+import com.camping.admin.domain.entity.Reservation;
 import com.camping.admin.domain.entity.SalesRecord;
 import com.camping.admin.dto.DailyRevenueReportResponse;
-import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.ProcessSaleRequest;
+import com.camping.admin.dto.RangeRevenueReportResponse;
 import com.camping.admin.dto.RevenueEntryResponse;
-import com.camping.admin.dto.SaleItemResponse;
 import com.camping.admin.dto.SalesRecordResponse;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.repository.SalesRecordRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class SalesService {
 
+    private static final BigDecimal NIGHTLY_RATE = new BigDecimal("50000");
+
     private final ProductRepository productRepository;
     private final SalesRecordRepository salesRecordRepository;
-    private final ReservationRepository reservationRepository; // For reports
-    private final RentalRecordRepository rentalRecordRepository; // For reports
-    private final ProductService productService; // To use decreaseStock
+    private final ReservationRepository reservationRepository;
+    private final RentalRecordRepository rentalRecordRepository;
+
+    // ===== Command =====
 
     @Transactional
     public void processSale(ProcessSaleRequest request) {
-        for (SaleItemResponse itemDto : request.getItems()) {
-            productService.decreaseStock(itemDto.getProductId(), itemDto.getQuantity());
+        for (var item : request.items()) {
+            var product = productRepository.findById(item.productId())
+                    .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + item.productId()));
 
-            Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + itemDto.getProductId()));
-            
-            BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
-            
-            SalesRecord salesRecord = new SalesRecord(product, itemDto.getQuantity(), totalPrice);
+            product.decreaseStock(item.quantity());
+
+            var salesRecord = SalesRecord.create(product, item.quantity());
             salesRecordRepository.save(salesRecord);
         }
     }
 
+    // ===== Query =====
+
     public List<SalesRecordResponse> findRecentSales(int limit) {
-        return salesRecordRepository.findAll().stream()
-                .sorted(java.util.Comparator.comparing(com.camping.admin.domain.entity.SalesRecord::getCreatedAt).reversed())
-                .limit(limit)
+        return salesRecordRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, limit)).stream()
                 .map(SalesRecordResponse::from)
                 .toList();
     }
 
     public DailyRevenueReportResponse generateDailyRevenueReport(LocalDate date) {
-        BigDecimal totalSalesRevenue = salesRecordRepository.findAll().stream()
-                .filter(record -> record.getCreatedAt().toLocalDate().equals(date))
+        var totalSalesRevenue = salesRecordRepository.findByCreatedDate(date).stream()
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null && r.getReservationDate().equals(date))
-                .map(r -> {
-                    long nights = java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
-                    if (nights < 1) nights = 1; // 최소 1박 처리
-                    return new BigDecimal(nights).multiply(new BigDecimal("50000"));
-                })
+        var totalReservationRevenue = reservationRepository.findByReservationDate(date).stream()
+                .map(this::calculateReservationRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalRentalRevenue = rentalRecordRepository.findAll().stream()
-                .filter(rr -> rr.getCreatedAt().toLocalDate().equals(date))
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
+        var totalRentalRevenue = rentalRecordRepository.findByCreatedDateWithProduct(date).stream()
+                .map(rr -> rr.getProduct().calculateTotalPrice(rr.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
+        var grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
 
         return new DailyRevenueReportResponse(date, totalReservationRevenue, totalSalesRevenue, totalRentalRevenue, grandTotal);
     }
 
     public RangeRevenueReportResponse generateRangeRevenueReport(LocalDate from, LocalDate to) {
-        BigDecimal totalSalesRevenue = salesRecordRepository.findAll().stream()
-                .filter(record -> {
-                    LocalDate d = record.getCreatedAt().toLocalDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
+        var totalSalesRevenue = salesRecordRepository.findByCreatedDateBetween(from, to).stream()
                 .map(SalesRecord::getTotalPrice)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> {
-                    LocalDate d = r.getReservationDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
-                .map(r -> {
-                    long nights = java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
-                    if (nights < 1) nights = 1;
-                    return new BigDecimal(nights).multiply(new BigDecimal("50000"));
-                })
+        var totalReservationRevenue = reservationRepository.findByReservationDateBetween(from, to).stream()
+                .map(this::calculateReservationRevenue)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal totalRentalRevenue = rentalRecordRepository.findAll().stream()
-                .filter(rr -> {
-                    LocalDate d = rr.getCreatedAt().toLocalDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
-                .map(rr -> rr.getProduct().getPrice().multiply(new BigDecimal(rr.getQuantity())))
+        var totalRentalRevenue = rentalRecordRepository.findByCreatedDateWithProductBetween(from, to).stream()
+                .map(rr -> rr.getProduct().calculateTotalPrice(rr.getQuantity()))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        BigDecimal grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
+        var grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
 
         return new RangeRevenueReportResponse(from, to, totalReservationRevenue, totalSalesRevenue, totalRentalRevenue, grandTotal);
     }
 
     public List<RevenueEntryResponse> generateRangeRevenueEntries(LocalDate from, LocalDate to) {
-        List<RevenueEntryResponse> entries = new ArrayList<>();
+        var entries = new ArrayList<RevenueEntryResponse>();
 
-        salesRecordRepository.findAll().stream()
-                .filter(record -> {
-                    LocalDate d = record.getCreatedAt().toLocalDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
+        salesRecordRepository.findByCreatedDateBetween(from, to)
                 .forEach(record -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.SALE,
                         record.getProduct().getName() + " 외",
@@ -130,36 +105,33 @@ public class SalesService {
                         record.getCreatedAt()
                 )));
 
-        reservationRepository.findAll().stream()
-                .filter(r -> r.getReservationDate() != null)
-                .filter(r -> {
-                    LocalDate d = r.getReservationDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
-                .forEach(r -> {
-                    long nights = java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
-                    if (nights < 1) nights = 1;
-                    entries.add(new RevenueEntryResponse(
-                            RevenueEntryResponse.EntryType.RESERVATION,
-                            "예약 #" + r.getId(),
-                            new java.math.BigDecimal(nights).multiply(new java.math.BigDecimal("50000")),
-                            r.getCreatedAt()
-                    ));
-                });
+        reservationRepository.findByReservationDateBetween(from, to)
+                .forEach(r -> entries.add(new RevenueEntryResponse(
+                        RevenueEntryResponse.EntryType.RESERVATION,
+                        "예약 #" + r.getId(),
+                        calculateReservationRevenue(r),
+                        r.getCreatedAt()
+                )));
 
-        rentalRecordRepository.findAll().stream()
-                .filter(rr -> {
-                    LocalDate d = rr.getCreatedAt().toLocalDate();
-                    return (d.isEqual(from) || d.isAfter(from)) && (d.isEqual(to) || d.isBefore(to));
-                })
+        rentalRecordRepository.findByCreatedDateWithProductBetween(from, to)
                 .forEach(rr -> entries.add(new RevenueEntryResponse(
                         RevenueEntryResponse.EntryType.RENTAL,
                         rr.getProduct().getName() + (rr.getReservation() != null ? " (예약#" + rr.getReservation().getId() + ")" : ""),
-                        rr.getProduct().getPrice().multiply(new java.math.BigDecimal(rr.getQuantity())),
+                        rr.getProduct().calculateTotalPrice(rr.getQuantity()),
                         rr.getCreatedAt()
                 )));
 
         entries.sort(Comparator.comparing(RevenueEntryResponse::getOccurredAt));
         return entries;
+    }
+
+    // ===== Helper =====
+
+    private BigDecimal calculateReservationRevenue(Reservation reservation) {
+        var nights = ChronoUnit.DAYS.between(reservation.getStartDate(), reservation.getEndDate());
+        if (nights < 1) {
+            nights = 1;
+        }
+        return NIGHTLY_RATE.multiply(BigDecimal.valueOf(nights));
     }
 }

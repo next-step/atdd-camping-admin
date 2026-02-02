@@ -63,4 +63,8 @@ public class Product {
     public boolean isRental() {
         return productType == ProductType.RENTAL;
     }
+
+    public BigDecimal calculateTotalPrice(int quantity) {
+        return price.multiply(BigDecimal.valueOf(quantity));
+    }
 }

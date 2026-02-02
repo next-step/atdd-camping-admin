@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/sales") // Public-facing API prefix
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class SalesController {
     }
 
     @GetMapping
-    public ResponseEntity<java.util.List<SalesRecordResponse>> listSales() {
-        java.util.List<SalesRecordResponse> records = salesService.findRecentSales(10);
-        return ResponseEntity.ok(records);
+    public ResponseEntity<List<SalesRecordResponse>> listSales() {
+        var responses = salesService.findRecentSales(10);
+        return ResponseEntity.ok(responses);
     }
 }
