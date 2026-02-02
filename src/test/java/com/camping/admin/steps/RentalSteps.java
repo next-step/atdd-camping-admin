@@ -68,6 +68,12 @@ public class RentalSteps {
         TestContext.setLastResponse(response);
     }
 
+    @When("관리자가 미반납 장비 목록을 조회한다")
+    public void 관리자가_미반납_장비_목록을_조회한다() {
+        Response response = RentalApi.미반납_목록_조회(TestContext.getAdminToken());
+        TestContext.setLastResponse(response);
+    }
+
     @When("관리자가 존재하지 않는 상품을 대여한다")
     public void 관리자가_존재하지_않는_상품을_대여한다() {
         Response response = RentalApi.대여_생성(TestContext.getAdminToken(), TestData.NOT_FOUND_ID, 1);

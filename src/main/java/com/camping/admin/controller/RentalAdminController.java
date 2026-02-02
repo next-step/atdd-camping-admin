@@ -23,6 +23,12 @@ public class RentalAdminController {
         return ResponseEntity.ok(rentals);
     }
 
+    @GetMapping("/unreturned")
+    public ResponseEntity<List<RentalRecordResponse>> getUnreturnedRentals() {
+        List<RentalRecordResponse> rentals = rentalService.getUnreturned();
+        return ResponseEntity.ok(rentals);
+    }
+
     @PostMapping
     public ResponseEntity<RentalRecordResponse> createRental(@Valid @RequestBody RentalCreateRequest createReq) {
         Long rentalRecordId = rentalService.create(createReq);

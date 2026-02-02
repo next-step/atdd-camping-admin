@@ -61,6 +61,12 @@ public class RentalService {
                 .toList();
     }
 
+    public List<RentalRecordResponse> getUnreturned() {
+        return rentalRecordRepository.findByIsReturned(false).stream()
+                .map(RentalRecordResponse::from)
+                .toList();
+    }
+
     public RentalRecordResponse get(Long rentalRecordId) {
         return RentalRecordResponse.from(findById(rentalRecordId));
     }
