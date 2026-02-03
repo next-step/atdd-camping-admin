@@ -51,4 +51,9 @@ public class RentalApi {
         return baseRequest()
                 .get("/admin/rentals");
     }
+
+    public static Response 미반납_목록_조회(String token) {
+        return authRequest(token)
+                .get("/admin/rentals/unreturned");
+    }
 }

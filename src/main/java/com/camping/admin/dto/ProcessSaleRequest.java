@@ -1,11 +1,15 @@
 package com.camping.admin.dto;
 
-import java.util.List;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 
-@Getter
-@Setter
-public class ProcessSaleRequest {
-    private List<SaleItemResponse> items;
+import java.util.ArrayList;
+import java.util.List;
+
+public record ProcessSaleRequest(
+        @NotNull @Valid List<SaleItemRequest> items
+) {
+    public ProcessSaleRequest {
+        items = items != null ? items : new ArrayList<>();
+    }
 }

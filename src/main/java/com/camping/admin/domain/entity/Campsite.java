@@ -1,18 +1,18 @@
 package com.camping.admin.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Objects.*;
+
 @Entity
 @Table(name = "campsites")
 @Getter
-@Setter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Campsite {
     
     @Id
@@ -28,10 +28,20 @@ public class Campsite {
     
     @OneToMany(mappedBy = "campsite", cascade = CascadeType.ALL)
     private List<Reservation> reservations = new ArrayList<>();
-    
-    public Campsite(String siteNumber, String description, Integer maxPeople) {
-        this.siteNumber = siteNumber;
-        this.description = description;
-        this.maxPeople = maxPeople;
+
+    public static Campsite create(String siteNumber, String description, Integer maxPeople) {
+        var campsite = new Campsite();
+
+        campsite.siteNumber = siteNumber;
+        campsite.description = requireNonNullElse(description, "");
+        campsite.maxPeople = maxPeople;
+
+        return campsite;
+    }
+
+    public void update(String siteNumber, String description, Integer maxPeople) {
+        this.siteNumber = requireNonNullElse(siteNumber, this.siteNumber);
+        this.description = requireNonNullElse(description, this.description);
+        this.maxPeople = requireNonNullElse(maxPeople, this.maxPeople);
     }
 }

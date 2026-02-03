@@ -1,10 +1,15 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.dto.ProductCreateRequest;
+import com.camping.admin.dto.ProductResponse;
+import com.camping.admin.dto.ProductUpdateRequest;
 import com.camping.admin.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -13,20 +18,44 @@ public class ProductService {
 
     private final ProductRepository productRepository;
 
+    // ===== Command =====
+
     @Transactional
-    public void decreaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        if (product.getStockQuantity() < quantity) {
-            throw new IllegalStateException("Not enough stock for product " + product.getName());
-        }
-        product.setStockQuantity(product.getStockQuantity() - quantity);
+    public Long create(ProductCreateRequest createReq) {
+        var newProduct = Product.create(
+                createReq.name(),
+                createReq.stockQuantity(),
+                createReq.price(),
+                createReq.productType());
+        productRepository.save(newProduct);
+
+        return newProduct.getId();
     }
 
     @Transactional
-    public void increaseStock(Long productId, Integer quantity) {
-        Product product = findById(productId);
-        product.setStockQuantity(product.getStockQuantity() + quantity);
+    public void update(Long productId, ProductUpdateRequest updateReq) {
+        var product = findById(productId);
+        product.update(
+                updateReq.name(),
+                updateReq.stockQuantity(),
+                updateReq.price(),
+                updateReq.productType());
     }
+
+    // ===== Query =====
+
+    public List<ProductResponse> getAll() {
+        return productRepository.findAll().stream()
+                .map(ProductResponse::from)
+                .toList();
+    }
+
+    public ProductResponse get(Long productId) {
+        var product = findById(productId);
+        return ProductResponse.from(product);
+    }
+
+    // ===== Helper =====
 
     private Product findById(Long productId) {
         return productRepository.findById(productId)

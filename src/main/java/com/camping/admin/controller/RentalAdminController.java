@@ -1,8 +1,9 @@
 package com.camping.admin.controller;
 
-import com.camping.admin.dto.CreateRentalRequest;
-import com.camping.admin.dto.RentalResponse;
+import com.camping.admin.dto.RentalCreateRequest;
+import com.camping.admin.dto.RentalRecordResponse;
 import com.camping.admin.service.RentalService;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -17,24 +18,28 @@ public class RentalAdminController {
     private final RentalService rentalService;
 
     @GetMapping
-    public ResponseEntity<List<RentalResponse>> getAllRentals() {
-        List<RentalResponse> rentals = rentalService.findAll();
+    public ResponseEntity<List<RentalRecordResponse>> getAllRentals() {
+        List<RentalRecordResponse> rentals = rentalService.getAll();
+        return ResponseEntity.ok(rentals);
+    }
+
+    @GetMapping("/unreturned")
+    public ResponseEntity<List<RentalRecordResponse>> getUnreturnedRentals() {
+        List<RentalRecordResponse> rentals = rentalService.getUnreturned();
         return ResponseEntity.ok(rentals);
     }
 
     @PostMapping
-    public ResponseEntity<RentalResponse> createRental(@RequestBody CreateRentalRequest request) {
-        RentalResponse createdRental = rentalService.createRental(
-                request.getProductId(),
-                request.getQuantity(),
-                request.getReservationId()
-        );
-        return new ResponseEntity<>(createdRental, HttpStatus.CREATED);
+    public ResponseEntity<RentalRecordResponse> createRental(@Valid @RequestBody RentalCreateRequest createReq) {
+        Long rentalRecordId = rentalService.create(createReq);
+        var response = rentalService.get(rentalRecordId);
+        return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
     @PatchMapping("/{rentalRecordId}/return")
-    public ResponseEntity<RentalResponse> markAsReturned(@PathVariable Long rentalRecordId) {
-        RentalResponse updatedRental = rentalService.markAsReturned(rentalRecordId);
-        return ResponseEntity.ok(updatedRental);
+    public ResponseEntity<RentalRecordResponse> markAsReturned(@PathVariable Long rentalRecordId) {
+        rentalService.returnItem(rentalRecordId);
+        var response = rentalService.get(rentalRecordId);
+        return ResponseEntity.ok(response);
     }
 }

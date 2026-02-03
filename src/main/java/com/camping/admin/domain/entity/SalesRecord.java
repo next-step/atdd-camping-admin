@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "sales_records")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class SalesRecord {
 
     @Id
@@ -30,10 +32,16 @@ public class SalesRecord {
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
-    public SalesRecord(Product product, Integer quantity, BigDecimal totalPrice) {
-        this.product = product;
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
-        this.createdAt = LocalDateTime.now();
+    public static SalesRecord create(Product product, int quantity) {
+        if (quantity < 1) {
+            throw new IllegalArgumentException("Quantity must be at least 1");
+        }
+
+        var salesRecord = new SalesRecord();
+        salesRecord.product = product;
+        salesRecord.quantity = quantity;
+        salesRecord.totalPrice = product.calculateTotalPrice(quantity);
+        salesRecord.createdAt = LocalDateTime.now();
+        return salesRecord;
     }
 }
