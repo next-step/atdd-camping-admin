@@ -67,7 +67,7 @@ public class RentalService {
     @Transactional
     public RentalResponse markAsReturned(Long rentalRecordId) {
         RentalRecord rentalRecord = rentalRecordRepository.findById(rentalRecordId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find rental record with id: " + rentalRecordId));
+                .orElseThrow(() -> new NotFoundException("Cannot find rental record with id: " + rentalRecordId));
         
         if (rentalRecord.getIsReturned()) {
             throw new IllegalStateException("This item has already been returned.");

@@ -25,4 +25,12 @@ public class RentalApiExtractableResponse {
                 .when()
                 .post("/admin/rentals");
     }
+
+    public static Response 대여를_반납한다(Long rentalRecordId) {
+        return RestAssured.given()
+                .header("Authorization", "Bearer " + CommonHooks.adminToken)
+                .contentType(ContentType.JSON)
+                .when()
+                .patch("/admin/rentals/" + rentalRecordId + "/return");
+    }
 }

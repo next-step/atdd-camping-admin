@@ -3,11 +3,13 @@ package com.camping.admin.helper;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
+import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.common.CommonHooks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.camping.admin.apiExtractableresponse.RentalApiExtractableResponse.대여를_반납한다;
 import static com.camping.admin.apiExtractableresponse.RentalApiExtractableResponse.대여를_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -18,9 +20,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class RentalTestHelper {
 
     private static final Long 존재하지_않는_상품_ID = 999999L;
+    private static final Long 존재하지_않는_대여_ID = 999999L;
 
     @Autowired
     private RentalRecordRepository rentalRecordRepository;
+
+    @Autowired
+    private ProductRepository productRepository;
 
     @Autowired
     private ProductTestHelper productTestHelper;
@@ -30,6 +36,7 @@ public class RentalTestHelper {
 
     private Product currentProduct;
     private Reservation currentReservation;
+    private RentalRecord currentRentalRecord;
     private int initialStock;
 
     // ==================== 상품 설정 (Given) ====================
@@ -45,6 +52,22 @@ public class RentalTestHelper {
 
     public void 예약을_조회한다() {
         this.currentReservation = reservationTestHelper.첫번째_예약을_조회한다();
+    }
+
+    public void 해당_상품을_대여한다(int quantity) {
+        RentalRecord rentalRecord = new RentalRecord(null, currentProduct, quantity);
+        this.currentRentalRecord = rentalRecordRepository.save(rentalRecord);
+        // 재고 감소 및 DB 저장
+        currentProduct.setStockQuantity(currentProduct.getStockQuantity() - quantity);
+        productRepository.save(currentProduct);
+    }
+
+    public void 해당_대여를_반납_처리한다_사전조건() {
+        currentRentalRecord.setReturned(true);
+        rentalRecordRepository.save(currentRentalRecord);
+        // 재고 복구 및 DB 저장
+        currentProduct.setStockQuantity(currentProduct.getStockQuantity() + currentRentalRecord.getQuantity());
+        productRepository.save(currentProduct);
     }
 
     // ==================== API 호출 (When) ====================
@@ -63,6 +86,14 @@ public class RentalTestHelper {
 
     public void 예약_없이_대여를_요청한다(int quantity) {
         CommonHooks.lastResponse = 대여를_생성한다(currentProduct.getId(), quantity, null);
+    }
+
+    public void 대여를_반납_처리한다() {
+        CommonHooks.lastResponse = 대여를_반납한다(currentRentalRecord.getId());
+    }
+
+    public void 존재하지_않는_대여를_반납_처리를_요청한다() {
+        CommonHooks.lastResponse = 대여를_반납한다(존재하지_않는_대여_ID);
     }
 
     // ==================== 검증 (Then) ====================
@@ -97,6 +128,12 @@ public class RentalTestHelper {
     public void 대여를_조회하여_예약과_연결되지_않았는지_검증한다() {
         RentalRecord latestRental = 가장_최근_대여_기록을_조회한다();
         assertThat(latestRental.getReservation()).isNull();
+    }
+
+    public void 대여를_조회하여_반납_상태인지_검증한다() {
+        RentalRecord rentalRecord = rentalRecordRepository.findById(currentRentalRecord.getId())
+                .orElseThrow(() -> new AssertionError("대여 기록을 찾을 수 없습니다."));
+        assertThat(rentalRecord.getIsReturned()).isTrue();
     }
 
     // ==================== Private ====================

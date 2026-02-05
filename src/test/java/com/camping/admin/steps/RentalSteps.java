@@ -8,7 +8,7 @@ import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
- * 대여 생성 기능의 인수 테스트 Step 정의
+ * 대여 관리 기능의 인수 테스트 Step 정의
  */
 public class RentalSteps extends CucumberSpringConfiguration {
 
@@ -37,6 +37,16 @@ public class RentalSteps extends CucumberSpringConfiguration {
         helper.판매용_상품을_등록한다();
     }
 
+    @Given("해당 상품 {int}개가 대여 중이다")
+    public void 해당_상품_N개가_대여_중이다(int quantity) {
+        helper.해당_상품을_대여한다(quantity);
+    }
+
+    @Given("해당 대여가 이미 반납되었다")
+    public void 해당_대여가_이미_반납되었다() {
+        helper.해당_대여를_반납_처리한다_사전조건();
+    }
+
     // ==================== When ====================
 
     @When("관리자가 해당 상품 {int}개를 예약에 연결하여 대여한다")
@@ -62,6 +72,21 @@ public class RentalSteps extends CucumberSpringConfiguration {
     @When("관리자가 예약 없이 해당 상품 {int}개를 대여한다")
     public void 관리자가_예약_없이_해당_상품_N개를_대여한다(int quantity) {
         helper.예약_없이_대여를_요청한다(quantity);
+    }
+
+    @When("관리자가 해당 대여를 반납 처리한다")
+    public void 관리자가_해당_대여를_반납_처리한다() {
+        helper.대여를_반납_처리한다();
+    }
+
+    @When("관리자가 해당 대여를 반납 처리를 요청한다")
+    public void 관리자가_해당_대여를_반납_처리를_요청한다() {
+        helper.대여를_반납_처리한다();
+    }
+
+    @When("관리자가 존재하지 않는 대여를 반납 처리를 요청한다")
+    public void 관리자가_존재하지_않는_대여를_반납_처리를_요청한다() {
+        helper.존재하지_않는_대여를_반납_처리를_요청한다();
     }
 
     // ==================== Then ====================
@@ -94,5 +119,10 @@ public class RentalSteps extends CucumberSpringConfiguration {
     @Then("해당 대여를 조회하면 예약과 연결되어 있지 않다")
     public void 해당_대여를_조회하면_예약과_연결되어_있지_않다() {
         helper.대여를_조회하여_예약과_연결되지_않았는지_검증한다();
+    }
+
+    @Then("대여를 조회하면 반납 상태이다")
+    public void 대여를_조회하면_반납_상태이다() {
+        helper.대여를_조회하여_반납_상태인지_검증한다();
     }
 }
