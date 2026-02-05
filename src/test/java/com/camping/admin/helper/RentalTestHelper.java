@@ -3,15 +3,10 @@ package com.camping.admin.helper;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.entity.RentalRecord;
 import com.camping.admin.domain.entity.Reservation;
-import com.camping.admin.domain.enums.ProductType;
-import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
-import com.camping.admin.repository.ReservationRepository;
 import com.camping.admin.common.CommonHooks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.math.BigDecimal;
 
 import static com.camping.admin.apiExtractableresponse.RentalApiExtractableResponse.대여를_생성한다;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,13 +20,13 @@ public class RentalTestHelper {
     private static final Long 존재하지_않는_상품_ID = 999999L;
 
     @Autowired
-    private ProductRepository productRepository;
-
-    @Autowired
     private RentalRecordRepository rentalRecordRepository;
 
     @Autowired
-    private ReservationRepository reservationRepository;
+    private ProductTestHelper productTestHelper;
+
+    @Autowired
+    private ReservationTestHelper reservationTestHelper;
 
     private Product currentProduct;
     private Reservation currentReservation;
@@ -41,22 +36,16 @@ public class RentalTestHelper {
     // ==================== 상품 설정 (Given) ====================
 
     public void 대여용_상품을_재고와_함께_등록한다(int stockQuantity) {
-        this.currentProduct = productRepository.save(
-                new Product("테스트 대여 상품", stockQuantity, new BigDecimal("10000"), ProductType.RENTAL)
-        );
+        this.currentProduct = productTestHelper.대여용_상품을_생성한다(stockQuantity);
         this.initialStock = stockQuantity;
     }
 
     public void 판매용_상품을_등록한다() {
-        this.currentProduct = productRepository.save(
-                new Product("테스트 판매 상품", 10, new BigDecimal("5000"), ProductType.SALE)
-        );
+        this.currentProduct = productTestHelper.판매용_상품을_생성한다();
     }
 
     public void 예약을_조회한다() {
-        this.currentReservation = reservationRepository.findAll().stream()
-                .findFirst()
-                .orElseThrow(() -> new IllegalStateException("예약이 존재하지 않습니다."));
+        this.currentReservation = reservationTestHelper.첫번째_예약을_조회한다();
     }
 
     // ==================== API 호출 (When) ====================
@@ -99,8 +88,7 @@ public class RentalTestHelper {
     }
 
     public void 상품_재고를_검증한다(int expectedStock) {
-        Product product = productRepository.findById(currentProduct.getId()).orElseThrow();
-        assertThat(product.getStockQuantity()).isEqualTo(expectedStock);
+        productTestHelper.재고를_검증한다(currentProduct.getId(), expectedStock);
     }
 
     public void 상품_재고가_유지되는지_검증한다(int expectedStock) {

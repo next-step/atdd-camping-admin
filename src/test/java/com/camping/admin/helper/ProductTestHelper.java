@@ -1,6 +1,7 @@
 package com.camping.admin.helper;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.common.CommonHooks;
 import io.cucumber.datatable.DataTable;
@@ -25,6 +26,25 @@ public class ProductTestHelper {
     private ProductRepository productRepository;
 
     private long productCountBeforeRequest;
+
+    // ==================== 상품 생성 (Given) ====================
+
+    public Product 대여용_상품을_생성한다(int stockQuantity) {
+        return productRepository.save(
+                new Product("테스트 대여 상품", stockQuantity, new BigDecimal("10000"), ProductType.RENTAL)
+        );
+    }
+
+    public Product 판매용_상품을_생성한다() {
+        return productRepository.save(
+                new Product("테스트 판매 상품", 10, new BigDecimal("5000"), ProductType.SALE)
+        );
+    }
+
+    public void 재고를_검증한다(Long productId, int expectedStock) {
+        Product product = productRepository.findById(productId).orElseThrow();
+        assertThat(product.getStockQuantity()).isEqualTo(expectedStock);
+    }
 
     // ==================== 상품 등록 (When) ====================
 

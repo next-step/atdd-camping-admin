@@ -23,6 +23,12 @@ public class ReservationTestHelper {
 
     // ==================== 예약 조회 (Given/When) ====================
 
+    public Reservation 첫번째_예약을_조회한다() {
+        return reservationRepository.findAll().stream()
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("예약이 존재하지 않습니다."));
+    }
+
     public void 확정된_예약을_찾는다() {
         this.currentReservation = reservationRepository.findAll().stream()
                 .filter(r -> ReservationStatus.CONFIRMED.name().equals(r.getStatus()))
