@@ -1,148 +1,50 @@
 package com.camping.admin.controller;
 
 import com.camping.admin.domain.entity.Campsite;
-import com.camping.admin.repository.CampsiteRepository;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.camping.admin.dto.CreateCampsiteRequest;
+import com.camping.admin.dto.UpdateCampsiteRequest;
+import com.camping.admin.exception.DuplicateSiteNumberException;
+import com.camping.admin.service.CampsiteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/admin/campsites")
 @RequiredArgsConstructor
 public class CampsiteAdminController {
 
-    private final CampsiteRepository campsiteRepository;
+    private final CampsiteService campsiteService;
 
     @GetMapping
     public ResponseEntity<List<Campsite>> getAllCampsites() {
-        List<Campsite> result;
-        List<Campsite> all = campsiteRepository.findAll();
-        if (all == null) {
-            result = new ArrayList<>();
-        } else if (all.isEmpty()) {
-            result = all; // 빈 목록 그대로 반환
-        } else {
-            // 그대로 반환하지만, 혹시 null 요소가 있으면 필터링
-            result = new ArrayList<>();
-            for (Campsite c : all) {
-                if (c != null) {
-                    result.add(c);
-                }
-            }
-        }
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(campsiteService.findAll());
     }
 
     @PostMapping
-    public ResponseEntity<Campsite> createCampsite(@RequestBody Map<String, Object> body) {
-        String siteNumber;
-        if (body.containsKey("siteNumber")) {
-            Object v = body.get("siteNumber");
-            if (v == null) {
-                siteNumber = null;
-            } else {
-                siteNumber = v.toString();
-            }
-        } else {
-            siteNumber = null;
-        }
-
-        String description;
-        if (body.containsKey("description")) {
-            Object d = body.get("description");
-            description = d == null ? "" : d.toString();
-        } else {
-            description = "";
-        }
-
-        Integer maxPeople;
-        if (body.containsKey("maxPeople")) {
-            Object m = body.get("maxPeople");
-            if (m == null) {
-                maxPeople = null;
-            } else if (m instanceof Number) {
-                maxPeople = ((Number) m).intValue();
-            } else {
-                try {
-                    maxPeople = Integer.valueOf(m.toString());
-                } catch (Exception e) {
-                    maxPeople = null;
-                }
-            }
-        } else {
-            maxPeople = null;
-        }
-
-        // 유효성 검사: 사이트번호가 null 또는 빈 문자열이면 등록 불가
-        if (siteNumber == null || siteNumber.trim().isEmpty()) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        // 유효성 검사: 최대인원이 0 이하이면 등록 불가
-        if (maxPeople == null || maxPeople <= 0) {
-            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
-        }
-
-        // 유효성 검사: 이미 존재하는 사이트번호이면 등록 불가
-        if (campsiteRepository.existsBySiteNumber(siteNumber)) {
-            return new ResponseEntity<>(null, HttpStatus.CONFLICT);
-        }
-
-        Campsite newCampsite = new Campsite(siteNumber, description, maxPeople);
-        Campsite saved = campsiteRepository.save(newCampsite);
-        if (saved == null) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        } else {
-            return new ResponseEntity<>(saved, HttpStatus.CREATED);
-        }
+    public ResponseEntity<Campsite> createCampsite(@RequestBody CreateCampsiteRequest request) {
+        Campsite created = campsiteService.create(request);
+        return new ResponseEntity<>(created, HttpStatus.CREATED);
     }
 
     @PutMapping("/{campsiteId}")
     public ResponseEntity<Campsite> updateCampsite(
             @PathVariable Long campsiteId,
-            @RequestBody Map<String, Object> body) {
-        Campsite campsite = campsiteRepository.findById(campsiteId)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find campsite with id: " + campsiteId));
+            @RequestBody UpdateCampsiteRequest request) {
+        Campsite updated = campsiteService.update(campsiteId, request);
+        return ResponseEntity.ok(updated);
+    }
 
-        if (body != null && !body.isEmpty()) {
-            if (body.containsKey("siteNumber")) {
-                Object v = body.get("siteNumber");
-                if (v != null) {
-                    campsite.setSiteNumber(v.toString());
-                }
-            } else {
-                // 아무것도 안 함
-            }
-            if (body.containsKey("description")) {
-                Object v = body.get("description");
-                if (v == null) {
-                    campsite.setDescription("");
-                } else {
-                    campsite.setDescription(v.toString());
-                }
-            } else {
-                // 그대로 유지
-            }
-            if (body.containsKey("maxPeople")) {
-                Object v = body.get("maxPeople");
-                if (v instanceof Number) {
-                    campsite.setMaxPeople(((Number) v).intValue());
-                } else if (v == null) {
-                    // null이면 변경하지 않음
-                } else {
-                    try {
-                        campsite.setMaxPeople(Integer.valueOf(v.toString()));
-                    } catch (Exception ignore) {
-                        // 파싱 실패 시 변경하지 않음
-                    }
-                }
-            }
-        }
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Void> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().build();
+    }
 
-        return ResponseEntity.ok(campsite);
+    @ExceptionHandler(DuplicateSiteNumberException.class)
+    public ResponseEntity<Void> handleDuplicateSiteNumberException(DuplicateSiteNumberException e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 }
