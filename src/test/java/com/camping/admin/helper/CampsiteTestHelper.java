@@ -109,7 +109,7 @@ public class CampsiteTestHelper {
         assertThat(statusCode).isNotEqualTo(201);
     }
 
-    public void 사이트번호로_캠프사이트가_존재하는지_검증한다(String siteNumber) {
+    public void 사이트번호로_캠프사이트를_조회하여_검증한다(String siteNumber) {
         assertThat(campsiteRepository.existsBySiteNumber(siteNumber)).isTrue();
     }
 }
