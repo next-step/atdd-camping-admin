@@ -39,8 +39,8 @@ public class RentalSteps extends CucumberSpringConfiguration {
 
     // ==================== When ====================
 
-    @When("관리자가 해당 상품 {int}개를 예약에 연결하여 대여를 요청한다")
-    public void 관리자가_해당_상품_N개를_예약에_연결하여_대여를_요청한다(int quantity) {
+    @When("관리자가 해당 상품 {int}개를 예약에 연결하여 대여한다")
+    public void 관리자가_해당_상품_N개를_예약에_연결하여_대여한다(int quantity) {
         helper.예약에_연결하여_대여를_요청한다(quantity);
     }
 
@@ -59,16 +59,16 @@ public class RentalSteps extends CucumberSpringConfiguration {
         helper.존재하지_않는_상품_대여를_요청한다();
     }
 
-    @When("관리자가 예약 없이 해당 상품 {int}개 대여를 요청한다")
-    public void 관리자가_예약_없이_해당_상품_N개_대여를_요청한다(int quantity) {
+    @When("관리자가 예약 없이 해당 상품 {int}개를 대여한다")
+    public void 관리자가_예약_없이_해당_상품_N개를_대여한다(int quantity) {
         helper.예약_없이_대여를_요청한다(quantity);
     }
 
     // ==================== Then ====================
 
-    @Then("대여 기록이 생성된다")
-    public void 대여_기록이_생성된다() {
-        helper.대여_기록이_생성되었는지_검증한다();
+    @Then("대여 내역을 조회하면 확인할 수 있다")
+    public void 대여_내역을_조회하면_확인할_수_있다() {
+        helper.대여_내역을_조회하여_검증한다();
     }
 
     @Then("대여 기록은 생성되지 않는다")
@@ -76,14 +76,14 @@ public class RentalSteps extends CucumberSpringConfiguration {
         helper.대여_기록이_생성되지_않았는지_검증한다();
     }
 
-    @Then("해당 대여는 미반납 상태이다")
-    public void 해당_대여는_미반납_상태이다() {
-        helper.대여가_미반납_상태인지_검증한다();
+    @Then("해당 대여를 조회하면 미반납 상태이다")
+    public void 해당_대여를_조회하면_미반납_상태이다() {
+        helper.대여를_조회하여_미반납_상태인지_검증한다();
     }
 
-    @Then("상품 재고가 {int}개로 감소한다")
-    public void 상품_재고가_N개로_감소한다(int expectedStock) {
-        helper.상품_재고를_검증한다(expectedStock);
+    @Then("상품을 조회하면 재고가 {int}개이다")
+    public void 상품을_조회하면_재고가_N개이다(int expectedStock) {
+        helper.상품을_조회하여_재고를_검증한다(expectedStock);
     }
 
     @Then("상품 재고는 {int}개로 유지된다")
@@ -91,8 +91,8 @@ public class RentalSteps extends CucumberSpringConfiguration {
         helper.상품_재고가_유지되는지_검증한다(expectedStock);
     }
 
-    @Then("해당 대여는 예약과 연결되지 않는다")
-    public void 해당_대여는_예약과_연결되지_않는다() {
-        helper.대여가_예약과_연결되지_않았는지_검증한다();
+    @Then("해당 대여를 조회하면 예약과 연결되어 있지 않다")
+    public void 해당_대여를_조회하면_예약과_연결되어_있지_않다() {
+        helper.대여를_조회하여_예약과_연결되지_않았는지_검증한다();
     }
 }

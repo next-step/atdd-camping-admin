@@ -19,6 +19,12 @@ public class ReservationSteps extends CucumberSpringConfiguration {
 
     // ==================== When ====================
 
+    @When("관리자가 확정된 예약을 취소한다")
+    public void 관리자가_확정된_예약을_취소한다() {
+        helper.확정된_예약을_찾는다();
+        helper.현재_예약의_상태를_변경한다("CANCELLED");
+    }
+
     @When("관리자가 확정된 예약을 {예약상태} 상태로 변경한다")
     public void 관리자가_확정된_예약을_상태로_변경한다(String status) {
         helper.확정된_예약을_찾는다();
@@ -42,6 +48,11 @@ public class ReservationSteps extends CucumberSpringConfiguration {
     }
 
     // ==================== Then ====================
+
+    @Then("예약을 조회하면 취소 상태이다")
+    public void 예약을_조회하면_취소_상태이다() {
+        helper.예약을_조회하여_상태를_검증한다("CANCELLED");
+    }
 
     @Then("예약이 {예약상태}된다")
     public void 예약이_된다(String status) {

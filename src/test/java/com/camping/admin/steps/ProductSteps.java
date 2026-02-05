@@ -2,7 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.helper.ProductTestHelper;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,9 @@ public class ProductSteps extends CucumberSpringConfiguration {
 
     // ==================== When ====================
 
-    @When("관리자가 다음 정보로 상품을 등록한다")
-    public void 관리자가_다음_정보로_상품을_등록한다(DataTable dataTable) {
-        helper.상품_정보로_등록을_요청한다(dataTable);
+    @When("관리자가 상품명 {string}로 상품을 등록한다")
+    public void 관리자가_상품명으로_상품을_등록한다(String productName) {
+        helper.상품명으로_등록을_요청한다(productName);
     }
 
     @When("관리자가 상품명 없이 상품 등록을 요청한다")
@@ -59,8 +58,8 @@ public class ProductSteps extends CucumberSpringConfiguration {
         helper.상품이_등록되지_않았는지_검증한다();
     }
 
-    @Then("상품 목록에 {string}가 포함된다")
-    public void 상품_목록에_포함된다(String productName) {
-        helper.상품_목록에_포함되는지_검증한다(productName);
+    @Then("상품 목록에 {string}가 포함되어 있다")
+    public void 상품_목록에_포함되어_있다(String productName) {
+        helper.상품_목록을_조회하여_포함되는지_검증한다(productName);
     }
 }

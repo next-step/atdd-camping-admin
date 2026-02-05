@@ -4,7 +4,6 @@ import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.common.CommonHooks;
-import io.cucumber.datatable.DataTable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,30 +47,16 @@ public class ProductTestHelper {
 
     // ==================== 상품 등록 (When) ====================
 
-    public void 상품_정보로_등록을_요청한다(DataTable dataTable) {
-        Map<String, String> row = dataTable.asMaps().get(0);
-        String name = row.get("상품명");
-        int stockQuantity = Integer.parseInt(row.get("재고"));
-        BigDecimal price = new BigDecimal(row.get("가격"));
-        String productType = 상품유형을_변환한다(row.get("유형"));
-
-        this.requestedProductName = name;
+    public void 상품명으로_등록을_요청한다(String productName) {
+        this.requestedProductName = productName;
 
         Map<String, Object> productData = new HashMap<>();
-        productData.put("name", name);
-        productData.put("stockQuantity", stockQuantity);
-        productData.put("price", price);
-        productData.put("productType", productType);
+        productData.put("name", productName);
+        productData.put("stockQuantity", 50);
+        productData.put("price", new BigDecimal("15000"));
+        productData.put("productType", "RENTAL");
 
         CommonHooks.lastResponse = 상품을_등록한다(productData);
-    }
-
-    private String 상품유형을_변환한다(String displayName) {
-        return switch (displayName) {
-            case "판매용" -> "SALE";
-            case "대여용" -> "RENTAL";
-            default -> displayName;
-        };
     }
 
     public void 상품명_없이_상품_등록을_요청한다() {
@@ -149,7 +134,7 @@ public class ProductTestHelper {
         assertThat(statusCode).isNotEqualTo(201);
     }
 
-    public void 상품_목록에_포함되는지_검증한다(String productName) {
+    public void 상품_목록을_조회하여_포함되는지_검증한다(String productName) {
         List<Product> products = productRepository.findAll();
         assertThat(products)
                 .extracting(Product::getName)

@@ -48,6 +48,11 @@ public class ReservationTestHelper {
 
     // ==================== 검증 (Then) ====================
 
+    public void 예약을_조회하여_상태를_검증한다(String status) {
+        assertThat(현재_예약을_다시_조회한다().getStatus())
+                .isEqualTo(status);
+    }
+
     public void 예약_상태를_검증한다(String status) {
         assertThat(현재_예약을_다시_조회한다().getStatus())
                 .isEqualTo(status);

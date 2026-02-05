@@ -67,7 +67,7 @@ public class RentalTestHelper {
 
     // ==================== 검증 (Then) ====================
 
-    public void 대여_기록이_생성되었는지_검증한다() {
+    public void 대여_내역을_조회하여_검증한다() {
         Long createdId = CommonHooks.lastResponse.jsonPath().getLong("id");
 
         RentalRecord rentalRecord = rentalRecordRepository.findById(createdId)
@@ -81,20 +81,20 @@ public class RentalTestHelper {
         assertThat(statusCode).isNotEqualTo(201);
     }
 
-    public void 대여가_미반납_상태인지_검증한다() {
+    public void 대여를_조회하여_미반납_상태인지_검증한다() {
         RentalRecord latestRental = 가장_최근_대여_기록을_조회한다();
         assertThat(latestRental.getIsReturned()).isFalse();
     }
 
-    public void 상품_재고를_검증한다(int expectedStock) {
+    public void 상품을_조회하여_재고를_검증한다(int expectedStock) {
         productTestHelper.재고를_검증한다(currentProduct.getId(), expectedStock);
     }
 
     public void 상품_재고가_유지되는지_검증한다(int expectedStock) {
-        상품_재고를_검증한다(expectedStock);
+        상품을_조회하여_재고를_검증한다(expectedStock);
     }
 
-    public void 대여가_예약과_연결되지_않았는지_검증한다() {
+    public void 대여를_조회하여_예약과_연결되지_않았는지_검증한다() {
         RentalRecord latestRental = 가장_최근_대여_기록을_조회한다();
         assertThat(latestRental.getReservation()).isNull();
     }
