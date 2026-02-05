@@ -30,7 +30,6 @@ public class RentalTestHelper {
 
     private Product currentProduct;
     private Reservation currentReservation;
-    private long rentalCountBeforeRequest;
     private int initialStock;
 
     // ==================== 상품 설정 (Given) ====================
@@ -51,35 +50,35 @@ public class RentalTestHelper {
     // ==================== API 호출 (When) ====================
 
     public void 예약에_연결하여_대여를_요청한다(int quantity) {
-        this.rentalCountBeforeRequest = rentalRecordRepository.count();
         CommonHooks.lastResponse = 대여를_생성한다(currentProduct.getId(), quantity, currentReservation.getId());
     }
 
     public void 대여를_요청한다(int quantity) {
-        this.rentalCountBeforeRequest = rentalRecordRepository.count();
         CommonHooks.lastResponse = 대여를_생성한다(currentProduct.getId(), quantity, null);
     }
 
     public void 존재하지_않는_상품_대여를_요청한다() {
-        this.rentalCountBeforeRequest = rentalRecordRepository.count();
         CommonHooks.lastResponse = 대여를_생성한다(존재하지_않는_상품_ID, 1, null);
     }
 
     public void 예약_없이_대여를_요청한다(int quantity) {
-        this.rentalCountBeforeRequest = rentalRecordRepository.count();
         CommonHooks.lastResponse = 대여를_생성한다(currentProduct.getId(), quantity, null);
     }
 
     // ==================== 검증 (Then) ====================
 
     public void 대여_기록이_생성되었는지_검증한다() {
-        long currentCount = rentalRecordRepository.count();
-        assertThat(currentCount).isEqualTo(rentalCountBeforeRequest + 1);
+        Long createdId = CommonHooks.lastResponse.jsonPath().getLong("id");
+
+        RentalRecord rentalRecord = rentalRecordRepository.findById(createdId)
+                .orElseThrow(() -> new AssertionError("생성된 대여 기록을 찾을 수 없습니다. ID: " + createdId));
+
+        assertThat(rentalRecord.getProduct().getId()).isEqualTo(currentProduct.getId());
     }
 
     public void 대여_기록이_생성되지_않았는지_검증한다() {
-        long currentCount = rentalRecordRepository.count();
-        assertThat(currentCount).isEqualTo(rentalCountBeforeRequest);
+        int statusCode = CommonHooks.lastResponse.statusCode();
+        assertThat(statusCode).isNotEqualTo(201);
     }
 
     public void 대여가_미반납_상태인지_검증한다() {

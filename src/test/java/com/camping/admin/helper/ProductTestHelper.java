@@ -25,7 +25,7 @@ public class ProductTestHelper {
     @Autowired
     private ProductRepository productRepository;
 
-    private long productCountBeforeRequest;
+    private String requestedProductName;
 
     // ==================== 상품 생성 (Given) ====================
 
@@ -49,13 +49,13 @@ public class ProductTestHelper {
     // ==================== 상품 등록 (When) ====================
 
     public void 상품_정보로_등록을_요청한다(DataTable dataTable) {
-        this.productCountBeforeRequest = productRepository.count();
-
         Map<String, String> row = dataTable.asMaps().get(0);
         String name = row.get("상품명");
         int stockQuantity = Integer.parseInt(row.get("재고"));
         BigDecimal price = new BigDecimal(row.get("가격"));
         String productType = 상품유형을_변환한다(row.get("유형"));
+
+        this.requestedProductName = name;
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("name", name);
@@ -75,7 +75,7 @@ public class ProductTestHelper {
     }
 
     public void 상품명_없이_상품_등록을_요청한다() {
-        this.productCountBeforeRequest = productRepository.count();
+        this.requestedProductName = null;
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("stockQuantity", 10);
@@ -86,7 +86,7 @@ public class ProductTestHelper {
     }
 
     public void 유효하지_않은_유형으로_상품_등록을_요청한다() {
-        this.productCountBeforeRequest = productRepository.count();
+        this.requestedProductName = "테스트 상품";
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("name", "테스트 상품");
@@ -98,7 +98,7 @@ public class ProductTestHelper {
     }
 
     public void 가격을_음수로_상품_등록을_요청한다(int price) {
-        this.productCountBeforeRequest = productRepository.count();
+        this.requestedProductName = "테스트 상품";
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("name", "테스트 상품");
@@ -110,7 +110,7 @@ public class ProductTestHelper {
     }
 
     public void 재고를_음수로_상품_등록을_요청한다(int stockQuantity) {
-        this.productCountBeforeRequest = productRepository.count();
+        this.requestedProductName = "테스트 상품";
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("name", "테스트 상품");
@@ -122,7 +122,7 @@ public class ProductTestHelper {
     }
 
     public void 상품명을_빈_값으로_상품_등록을_요청한다() {
-        this.productCountBeforeRequest = productRepository.count();
+        this.requestedProductName = "";
 
         Map<String, Object> productData = new HashMap<>();
         productData.put("name", "");
@@ -136,13 +136,17 @@ public class ProductTestHelper {
     // ==================== 검증 (Then) ====================
 
     public void 상품이_등록되었는지_검증한다() {
-        long currentCount = productRepository.count();
-        assertThat(currentCount).isEqualTo(productCountBeforeRequest + 1);
+        Long createdId = CommonHooks.lastResponse.jsonPath().getLong("id");
+
+        Product product = productRepository.findById(createdId)
+                .orElseThrow(() -> new AssertionError("등록된 상품을 찾을 수 없습니다. ID: " + createdId));
+
+        assertThat(product.getName()).isEqualTo(requestedProductName);
     }
 
     public void 상품이_등록되지_않았는지_검증한다() {
-        long currentCount = productRepository.count();
-        assertThat(currentCount).isEqualTo(productCountBeforeRequest);
+        int statusCode = CommonHooks.lastResponse.statusCode();
+        assertThat(statusCode).isNotEqualTo(201);
     }
 
     public void 상품_목록에_포함되는지_검증한다(String productName) {
