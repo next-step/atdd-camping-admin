@@ -2,7 +2,6 @@ package com.camping.admin.steps;
 
 import com.camping.admin.CucumberSpringConfiguration;
 import com.camping.admin.helper.CampsiteTestHelper;
-import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -25,9 +24,9 @@ public class CampsiteSteps extends CucumberSpringConfiguration {
 
     // ==================== When ====================
 
-    @When("관리자가 다음 정보로 캠프사이트를 등록한다")
-    public void 관리자가_다음_정보로_캠프사이트를_등록한다(DataTable dataTable) {
-        helper.캠프사이트_정보로_등록을_요청한다(dataTable);
+    @When("관리자가 사이트번호 {string}로 캠프사이트를 등록한다")
+    public void 관리자가_사이트번호로_캠프사이트를_등록한다(String siteNumber) {
+        helper.사이트번호로_등록을_요청한다(siteNumber);
     }
 
     @When("관리자가 사이트번호 없이 캠프사이트 등록을 요청한다")
@@ -62,8 +61,8 @@ public class CampsiteSteps extends CucumberSpringConfiguration {
         helper.캠프사이트가_등록되지_않았는지_검증한다();
     }
 
-    @Then("사이트번호가 {string}인 캠프사이트가 생성된다")
-    public void 사이트번호가_인_캠프사이트가_생성된다(String siteNumber) {
-        helper.사이트번호로_캠프사이트가_존재하는지_검증한다(siteNumber);
+    @Then("사이트번호가 {string}인 캠프사이트를 조회하면 확인할 수 있다")
+    public void 사이트번호가_인_캠프사이트를_조회하면_확인할_수_있다(String siteNumber) {
+        helper.사이트번호로_캠프사이트를_조회하여_검증한다(siteNumber);
     }
 }

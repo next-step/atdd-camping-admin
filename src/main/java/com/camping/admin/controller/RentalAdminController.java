@@ -44,6 +44,11 @@ public class RentalAdminController {
         return ResponseEntity.badRequest().build();
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<Void> handleIllegalStateException(IllegalStateException e) {
+        return ResponseEntity.badRequest().build();
+    }
+
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<Void> handleNotFoundException(NotFoundException e) {
         return ResponseEntity.notFound().build();

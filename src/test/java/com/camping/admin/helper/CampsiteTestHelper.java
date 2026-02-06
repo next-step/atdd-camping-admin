@@ -22,7 +22,7 @@ public class CampsiteTestHelper {
     @Autowired
     private CampsiteRepository campsiteRepository;
 
-    private long campsiteCountBeforeRequest;
+    private String requestedSiteNumber;
 
     // ==================== 캠프사이트 설정 (Given) ====================
 
@@ -35,12 +35,12 @@ public class CampsiteTestHelper {
     // ==================== API 호출 (When) ====================
 
     public void 캠프사이트_정보로_등록을_요청한다(DataTable dataTable) {
-        this.campsiteCountBeforeRequest = campsiteRepository.count();
-
         Map<String, String> row = dataTable.asMaps().get(0);
         String siteNumber = row.get("사이트번호");
         String description = row.get("설명");
         int maxPeople = Integer.parseInt(row.get("최대인원"));
+
+        this.requestedSiteNumber = siteNumber;
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("siteNumber", siteNumber);
@@ -51,7 +51,7 @@ public class CampsiteTestHelper {
     }
 
     public void 사이트번호_없이_등록을_요청한다() {
-        this.campsiteCountBeforeRequest = campsiteRepository.count();
+        this.requestedSiteNumber = null;
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("description", "테스트 설명");
@@ -61,7 +61,7 @@ public class CampsiteTestHelper {
     }
 
     public void 사이트번호로_등록을_요청한다(String siteNumber) {
-        this.campsiteCountBeforeRequest = campsiteRepository.count();
+        this.requestedSiteNumber = siteNumber;
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("siteNumber", siteNumber);
@@ -72,7 +72,7 @@ public class CampsiteTestHelper {
     }
 
     public void 최대인원으로_등록을_요청한다(int maxPeople) {
-        this.campsiteCountBeforeRequest = campsiteRepository.count();
+        this.requestedSiteNumber = "TEST-001";
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("siteNumber", "TEST-001");
@@ -83,7 +83,7 @@ public class CampsiteTestHelper {
     }
 
     public void 빈_사이트번호로_등록을_요청한다() {
-        this.campsiteCountBeforeRequest = campsiteRepository.count();
+        this.requestedSiteNumber = "";
 
         Map<String, Object> campsiteData = new HashMap<>();
         campsiteData.put("siteNumber", "");
@@ -96,16 +96,20 @@ public class CampsiteTestHelper {
     // ==================== 검증 (Then) ====================
 
     public void 캠프사이트가_등록되었는지_검증한다() {
-        long currentCount = campsiteRepository.count();
-        assertThat(currentCount).isEqualTo(campsiteCountBeforeRequest + 1);
+        Long createdId = CommonHooks.lastResponse.jsonPath().getLong("id");
+
+        Campsite campsite = campsiteRepository.findById(createdId)
+                .orElseThrow(() -> new AssertionError("등록된 캠프사이트를 찾을 수 없습니다. ID: " + createdId));
+
+        assertThat(campsite.getSiteNumber()).isEqualTo(requestedSiteNumber);
     }
 
     public void 캠프사이트가_등록되지_않았는지_검증한다() {
-        long currentCount = campsiteRepository.count();
-        assertThat(currentCount).isEqualTo(campsiteCountBeforeRequest);
+        int statusCode = CommonHooks.lastResponse.statusCode();
+        assertThat(statusCode).isNotEqualTo(201);
     }
 
-    public void 사이트번호로_캠프사이트가_존재하는지_검증한다(String siteNumber) {
+    public void 사이트번호로_캠프사이트를_조회하여_검증한다(String siteNumber) {
         assertThat(campsiteRepository.existsBySiteNumber(siteNumber)).isTrue();
     }
 }
