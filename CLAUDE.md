@@ -49,6 +49,11 @@ Test dependencies (Cucumber, REST Assured) are configured in `build.gradle` but 
 - Step definitions in `src/test/java/`
 - JUnit Platform Suite runner class
 
+## Code Rules
+
+- **Gherkin keywords must be English** — use `Given`, `When`, `Then`, `And`, `But` in `.feature` files. Descriptions and step text should remain in Korean.
+- **Step definition annotations must use English** — use `io.cucumber.java.en.*` imports (`@Given`, `@When`, `@Then`, `@And`), never Korean (`io.cucumber.java.ko.*`)
+
 ## Known Intentional Issues
 
 - `CampsiteAdminController.updateCampsite` and `ProductAdminController.updateProduct` do not call `repository.save()`
