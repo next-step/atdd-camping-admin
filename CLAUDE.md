@@ -89,6 +89,28 @@ Scenario: 판매 상품을 등록한다
   And 응답의 "stockQuantity" 값은 100이다
 ```
 
+## Test Architecture
+
+Tests use Cucumber + REST Assured against a real Spring Boot server started on a random port.
+
+**Key files:**
+- `CucumberSpringConfiguration` — `@SpringBootTest(RANDOM_PORT)` + `@CucumberContextConfiguration`, sets `RestAssured.port`
+- `support/TestContext` — `@Scope("cucumber-glue")` shared state per scenario (response, JWT token, entity IDs, stock snapshots)
+- `steps/HookSteps` — `@Before` hook: deletes all data in FK-safe order, then logs in to obtain JWT token
+- `steps/CommonSteps` — steps shared across features: `캠프사이트가 등록되어 있다`, `확정된 예약이 존재한다`, `조회에 성공한다`, `수정에 성공한다`, `상품 재고가 감소한다/복구된다`
+- `src/test/resources/application.yml` — overrides prod config: H2 in-memory, `sql.init.mode: never` (no data.sql)
+
+**DB cleanup order** (FK constraints):
+`rental_records` → `sales_records` → `reservations` → `campsites` → `products`
+
+**Auth:** every test scenario logs in via `POST /auth/login` in `@Before` and stores the JWT in `TestContext.jwtToken`. All API calls use `context.authRequest()` which adds the `Authorization: Bearer` header.
+
+**Step definition conventions:**
+- Steps with regex special chars in URL (parentheses, braces) use regex patterns starting with `^`
+- Given steps use repositories to insert data directly (faster, no auth loop)
+- When steps call the API via REST Assured and store the response in `context.response`
+- Then/And steps assert against `context.response` or query repositories directly
+
 ## Known Intentional Issues
 
 - `CampsiteAdminController.updateCampsite` and `ProductAdminController.updateProduct` do not call `repository.save()`
