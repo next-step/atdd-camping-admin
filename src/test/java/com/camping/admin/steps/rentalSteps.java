@@ -41,6 +41,8 @@ public class rentalSteps {
         Product product = productRepository.findById(context.productId).orElseThrow();
         RentalRecord record = rentalRecordRepository.save(new RentalRecord(reservation, product, 2));
         context.rentalRecordId = record.getId();
+        product.setStockQuantity(product.getStockQuantity() - record.getQuantity());
+        productRepository.save(product);
     }
 
     @When("대여 목록을 조회한다")
