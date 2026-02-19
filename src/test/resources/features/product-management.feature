@@ -3,28 +3,28 @@ Feature: 상품 관리
 
   Scenario: 상품 목록을 조회한다
     Given 상품 2개가 등록되어 있다
-    When 상품 목록을 조회한다 (GET "/admin/products")
-    Then 조회에 성공한다 (200)
+    When 상품 목록을 조회한다
+    Then 조회에 성공한다
     And 상품 2개가 반환된다
 
   Scenario: 판매 상품을 등록한다
-    When 판매 상품을 등록한다 (POST "/admin/products")
-    Then 상품이 생성된다 (201)
+    When 판매 상품을 등록한다
+    Then 상품이 생성된다
     And 생성된 상품 정보가 반환된다
 
   Scenario: 대여 상품을 등록한다
-    When 대여 상품을 등록한다 (POST "/admin/products")
-    Then 상품이 생성된다 (201)
+    When 대여 상품을 등록한다
+    Then 상품이 생성된다
     And 생성된 상품 정보가 반환된다
 
   Scenario: 상품 가격을 수정한다
     Given 상품이 등록되어 있다
-    When 상품 가격을 수정한다 (PUT "/admin/products/{id}")
-    Then 수정에 성공한다 (200)
+    When 상품 가격을 수정한다
+    Then 수정에 성공한다
     And 수정된 상품 정보가 반환된다
 
   Scenario: 상품 재고를 수정한다
     Given 상품이 등록되어 있다
-    When 상품 재고를 수정한다 (PUT "/admin/products/{id}")
-    Then 수정에 성공한다 (200)
+    When 상품 재고를 수정한다
+    Then 수정에 성공한다
     And 수정된 상품 정보가 반환된다

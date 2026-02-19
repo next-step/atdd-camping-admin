@@ -31,14 +31,14 @@ public class revenueReportSteps {
         salesRecordRepository.save(new SalesRecord(product, 3, BigDecimal.valueOf(30000)));
     }
 
-    @When("^오늘 날짜로 일별 매출 리포트를 조회한다 \\(GET \"/admin/reports/revenue/daily\"\\)$")
+    @When("오늘 날짜로 일별 매출 리포트를 조회한다")
     public void 오늘날짜로일별매출리포트를조회한다() {
         context.response = context.authRequest()
                 .queryParam("date", LocalDate.now().toString())
                 .get("/admin/reports/revenue/daily");
     }
 
-    @When("^최근 7일 기간으로 매출 리포트를 조회한다 \\(GET \"/admin/reports/revenue/range\"\\)$")
+    @When("최근 7일 기간으로 매출 리포트를 조회한다")
     public void 최근7일기간으로매출리포트를조회한다() {
         context.response = context.authRequest()
                 .queryParam("from", LocalDate.now().minusDays(7).toString())
@@ -46,7 +46,7 @@ public class revenueReportSteps {
                 .get("/admin/reports/revenue/range");
     }
 
-    @When("^최근 30일 기간으로 매출 상세 내역을 조회한다 \\(GET \"/admin/reports/revenue/range/entries\"\\)$")
+    @When("최근 30일 기간으로 매출 상세 내역을 조회한다")
     public void 최근30일기간으로매출상세내역을조회한다() {
         context.response = context.authRequest()
                 .queryParam("from", LocalDate.now().minusDays(30).toString())
@@ -54,7 +54,7 @@ public class revenueReportSteps {
                 .get("/admin/reports/revenue/range/entries");
     }
 
-    @When("^판매 기록이 없는 날짜의 일별 매출 리포트를 조회한다 \\(GET \"/admin/reports/revenue/daily\"\\)$")
+    @When("판매 기록이 없는 날짜의 일별 매출 리포트를 조회한다")
     public void 판매기록이없는날짜의일별매출리포트를조회한다() {
         context.response = context.authRequest()
                 .queryParam("date", "2020-01-01")

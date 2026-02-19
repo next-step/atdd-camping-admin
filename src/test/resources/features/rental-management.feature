@@ -8,24 +8,24 @@ Feature: 대여 관리
 
   Scenario: 대여 목록을 조회한다
     Given 대여 기록이 존재한다
-    When 대여 목록을 조회한다 (GET "/admin/rentals")
-    Then 조회에 성공한다 (200)
+    When 대여 목록을 조회한다
+    Then 조회에 성공한다
     And 대여 목록이 반환된다
 
   Scenario: 예약 고객에게 장비를 대여한다
-    When 예약 고객에게 장비를 대여한다 (POST "/admin/rentals")
-    Then 대여가 등록된다 (201)
+    When 예약 고객에게 장비를 대여한다
+    Then 대여가 등록된다
     And 대여 정보가 반환된다
     And 상품 재고가 감소한다
 
   Scenario: 워크인 고객에게 장비를 대여한다
-    When 워크인 고객에게 장비를 대여한다 (POST "/admin/rentals")
-    Then 대여가 등록된다 (201)
+    When 워크인 고객에게 장비를 대여한다
+    Then 대여가 등록된다
     And 예약 없이 대여된 정보가 반환된다
 
   Scenario: 대여 장비를 반납 처리한다
     Given 대여 기록이 존재한다
-    When 장비 반납을 처리한다 (PATCH "/admin/rentals/{id}/return")
-    Then 반납 처리에 성공한다 (200)
+    When 장비 반납을 처리한다
+    Then 반납 처리에 성공한다
     And 반납 상태로 변경된다
     And 상품 재고가 복구된다

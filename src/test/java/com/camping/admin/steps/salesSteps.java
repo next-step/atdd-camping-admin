@@ -49,14 +49,14 @@ public class salesSteps {
         salesRecordRepository.save(new SalesRecord(product, 3, BigDecimal.valueOf(30000)));
     }
 
-    @When("^상품을 판매한다 \\(POST \"/api/sales\"\\)$")
+    @When("상품을 판매한다")
     public void 상품을판매한다() {
         context.response = context.authRequest()
                 .body(Map.of("items", List.of(Map.of("productId", context.productId, "quantity", 3))))
                 .post("/api/sales");
     }
 
-    @When("^여러 상품을 한번에 판매한다 \\(POST \"/api/sales\"\\)$")
+    @When("여러 상품을 한번에 판매한다")
     public void 여러상품을한번에판매한다() {
         context.response = context.authRequest()
                 .body(Map.of("items", List.of(
@@ -66,14 +66,14 @@ public class salesSteps {
                 .post("/api/sales");
     }
 
-    @When("^판매 내역을 조회한다 \\(GET \"/api/sales\"\\)$")
+    @When("판매 내역을 조회한다")
     public void 판매내역을조회한다() {
         context.response = context.authRequest().get("/api/sales");
     }
 
-    @Then("^판매가 처리된다 \\((\\d+)\\)$")
-    public void 판매가처리된다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("판매가 처리된다")
+    public void 판매가처리된다() {
+        context.response.then().statusCode(200);
     }
 
     @And("판매 내역이 반환된다")

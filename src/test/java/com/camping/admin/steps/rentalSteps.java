@@ -43,12 +43,12 @@ public class rentalSteps {
         context.rentalRecordId = record.getId();
     }
 
-    @When("^대여 목록을 조회한다 \\(GET \"/admin/rentals\"\\)$")
+    @When("대여 목록을 조회한다")
     public void 대여목록을조회한다() {
         context.response = context.authRequest().get("/admin/rentals");
     }
 
-    @When("^예약 고객에게 장비를 대여한다 \\(POST \"/admin/rentals\"\\)$")
+    @When("예약 고객에게 장비를 대여한다")
     public void 예약고객에게장비를대여한다() {
         context.response = context.authRequest()
                 .body(Map.of("reservationId", context.reservationId, "productId", context.productId, "quantity", 2))
@@ -58,7 +58,7 @@ public class rentalSteps {
         }
     }
 
-    @When("^워크인 고객에게 장비를 대여한다 \\(POST \"/admin/rentals\"\\)$")
+    @When("워크인 고객에게 장비를 대여한다")
     public void 워크인고객에게장비를대여한다() {
         context.response = context.authRequest()
                 .body(Map.of("productId", context.productId, "quantity", 1))
@@ -68,20 +68,20 @@ public class rentalSteps {
         }
     }
 
-    @When("^장비 반납을 처리한다 \\(PATCH \"/admin/rentals/\\{id\\}/return\"\\)$")
+    @When("장비 반납을 처리한다")
     public void 장비반납을처리한다() {
         context.response = context.authRequest()
                 .patch("/admin/rentals/" + context.rentalRecordId + "/return");
     }
 
-    @Then("^대여가 등록된다 \\((\\d+)\\)$")
-    public void 대여가등록된다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("대여가 등록된다")
+    public void 대여가등록된다() {
+        context.response.then().statusCode(201);
     }
 
-    @Then("^반납 처리에 성공한다 \\((\\d+)\\)$")
-    public void 반납처리에성공한다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("반납 처리에 성공한다")
+    public void 반납처리에성공한다() {
+        context.response.then().statusCode(200);
     }
 
     @And("대여 목록이 반환된다")

@@ -37,14 +37,14 @@ public class CommonSteps {
         context.reservationId = reservation.getId();
     }
 
-    @Then("^조회에 성공한다 \\((\\d+)\\)$")
-    public void 조회에성공한다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("조회에 성공한다")
+    public void 조회에성공한다() {
+        context.response.then().statusCode(200);
     }
 
-    @Then("^수정에 성공한다 \\((\\d+)\\)$")
-    public void 수정에성공한다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("수정에 성공한다")
+    public void 수정에성공한다() {
+        context.response.then().statusCode(200);
     }
 
     // HTTP가 아닌 DB 직접 조회이므로 AssertJ 사용

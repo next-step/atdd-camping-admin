@@ -11,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class campsiteSteps {
 
@@ -25,12 +27,12 @@ public class campsiteSteps {
         }
     }
 
-    @When("^캠프사이트 목록을 조회한다 \\(GET \"/admin/campsites\"\\)$")
+    @When("캠프사이트 목록을 조회한다")
     public void 캠프사이트목록을조회한다() {
         context.response = context.authRequest().get("/admin/campsites");
     }
 
-    @When("^새로운 캠프사이트를 등록한다 \\(POST \"/admin/campsites\"\\)$")
+    @When("새로운 캠프사이트를 등록한다")
     public void 새로운캠프사이트를등록한다() {
         context.response = context.authRequest()
                 .body(Map.of("siteNumber", "B-01", "description", "신규 사이트", "maxPeople", 5))
@@ -40,16 +42,16 @@ public class campsiteSteps {
         }
     }
 
-    @When("^캠프사이트 정보를 수정한다 \\(PUT \"/admin/campsites/\\{id\\}\"\\)$")
+    @When("캠프사이트 정보를 수정한다")
     public void 캠프사이트정보를수정한다() {
         context.response = context.authRequest()
                 .body(Map.of("description", "수정된 사이트 설명", "maxPeople", 8))
                 .put("/admin/campsites/" + context.campsiteId);
     }
 
-    @Then("^캠프사이트가 생성된다 \\((\\d+)\\)$")
-    public void 캠프사이트가생성된다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("캠프사이트가 생성된다")
+    public void 캠프사이트가생성된다() {
+        context.response.then().statusCode(201);
     }
 
     @And("캠프사이트 {int}개가 반환된다")

@@ -3,17 +3,17 @@ Feature: 캠프사이트 관리
 
   Scenario: 캠프사이트 목록을 조회한다
     Given 캠프사이트 2개가 등록되어 있다
-    When 캠프사이트 목록을 조회한다 (GET "/admin/campsites")
-    Then 조회에 성공한다 (200)
+    When 캠프사이트 목록을 조회한다
+    Then 조회에 성공한다
     And 캠프사이트 2개가 반환된다
 
   Scenario: 새로운 캠프사이트를 등록한다
-    When 새로운 캠프사이트를 등록한다 (POST "/admin/campsites")
-    Then 캠프사이트가 생성된다 (201)
+    When 새로운 캠프사이트를 등록한다
+    Then 캠프사이트가 생성된다
     And 생성된 캠프사이트 정보가 반환된다
 
   Scenario: 캠프사이트 정보를 수정한다
     Given 캠프사이트가 등록되어 있다
-    When 캠프사이트 정보를 수정한다 (PUT "/admin/campsites/{id}")
-    Then 수정에 성공한다 (200)
+    When 캠프사이트 정보를 수정한다
+    Then 수정에 성공한다
     And 수정된 캠프사이트 정보가 반환된다

@@ -5,18 +5,18 @@ Feature: 판매 처리
     Given 판매 상품이 등록되어 있다
 
   Scenario: 상품을 판매한다
-    When 상품을 판매한다 (POST "/api/sales")
-    Then 판매가 처리된다 (200)
+    When 상품을 판매한다
+    Then 판매가 처리된다
     And 상품 재고가 감소한다
 
   Scenario: 여러 상품을 한번에 판매한다
     Given 추가 판매 상품이 등록되어 있다
-    When 여러 상품을 한번에 판매한다 (POST "/api/sales")
-    Then 판매가 처리된다 (200)
+    When 여러 상품을 한번에 판매한다
+    Then 판매가 처리된다
     And 각 상품의 재고가 감소한다
 
   Scenario: 최근 판매 내역을 조회한다
     Given 판매 기록이 존재한다
-    When 판매 내역을 조회한다 (GET "/api/sales")
-    Then 조회에 성공한다 (200)
+    When 판매 내역을 조회한다
+    Then 조회에 성공한다
     And 판매 내역이 반환된다

@@ -35,12 +35,12 @@ public class productSteps {
         context.productId = product.getId();
     }
 
-    @When("^상품 목록을 조회한다 \\(GET \"/admin/products\"\\)$")
+    @When("상품 목록을 조회한다")
     public void 상품목록을조회한다() {
         context.response = context.authRequest().get("/admin/products");
     }
 
-    @When("^판매 상품을 등록한다 \\(POST \"/admin/products\"\\)$")
+    @When("판매 상품을 등록한다")
     public void 판매상품을등록한다() {
         context.response = context.authRequest()
                 .body(Map.of("name", "모기향", "stockQuantity", 100, "price", 3000, "productType", "SALE"))
@@ -50,7 +50,7 @@ public class productSteps {
         }
     }
 
-    @When("^대여 상품을 등록한다 \\(POST \"/admin/products\"\\)$")
+    @When("대여 상품을 등록한다")
     public void 대여상품을등록한다() {
         context.response = context.authRequest()
                 .body(Map.of("name", "텐트", "stockQuantity", 10, "price", 50000, "productType", "RENTAL"))
@@ -60,23 +60,23 @@ public class productSteps {
         }
     }
 
-    @When("^상품 가격을 수정한다 \\(PUT \"/admin/products/\\{id\\}\"\\)$")
+    @When("상품 가격을 수정한다")
     public void 상품가격을수정한다() {
         context.response = context.authRequest()
                 .body(Map.of("price", 35000))
                 .put("/admin/products/" + context.productId);
     }
 
-    @When("^상품 재고를 수정한다 \\(PUT \"/admin/products/\\{id\\}\"\\)$")
+    @When("상품 재고를 수정한다")
     public void 상품재고를수정한다() {
         context.response = context.authRequest()
                 .body(Map.of("stockQuantity", 50))
                 .put("/admin/products/" + context.productId);
     }
 
-    @Then("^상품이 생성된다 \\((\\d+)\\)$")
-    public void 상품이생성된다(int statusCode) {
-        context.response.then().statusCode(statusCode);
+    @Then("상품이 생성된다")
+    public void 상품이생성된다() {
+        context.response.then().statusCode(201);
     }
 
     @And("상품 {int}개가 반환된다")
