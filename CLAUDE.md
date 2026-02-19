@@ -54,6 +54,41 @@ Test dependencies (Cucumber, REST Assured) are configured in `build.gradle` but 
 - **Gherkin keywords must be English** — use `Given`, `When`, `Then`, `And`, `But` in `.feature` files. Descriptions and step text should remain in Korean.
 - **Step definition annotations must use English** — use `io.cucumber.java.en.*` imports (`@Given`, `@When`, `@Then`, `@And`), never Korean (`io.cucumber.java.ko.*`)
 
+## Feature File Writing Guidelines
+
+Feature files describe business behavior at a **high level**. Step text should be readable by non-technical stakeholders.
+
+**Do:**
+- Write step text in natural Korean that describes intent, not implementation
+- Put the API endpoint in parentheses at the end of `When` steps: `When 상품 목록을 조회한다 (GET "/admin/products")`
+- Put the HTTP status code in parentheses at the end of `Then` steps: `Then 조회에 성공한다 (200)`
+- Describe outcomes in business terms: `And 상품 재고가 감소한다`
+
+**Don't:**
+- Embed data tables in feature steps — put test data in step definitions instead
+- Assert specific field values in the feature file: ~~`And 응답의 "name" 값은 "모기향"이다`~~
+- Use verbose technical phrasing: ~~`When 다음 정보로 상품 등록 요청을 보내면`~~
+- Include query parameters or request details in the URL: ~~`(GET "/admin/reports/revenue/daily?date={today}")`~~
+
+**Example (good):**
+```gherkin
+Scenario: 판매 상품을 등록한다
+  When 판매 상품을 등록한다 (POST "/admin/products")
+  Then 상품이 생성된다 (201)
+  And 생성된 상품 정보가 반환된다
+```
+
+**Example (bad):**
+```gherkin
+Scenario: 판매 상품을 등록한다
+  When 다음 정보로 상품 등록 요청을 보내면 (POST "/admin/products")
+    | name | stockQuantity | price | productType |
+    | 모기향  | 100           | 3000  | SALE        |
+  Then 리소스가 생성된다 (201)
+  And 응답의 "name" 값은 "모기향"이다
+  And 응답의 "stockQuantity" 값은 100이다
+```
+
 ## Known Intentional Issues
 
 - `CampsiteAdminController.updateCampsite` and `ProductAdminController.updateProduct` do not call `repository.save()`
