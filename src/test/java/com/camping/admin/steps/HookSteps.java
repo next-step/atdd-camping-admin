@@ -32,14 +32,7 @@ public class HookSteps {
         productRepository.deleteAllInBatch();
 
         // 컨텍스트 초기화
-        context.response = null;
-        context.campsiteId = null;
-        context.reservationId = null;
-        context.productId = null;
-        context.productId2 = null;
-        context.rentalRecordId = null;
-        context.productStockBefore = null;
-        context.productStockBefore2 = null;
+        context.reset();
 
         // JWT 토큰 발급
         context.jwtToken = RestAssured.given()
