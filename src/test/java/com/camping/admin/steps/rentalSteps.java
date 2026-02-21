@@ -107,4 +107,38 @@ public class rentalSteps {
     public void 반납상태로변경된다() {
         context.response.then().body("isReturned", equalTo(true));
     }
+
+    // ── 예외 시나리오 ──────────────────────────────────────────
+
+    @Given("상품 재고가 모두 소진되어 있다")
+    public void 상품재고가모두소진되어있다() {
+        Product product = productRepository.findById(context.productId).orElseThrow();
+        product.setStockQuantity(0);
+        productRepository.save(product);
+    }
+
+    @Given("판매 유형의 상품이 등록되어 있다")
+    public void 판매유형의상품이등록되어있다() {
+        Product product = productRepository.save(
+                new Product("판매용 소모품", 10, BigDecimal.valueOf(5000), ProductType.SALE)
+        );
+        context.productId = product.getId();
+    }
+
+    @Given("장비가 이미 반납 처리되어 있다")
+    public void 장비가이미반납처리되어있다() {
+        RentalRecord record = rentalRecordRepository.findById(context.rentalRecordId).orElseThrow();
+        record.setReturned(true);
+        rentalRecordRepository.save(record);
+    }
+
+    @Then("대여가 거부된다")
+    public void 대여가거부된다() {
+        context.response.then().statusCode(400);
+    }
+
+    @Then("반납 처리가 거부된다")
+    public void 반납처리가거부된다() {
+        context.response.then().statusCode(400);
+    }
 }

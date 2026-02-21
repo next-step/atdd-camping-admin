@@ -60,8 +60,7 @@ Feature files describe business behavior at a **high level**. Step text should b
 
 **Do:**
 - Write step text in natural Korean that describes intent, not implementation
-- Put the API endpoint in parentheses at the end of `When` steps: `When 상품 목록을 조회한다 (GET "/admin/products")`
-- Put the HTTP status code in parentheses at the end of `Then` steps: `Then 조회에 성공한다 (200)`
+- Put the API endpoint in commend in steps: `# GET "/admin/products"`
 - Describe outcomes in business terms: `And 상품 재고가 감소한다`
 
 **Don't:**
@@ -69,6 +68,7 @@ Feature files describe business behavior at a **high level**. Step text should b
 - Assert specific field values in the feature file: ~~`And 응답의 "name" 값은 "모기향"이다`~~
 - Use verbose technical phrasing: ~~`When 다음 정보로 상품 등록 요청을 보내면`~~
 - Include query parameters or request details in the URL: ~~`(GET "/admin/reports/revenue/daily?date={today}")`~~
+- No put HTTP status code in parentheses at the end of `Then` steps: `Then 조회에 성공한다`
 
 **Example (good):**
 ```gherkin

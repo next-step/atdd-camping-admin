@@ -77,4 +77,18 @@ public class revenueReportSteps {
         BigDecimal total = context.response.jsonPath().getObject("grandTotalRevenue", BigDecimal.class);
         assertThat(total).isEqualByComparingTo(BigDecimal.ZERO);
     }
+
+    // ── 예외 시나리오 ──────────────────────────────────────────
+
+    @When("잘못된 날짜 형식으로 일별 매출 리포트를 조회한다")
+    public void 잘못된날짜형식으로일별매출리포트를조회한다() {
+        context.response = context.authRequest()
+                .queryParam("date", "not-a-date")
+                .get("/admin/reports/revenue/daily");
+    }
+
+    @Then("조회가 거부된다")
+    public void 조회가거부된다() {
+        context.response.then().statusCode(400);
+    }
 }

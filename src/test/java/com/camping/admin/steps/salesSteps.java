@@ -89,4 +89,18 @@ public class salesSteps {
         assertThat(stock1).isLessThan(context.productStockBefore);
         assertThat(stock2).isLessThan(context.productStockBefore2);
     }
+
+    // ── 예외 시나리오 ──────────────────────────────────────────
+
+    @When("재고를 초과하는 수량으로 상품을 판매한다")
+    public void 재고를초과하는수량으로상품을판매한다() {
+        context.response = context.authRequest()
+                .body(Map.of("items", List.of(Map.of("productId", context.productId, "quantity", 9999))))
+                .post("/api/sales");
+    }
+
+    @Then("판매가 거부된다")
+    public void 판매가거부된다() {
+        context.response.then().statusCode(400);
+    }
 }
