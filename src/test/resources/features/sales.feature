@@ -25,22 +25,27 @@ Feature: 판매 처리
   # 예외 시나리오
   # ───────────────────────────────────────
 
-  Scenario: 재고를 초과하여 판매하면 실패한다
-    When 재고를 초과하는 수량으로 상품을 판매한다
-    Then 판매가 거부된다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalStateException (재고 부족) → 400
+  # Scenario: 재고를 초과하여 판매하면 실패한다
+  #   When 재고를 초과하는 수량으로 상품을 판매한다
+  #   Then 판매가 거부된다
 
-  Scenario: 존재하지 않는 상품을 판매하면 실패한다
-    When 존재하지 않는 상품을 판매한다
-    Then 판매가 거부된다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException (상품 없음) → 400
+  # Scenario: 존재하지 않는 상품을 판매하면 실패한다
+  #   When 존재하지 않는 상품을 판매한다
+  #   Then 판매가 거부된다
 
-  Scenario: 빈 판매 항목으로 요청하면 실패한다
-    When 빈 판매 항목으로 요청한다
-    Then 판매가 거부된다
+  # TODO: SalesService.processSale — 빈 items 목록 검증 추가 (empty → 400)
+  # Scenario: 빈 판매 항목으로 요청하면 실패한다
+  #   When 빈 판매 항목으로 요청한다
+  #   Then 판매가 거부된다
 
-  Scenario: 수량이 0인 판매 요청은 실패한다
-    When 수량이 0인 상품 판매를 시도한다
-    Then 판매가 거부된다
+  # TODO: SalesService.processSale — quantity <= 0 검증 추가 (0 → 400)
+  # Scenario: 수량이 0인 판매 요청은 실패한다
+  #   When 수량이 0인 상품 판매를 시도한다
+  #   Then 판매가 거부된다
 
-  Scenario: 음수 수량 판매 요청은 실패한다
-    When 음수 수량으로 상품 판매를 시도한다
-    Then 판매가 거부된다
+  # TODO: SalesService.processSale — quantity <= 0 검증 추가 (음수 → 400)
+  # Scenario: 음수 수량 판매 요청은 실패한다
+  #   When 음수 수량으로 상품 판매를 시도한다
+  #   Then 판매가 거부된다

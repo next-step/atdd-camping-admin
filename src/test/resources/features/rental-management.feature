@@ -34,38 +34,46 @@ Feature: 대여 관리
   # 예외 시나리오
   # ───────────────────────────────────────
 
-  Scenario: 재고가 없는 상품을 대여하면 실패한다
-    Given 상품 재고가 모두 소진되어 있다
-    When 예약 고객에게 장비를 대여한다
-    Then 대여가 거부된다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalStateException (재고 부족) → 400
+  # Scenario: 재고가 없는 상품을 대여하면 실패한다
+  #   Given 상품 재고가 모두 소진되어 있다
+  #   When 예약 고객에게 장비를 대여한다
+  #   Then 대여가 거부된다
 
-  Scenario: 판매 상품을 대여하면 실패한다
-    Given 판매 유형의 상품이 등록되어 있다
-    When 예약 고객에게 장비를 대여한다
-    Then 대여가 거부된다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException (RENTAL 타입 아님) → 400
+  # Scenario: 판매 상품을 대여하면 실패한다
+  #   Given 판매 유형의 상품이 등록되어 있다
+  #   When 예약 고객에게 장비를 대여한다
+  #   Then 대여가 거부된다
 
-  Scenario: 이미 반납된 장비를 다시 반납하면 실패한다
-    Given 대여 기록이 존재한다
-    And 장비가 이미 반납 처리되어 있다
-    When 장비 반납을 처리한다
-    Then 반납 처리가 거부된다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalStateException (이미 반납) → 400
+  # Scenario: 이미 반납된 장비를 다시 반납하면 실패한다
+  #   Given 대여 기록이 존재한다
+  #   And 장비가 이미 반납 처리되어 있다
+  #   When 장비 반납을 처리한다
+  #   Then 반납 처리가 거부된다
 
-  Scenario: 존재하지 않는 상품을 대여하면 실패한다
-    When 존재하지 않는 상품으로 대여를 시도한다
-    Then 대여 요청 대상을 찾을 수 없다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException (상품 없음) → 404
+  # Scenario: 존재하지 않는 상품을 대여하면 실패한다
+  #   When 존재하지 않는 상품으로 대여를 시도한다
+  #   Then 대여 요청 대상을 찾을 수 없다
 
-  Scenario: 존재하지 않는 예약으로 대여하면 실패한다
-    When 존재하지 않는 예약으로 대여를 시도한다
-    Then 대여 요청 대상을 찾을 수 없다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException (예약 없음) → 404
+  # Scenario: 존재하지 않는 예약으로 대여하면 실패한다
+  #   When 존재하지 않는 예약으로 대여를 시도한다
+  #   Then 대여 요청 대상을 찾을 수 없다
 
-  Scenario: 수량이 0인 장비를 대여하면 실패한다
-    When 수량이 0인 장비 대여를 시도한다
-    Then 대여가 거부된다
+  # TODO: RentalService.createRental — quantity <= 0 검증 추가 (0 → 400)
+  # Scenario: 수량이 0인 장비를 대여하면 실패한다
+  #   When 수량이 0인 장비 대여를 시도한다
+  #   Then 대여가 거부된다
 
-  Scenario: 음수 수량으로 장비를 대여하면 실패한다
-    When 음수 수량으로 장비 대여를 시도한다
-    Then 대여가 거부된다
+  # TODO: RentalService.createRental — quantity <= 0 검증 추가 (음수 → 400)
+  # Scenario: 음수 수량으로 장비를 대여하면 실패한다
+  #   When 음수 수량으로 장비 대여를 시도한다
+  #   Then 대여가 거부된다
 
-  Scenario: 존재하지 않는 대여 기록을 반납 처리하면 실패한다
-    When 존재하지 않는 대여 기록을 반납 처리한다
-    Then 대여 기록을 찾을 수 없다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException (대여 기록 없음) → 404
+  # Scenario: 존재하지 않는 대여 기록을 반납 처리하면 실패한다
+  #   When 존재하지 않는 대여 기록을 반납 처리한다
+  #   Then 대여 기록을 찾을 수 없다

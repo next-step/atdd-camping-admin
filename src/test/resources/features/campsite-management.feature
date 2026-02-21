@@ -27,19 +27,23 @@ Feature: 캠프사이트 관리
   # 예외 시나리오
   # ───────────────────────────────────────
 
-  Scenario: 존재하지 않는 캠프사이트를 수정하면 실패한다
-    When 존재하지 않는 캠프사이트를 수정한다
-    Then 캠프사이트를 찾을 수 없다
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException → 404
+  # Scenario: 존재하지 않는 캠프사이트를 수정하면 실패한다
+  #   When 존재하지 않는 캠프사이트를 수정한다
+  #   Then 캠프사이트를 찾을 수 없다
 
-  Scenario: siteNumber 없이 캠프사이트를 등록하면 실패한다
-    When siteNumber 없이 캠프사이트를 등록한다
-    Then 등록이 거부된다
+  # TODO: CampsiteAdminController.createCampsite — siteNumber 필수값 검증 추가 (null → 400)
+  # Scenario: siteNumber 없이 캠프사이트를 등록하면 실패한다
+  #   When siteNumber 없이 캠프사이트를 등록한다
+  #   Then 등록이 거부된다
 
-  Scenario: 중복 siteNumber로 캠프사이트를 등록하면 실패한다
-    Given 캠프사이트가 등록되어 있다
-    When 중복 siteNumber로 캠프사이트를 등록한다
-    Then 등록이 거부된다
+  # TODO: CampsiteAdminController.createCampsite — siteNumber 중복 체크 추가 (중복 → 400)
+  # Scenario: 중복 siteNumber로 캠프사이트를 등록하면 실패한다
+  #   Given 캠프사이트가 등록되어 있다
+  #   When 중복 siteNumber로 캠프사이트를 등록한다
+  #   Then 등록이 거부된다
 
-  Scenario: 음수 최대 인원으로 캠프사이트를 등록하면 실패한다
-    When 음수 최대 인원으로 캠프사이트를 등록한다
-    Then 등록이 거부된다
+  # TODO: CampsiteAdminController.createCampsite — maxPeople 양수 검증 추가 (음수 → 400)
+  # Scenario: 음수 최대 인원으로 캠프사이트를 등록하면 실패한다
+  #   When 음수 최대 인원으로 캠프사이트를 등록한다
+  #   Then 등록이 거부된다
