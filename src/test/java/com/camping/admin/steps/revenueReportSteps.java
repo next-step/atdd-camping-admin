@@ -90,6 +90,36 @@ public class revenueReportSteps {
                 .get("/admin/reports/revenue/daily");
     }
 
+    @When("from 파라미터 없이 기간별 매출 리포트를 조회한다")
+    public void from파라미터없이기간별매출리포트를조회한다() {
+        context.response = context.authRequest()
+                .queryParam("to", LocalDate.now().toString())
+                .get("/admin/reports/revenue/range");
+    }
+
+    @When("to 파라미터 없이 기간별 매출 리포트를 조회한다")
+    public void to파라미터없이기간별매출리포트를조회한다() {
+        context.response = context.authRequest()
+                .queryParam("from", LocalDate.now().minusDays(7).toString())
+                .get("/admin/reports/revenue/range");
+    }
+
+    @When("시작일이 종료일보다 늦은 기간으로 매출 리포트를 조회한다")
+    public void 시작일이종료일보다늦은기간으로매출리포트를조회한다() {
+        context.response = context.authRequest()
+                .queryParam("from", LocalDate.now().toString())
+                .queryParam("to", LocalDate.now().minusDays(7).toString())
+                .get("/admin/reports/revenue/range");
+    }
+
+    @When("판매 기록이 없는 기간의 매출 상세 내역을 조회한다")
+    public void 판매기록이없는기간의매출상세내역을조회한다() {
+        context.response = context.authRequest()
+                .queryParam("from", "2020-01-01")
+                .queryParam("to", "2020-01-07")
+                .get("/admin/reports/revenue/range/entries");
+    }
+
     @Then("조회가 거부된다")
     public void 조회가거부된다() {
         context.response.then().statusCode(400);

@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 
 public class CommonSteps {
 
@@ -45,6 +46,16 @@ public class CommonSteps {
     @Then("수정에 성공한다")
     public void 수정에성공한다() {
         context.response.then().statusCode(200);
+    }
+
+    @Then("등록이 거부된다")
+    public void 등록이거부된다() {
+        context.response.then().statusCode(400);
+    }
+
+    @And("빈 목록이 반환된다")
+    public void 빈목록이반환된다() {
+        context.response.then().body("$", hasSize(0));
     }
 
     // HTTP가 아닌 DB 직접 조회이므로 AssertJ 사용

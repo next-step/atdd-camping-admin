@@ -53,6 +53,7 @@ Test dependencies (Cucumber, REST Assured) are configured in `build.gradle` but 
 
 - **Gherkin keywords must be English** — use `Given`, `When`, `Then`, `And`, `But` in `.feature` files. Descriptions and step text should remain in Korean.
 - **Step definition annotations must use English** — use `io.cucumber.java.en.*` imports (`@Given`, `@When`, `@Then`, `@And`), never Korean (`io.cucumber.java.ko.*`)
+- **Step definitions are global** — Cucumber registers all step definitions across all step classes into a single global registry. Defining the same step text in two different classes causes `AmbiguousStepDefinitionsException`. Steps used by more than one feature must be defined exactly once in `CommonSteps.java`.
 
 ## Feature File Writing Guidelines
 

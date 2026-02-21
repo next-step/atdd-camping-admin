@@ -8,6 +8,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,6 +18,14 @@ public class reservationStatusSteps {
 
     @Autowired private TestContext context;
     @Autowired private ReservationRepository reservationRepository;
+
+    // ── 공통 헬퍼 ─────────────────────────────────────────────
+
+    private void patchStatus(String status) {
+        context.response = context.authRequest()
+                .body(Map.of("status", status))
+                .patch("/admin/reservations/" + context.reservationId + "/status");
+    }
 
     // ── 상태 사전 설정 ─────────────────────────────────────────
 
@@ -48,93 +57,74 @@ public class reservationStatusSteps {
 
     // ── 정상 상태 변경 ─────────────────────────────────────────
 
+    @When("예약 목록을 조회한다")
+    public void 예약목록을조회한다() {
+        context.response = context.authRequest().get("/admin/reservations");
+    }
+
     @When("예약 상태를 체크인으로 변경한다")
     public void 예약상태를체크인으로변경한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "CHECKED_IN"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("CHECKED_IN");
     }
 
     @When("예약 상태를 체크아웃으로 변경한다")
     public void 예약상태를체크아웃으로변경한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "CHECKED_OUT"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("CHECKED_OUT");
     }
 
     @When("예약 상태를 확정으로 변경한다")
     public void 예약상태를확정으로변경한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "CONFIRMED"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("CONFIRMED");
     }
 
     @When("예약 상태를 대기로 변경한다")
     public void 예약상태를대기로변경한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "WAITING"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("WAITING");
     }
 
     @When("현재와 동일한 상태로 변경을 시도한다")
     public void 현재와동일한상태로변경을시도한다() {
         // Background에서 CONFIRMED 상태로 생성됨
-        context.response = context.authRequest()
-                .body(Map.of("status", "CONFIRMED"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("CONFIRMED");
     }
 
     // ── 유효하지 않은 상태 값 ──────────────────────────────────
 
     @When("존재하지 않는 상태 값으로 변경을 시도한다")
     public void 존재하지않는상태값으로변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "HELLO_WORLD"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("HELLO_WORLD");
     }
 
     @When("소문자로 된 상태 값으로 변경을 시도한다")
     public void 소문자로된상태값으로변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "confirmed"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("confirmed");
     }
 
     @When("숫자 값으로 상태 변경을 시도한다")
     public void 숫자값으로상태변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "12345"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("12345");
     }
 
     @When("특수문자가 포함된 상태 값으로 변경을 시도한다")
     public void 특수문자가포함된상태값으로변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "CONFIRMED!@#"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("CONFIRMED!@#");
     }
 
     @When("SQL 인젝션 문자열로 상태 변경을 시도한다")
     public void SQL인젝션문자열로상태변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "'; DROP TABLE reservations;--"))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("'; DROP TABLE reservations;--");
     }
 
     // ── 빈 값 처리 ────────────────────────────────────────────
 
     @When("빈 문자열로 상태 변경을 시도한다")
     public void 빈문자열로상태변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", ""))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("");
     }
 
     @When("공백 문자열로 상태 변경을 시도한다")
     public void 공백문자열로상태변경을시도한다() {
-        context.response = context.authRequest()
-                .body(Map.of("status", "   "))
-                .patch("/admin/reservations/" + context.reservationId + "/status");
+        patchStatus("   ");
     }
 
     @When("status 필드 없이 상태 변경을 시도한다")
@@ -148,6 +138,15 @@ public class reservationStatusSteps {
     public void 빈요청본문으로상태변경을시도한다() {
         context.response = context.authRequest()
                 .body("{}")
+                .patch("/admin/reservations/" + context.reservationId + "/status");
+    }
+
+    @When("null 값으로 상태 변경을 시도한다")
+    public void null값으로상태변경을시도한다() {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", null);
+        context.response = context.authRequest()
+                .body(body)
                 .patch("/admin/reservations/" + context.reservationId + "/status");
     }
 
@@ -185,6 +184,11 @@ public class reservationStatusSteps {
     @And("예약 상태는 체크아웃이다")
     public void 예약상태는체크아웃이다() {
         context.response.then().body("status", equalTo("CHECKED_OUT"));
+    }
+
+    @And("예약 목록이 반환된다")
+    public void 예약목록이반환된다() {
+        context.response.then().body("$", not(empty()));
     }
 
     // 오류 메시지 내용 검증은 AssertJ의 문자열 포함 검사가 더 자연스러움
