@@ -42,6 +42,27 @@ public class campsiteSteps {
         }
     }
 
+    @When("siteNumber 없이 캠프사이트를 등록한다")
+    public void siteNumber없이캠프사이트를등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("description", "siteNumber 누락", "maxPeople", 4))
+                .post("/admin/campsites");
+    }
+
+    @When("중복 siteNumber로 캠프사이트를 등록한다")
+    public void 중복siteNumber로캠프사이트를등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("siteNumber", "T-01", "description", "중복 사이트", "maxPeople", 4))
+                .post("/admin/campsites");
+    }
+
+    @When("음수 최대 인원으로 캠프사이트를 등록한다")
+    public void 음수최대인원으로캠프사이트를등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("siteNumber", "NEG-01", "description", "음수 인원", "maxPeople", -1))
+                .post("/admin/campsites");
+    }
+
     @When("캠프사이트 정보를 수정한다")
     public void 캠프사이트정보를수정한다() {
         context.response = context.authRequest()
@@ -71,5 +92,19 @@ public class campsiteSteps {
         context.response.then()
                 .body("description", equalTo("수정된 사이트 설명"))
                 .body("maxPeople", equalTo(8));
+    }
+
+    // ── 예외 시나리오 ──────────────────────────────────────────
+
+    @When("존재하지 않는 캠프사이트를 수정한다")
+    public void 존재하지않는캠프사이트를수정한다() {
+        context.response = context.authRequest()
+                .body(Map.of("description", "없는 사이트", "maxPeople", 4))
+                .put("/admin/campsites/99999");
+    }
+
+    @Then("캠프사이트를 찾을 수 없다")
+    public void 캠프사이트를찾을수없다() {
+        context.response.then().statusCode(404);
     }
 }

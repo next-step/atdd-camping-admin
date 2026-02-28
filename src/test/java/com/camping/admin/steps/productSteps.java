@@ -60,6 +60,27 @@ public class productSteps {
         }
     }
 
+    @When("상품명 없이 상품을 등록한다")
+    public void 상품명없이상품을등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("stockQuantity", 10, "price", 5000, "productType", "SALE"))
+                .post("/admin/products");
+    }
+
+    @When("음수 재고로 상품을 등록한다")
+    public void 음수재고로상품을등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("name", "음수 재고 상품", "stockQuantity", -5, "price", 5000, "productType", "SALE"))
+                .post("/admin/products");
+    }
+
+    @When("알 수 없는 상품 유형으로 상품을 등록한다")
+    public void 알수없는상품유형으로상품을등록한다() {
+        context.response = context.authRequest()
+                .body(Map.of("name", "이상한 상품", "stockQuantity", 5, "price", 5000, "productType", "UNKNOWN"))
+                .post("/admin/products");
+    }
+
     @When("상품 가격을 수정한다")
     public void 상품가격을수정한다() {
         context.response = context.authRequest()
@@ -94,5 +115,19 @@ public class productSteps {
     @And("수정된 상품 정보가 반환된다")
     public void 수정된상품정보가반환된다() {
         context.response.then().body("id", notNullValue());
+    }
+
+    // ── 예외 시나리오 ──────────────────────────────────────────
+
+    @When("존재하지 않는 상품을 수정한다")
+    public void 존재하지않는상품을수정한다() {
+        context.response = context.authRequest()
+                .body(Map.of("price", 10000))
+                .put("/admin/products/99999");
+    }
+
+    @Then("상품을 찾을 수 없다")
+    public void 상품을찾을수없다() {
+        context.response.then().statusCode(404);
     }
 }

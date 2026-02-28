@@ -28,3 +28,27 @@ Feature: 상품 관리
     When 상품 재고를 수정한다
     Then 수정에 성공한다
     And 수정된 상품 정보가 반환된다
+
+  # ───────────────────────────────────────
+  # 예외 시나리오
+  # ───────────────────────────────────────
+
+  # TODO: GlobalExceptionHandler 구현 필요 — IllegalArgumentException → 404
+  # Scenario: 존재하지 않는 상품을 수정하면 실패한다
+  #   When 존재하지 않는 상품을 수정한다
+  #   Then 상품을 찾을 수 없다
+
+  # TODO: ProductAdminController.createProduct — name 필수값 검증 추가 (null → 400)
+  # Scenario: 상품명 없이 상품을 등록하면 실패한다
+  #   When 상품명 없이 상품을 등록한다
+  #   Then 등록이 거부된다
+
+  # TODO: ProductAdminController.createProduct — stockQuantity 음수 검증 추가 (음수 → 400)
+  # Scenario: 음수 재고로 상품을 등록하면 실패한다
+  #   When 음수 재고로 상품을 등록한다
+  #   Then 등록이 거부된다
+
+  # TODO: ProductAdminController.createProduct — 유효하지 않은 productType → 400 (현재 SALE로 기본값 처리)
+  # Scenario: 알 수 없는 상품 유형으로 상품을 등록하면 실패한다
+  #   When 알 수 없는 상품 유형으로 상품을 등록한다
+  #   Then 등록이 거부된다

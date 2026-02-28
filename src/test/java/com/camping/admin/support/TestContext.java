@@ -23,6 +23,17 @@ public class TestContext {
     public Integer productStockBefore;
     public Integer productStockBefore2;
 
+    public void reset() {
+        response = null;
+        campsiteId = null;
+        reservationId = null;
+        productId = null;
+        productId2 = null;
+        rentalRecordId = null;
+        productStockBefore = null;
+        productStockBefore2 = null;
+    }
+
     public RequestSpecification authRequest() {
         return RestAssured.given()
                 .header("Authorization", "Bearer " + jwtToken)
