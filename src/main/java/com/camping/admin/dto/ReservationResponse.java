@@ -1,19 +1,19 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.Reservation;
-import java.time.LocalDate;
-
 import lombok.Getter;
+
+import java.time.LocalDate;
 
 @Getter
 public class ReservationResponse {
-    private Long id;
-    private String customerName;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private String status;
-    private String campsiteSiteNumber;
-    private LocalDate reservationDate;
+    private final Long id;
+    private final String customerName;
+    private final LocalDate startDate;
+    private final LocalDate endDate;
+    private final String status;
+    private final String campsiteSiteNumber;
+    private final LocalDate reservationDate;
 
     public static ReservationResponse from(Reservation reservation) {
         return new ReservationResponse(reservation);

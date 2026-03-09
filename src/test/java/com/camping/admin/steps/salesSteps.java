@@ -17,13 +17,17 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 
 public class salesSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private SalesRecordRepository salesRecordRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private SalesRecordRepository salesRecordRepository;
 
     private void postSaleItems(List<Map<String, Object>> items) {
         context.response = context.authRequest()

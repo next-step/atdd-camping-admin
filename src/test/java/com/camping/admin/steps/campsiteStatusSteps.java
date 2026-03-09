@@ -16,8 +16,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class campsiteStatusSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private CampsiteRepository campsiteRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private CampsiteRepository campsiteRepository;
 
     // ── Given ─────────────────────────────────────────────
 

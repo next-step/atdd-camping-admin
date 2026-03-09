@@ -2,7 +2,6 @@ package com.camping.admin.web;
 
 import com.camping.admin.domain.entity.Campsite;
 import com.camping.admin.repository.CampsiteRepository;
-import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +10,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.Map;
 
 @Controller
 @RequestMapping("/console/campsites")
@@ -78,7 +79,8 @@ public class ConsoleCampsiteController {
         if (params.containsKey("maxPeople")) {
             try {
                 campsite.setMaxPeople(Integer.valueOf(params.get("maxPeople")));
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
 
         redirectAttributes.addFlashAttribute("success", "캠프사이트가 수정되었습니다.");

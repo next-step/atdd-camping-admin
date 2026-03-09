@@ -18,10 +18,14 @@ import static org.hamcrest.Matchers.hasSize;
 
 public class CommonSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private CampsiteRepository campsiteRepository;
-    @Autowired private ReservationRepository reservationRepository;
-    @Autowired private ProductRepository productRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private CampsiteRepository campsiteRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Given("캠프사이트가 등록되어 있다")
     public void 캠프사이트가등록되어있다() {

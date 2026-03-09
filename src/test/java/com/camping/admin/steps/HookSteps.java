@@ -12,7 +12,8 @@ import java.util.Map;
 
 public class HookSteps {
 
-    @Autowired private TestContext context;
+    @Autowired
+    private TestContext context;
 
     @Autowired
     @Qualifier("deleteAndReset")

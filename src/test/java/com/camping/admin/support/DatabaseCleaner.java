@@ -12,6 +12,7 @@ public interface DatabaseCleaner {
 
     /**
      * JPA Metamodel에서 관리되는 모든 엔티티의 테이블 이름을 조회한다.
+     *
      * @Table(name = ...) 이 있으면 그 값을, 없으면 클래스명을 snake_case로 변환한 값을 사용한다.
      */
     static List<String> resolveTableNames(EntityManagerFactory emf) {

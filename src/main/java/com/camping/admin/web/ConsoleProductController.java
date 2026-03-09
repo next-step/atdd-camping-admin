@@ -3,8 +3,6 @@ package com.camping.admin.web;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
-import java.math.BigDecimal;
-import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.math.BigDecimal;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/console/products")
@@ -84,17 +85,20 @@ public class ConsoleProductController {
         if (params.containsKey("stockQuantity")) {
             try {
                 product.setStockQuantity(Integer.valueOf(params.get("stockQuantity")));
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
         if (params.containsKey("price")) {
             try {
                 product.setPrice(new BigDecimal(params.get("price")));
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
         if (params.containsKey("productType")) {
             try {
                 product.setProductType(ProductType.valueOf(params.get("productType")));
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
         }
 
         redirectAttributes.addFlashAttribute("success", "상품이 수정되었습니다.");

@@ -8,8 +8,8 @@ import com.camping.admin.repository.SalesRecordRepository;
 import com.camping.admin.support.TestContext;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
-import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
+import io.cucumber.java.en.When;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -22,9 +22,12 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class revenueReportSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private SalesRecordRepository salesRecordRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private SalesRecordRepository salesRecordRepository;
 
     @Given("판매 상품과 판매 기록이 존재한다")
     public void 판매상품과판매기록이존재한다() {

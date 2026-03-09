@@ -9,5 +9,6 @@ import java.util.Optional;
 @Repository
 public interface CampsiteRepository extends JpaRepository<Campsite, Long> {
     Optional<Campsite> findBySiteNumber(String siteNumber);
+
     boolean existsBySiteNumber(String siteNumber);
 }

@@ -10,11 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class authSteps {
 
-    @Autowired private TestContext context;
+    @Autowired
+    private TestContext context;
 
     @When("올바른 자격증명으로 로그인한다")
     public void 올바른자격증명으로로그인한다() {
