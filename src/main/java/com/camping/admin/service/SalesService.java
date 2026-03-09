@@ -34,12 +34,18 @@ public class SalesService {
 
     @Transactional
     public void processSale(ProcessSaleRequest request) {
+        if (request.getItems() == null || request.getItems().isEmpty()) {
+            throw new IllegalArgumentException("판매 항목은 최소 1개 이상이어야 합니다.");
+        }
         for (SaleItemResponse itemDto : request.getItems()) {
+            if (itemDto.getQuantity() == null || itemDto.getQuantity() <= 0) {
+                throw new IllegalArgumentException("판매 수량은 1 이상이어야 합니다.");
+            }
+            Product product = productRepository.findById(itemDto.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("판매 요청에 존재하지 않는 상품이 포함되어 있습니다."));
+
             productService.decreaseStock(itemDto.getProductId(), itemDto.getQuantity());
 
-            Product product = productRepository.findById(itemDto.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + itemDto.getProductId()));
-            
             BigDecimal totalPrice = product.getPrice().multiply(new BigDecimal(itemDto.getQuantity()));
             
             SalesRecord salesRecord = new SalesRecord(product, itemDto.getQuantity(), totalPrice);
@@ -81,6 +87,7 @@ public class SalesService {
     }
 
     public RangeRevenueReportResponse generateRangeRevenueReport(LocalDate from, LocalDate to) {
+        validateDateRange(from, to);
         BigDecimal totalSalesRevenue = salesRecordRepository.findAll().stream()
                 .filter(record -> {
                     LocalDate d = record.getCreatedAt().toLocalDate();
@@ -113,6 +120,12 @@ public class SalesService {
         BigDecimal grandTotal = totalSalesRevenue.add(totalReservationRevenue).add(totalRentalRevenue);
 
         return new RangeRevenueReportResponse(from, to, totalReservationRevenue, totalSalesRevenue, totalRentalRevenue, grandTotal);
+    }
+
+    private void validateDateRange(LocalDate from, LocalDate to) {
+        if (from.isAfter(to)) {
+            throw new IllegalArgumentException("시작일이 종료일보다 늦을 수 없습니다.");
+        }
     }
 
     public List<RevenueEntryResponse> generateRangeRevenueEntries(LocalDate from, LocalDate to) {
