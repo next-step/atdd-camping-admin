@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/sales") // Public-facing API prefix
+@RequestMapping("/admin/sales")
 @RequiredArgsConstructor
 public class SalesController {
 

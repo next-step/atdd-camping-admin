@@ -120,7 +120,7 @@
 
           async function loadRecentSales() {
             try {
-              const res = await fetch('/api/sales', { headers: { 'Accept': 'application/json' }});
+              const res = await fetch('/admin/sales', { headers: { 'Accept': 'application/json' }});
               const tbody = document.getElementById('recent-sales');
               if (!res.ok) { tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger">불러오기 실패</td></tr>'; return; }
               const sales = await res.json();
