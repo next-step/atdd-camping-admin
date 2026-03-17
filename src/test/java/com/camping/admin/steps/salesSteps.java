@@ -17,18 +17,22 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 
 public class salesSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private SalesRecordRepository salesRecordRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private SalesRecordRepository salesRecordRepository;
 
     private void postSaleItems(List<Map<String, Object>> items) {
         context.response = context.authRequest()
                 .body(Map.of("items", items))
-                .post("/api/sales");
+                .post("/admin/sales");
     }
 
     private void postSale(Long productId, int quantity) {
@@ -76,7 +80,7 @@ public class salesSteps {
 
     @When("판매 내역을 조회한다")
     public void 판매내역을조회한다() {
-        context.response = context.authRequest().get("/api/sales");
+        context.response = context.authRequest().get("/admin/sales");
     }
 
     @When("재고를 초과하는 수량으로 상품을 판매한다")

@@ -18,14 +18,23 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
 public class rentalSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ProductRepository productRepository;
-    @Autowired private RentalRecordRepository rentalRecordRepository;
-    @Autowired private ReservationRepository reservationRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ProductRepository productRepository;
+    @Autowired
+    private RentalRecordRepository rentalRecordRepository;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     // ── 공통 헬퍼 ─────────────────────────────────────────────
 

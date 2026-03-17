@@ -8,11 +8,12 @@ import com.camping.admin.dto.RentalResponse;
 import com.camping.admin.repository.ProductRepository;
 import com.camping.admin.repository.RentalRecordRepository;
 import com.camping.admin.repository.ReservationRepository;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +33,10 @@ public class RentalService {
 
     @Transactional
     public RentalResponse createRental(Long productId, Integer quantity, Long reservationId) {
+        if (quantity == null || quantity <= 0) {
+            throw new IllegalArgumentException("대여 수량은 1 이상이어야 합니다.");
+        }
+
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + productId));
 
@@ -57,14 +62,14 @@ public class RentalService {
     public RentalResponse markAsReturned(Long rentalRecordId) {
         RentalRecord rentalRecord = rentalRecordRepository.findById(rentalRecordId)
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find rental record with id: " + rentalRecordId));
-        
+
         if (rentalRecord.getIsReturned()) {
             throw new IllegalStateException("This item has already been returned.");
         }
         rentalRecord.setReturned(true);
-        
+
         productService.increaseStock(rentalRecord.getProduct().getId(), rentalRecord.getQuantity());
-        
+
         return RentalResponse.from(rentalRecord);
     }
 }

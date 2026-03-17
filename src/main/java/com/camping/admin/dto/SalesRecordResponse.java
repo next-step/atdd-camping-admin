@@ -1,17 +1,18 @@
 package com.camping.admin.dto;
 
 import com.camping.admin.domain.entity.SalesRecord;
+import lombok.Getter;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import lombok.Getter;
 
 @Getter
 public class SalesRecordResponse {
-    private Long id;
-    private String productName;
-    private Integer quantity;
-    private BigDecimal totalPrice;
-    private LocalDateTime createdAt;
+    private final Long id;
+    private final String productName;
+    private final Integer quantity;
+    private final BigDecimal totalPrice;
+    private final LocalDateTime createdAt;
 
     public static SalesRecordResponse from(SalesRecord record) {
         return new SalesRecordResponse(record);

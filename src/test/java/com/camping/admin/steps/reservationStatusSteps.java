@@ -12,12 +12,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 
 public class reservationStatusSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ReservationRepository reservationRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     // ── 공통 헬퍼 ─────────────────────────────────────────────
 

@@ -13,12 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.math.BigDecimal;
 import java.util.Map;
 
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.notNullValue;
 
 public class productSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ProductRepository productRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ProductRepository productRepository;
 
     @Given("상품 {int}개가 등록되어 있다")
     public void 상품N개가등록되어있다(int count) {

@@ -40,10 +40,9 @@ Feature: 매출 리포트
     When to 파라미터 없이 기간별 매출 리포트를 조회한다
     Then 조회가 거부된다
 
-  # TODO: RevenueAdminController or SalesService — from > to 날짜 역순 검증 추가 (→ 400)
-  # Scenario: 시작일이 종료일보다 늦은 기간으로 조회하면 실패한다
-  #   When 시작일이 종료일보다 늦은 기간으로 매출 리포트를 조회한다
-  #   Then 조회가 거부된다
+  Scenario: 시작일이 종료일보다 늦은 기간으로 조회하면 실패한다
+    When 시작일이 종료일보다 늦은 기간으로 매출 리포트를 조회한다
+    Then 조회가 거부된다
 
   Scenario: 판매 기록이 없는 기간의 매출 상세 내역은 빈 목록이다
     When 판매 기록이 없는 기간의 매출 상세 내역을 조회한다

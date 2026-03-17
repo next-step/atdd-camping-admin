@@ -1,15 +1,16 @@
 package com.camping.admin.dto;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @Getter
 @AllArgsConstructor
 public class RevenueEntryResponse {
 
-    public enum EntryType { RESERVATION, SALE, RENTAL }
+    public enum EntryType {RESERVATION, SALE, RENTAL}
 
     private EntryType type;
     private String title;

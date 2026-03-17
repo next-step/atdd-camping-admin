@@ -17,8 +17,8 @@ public interface RentalRecordRepository extends JpaRepository<RentalRecord, Long
     List<RentalRecord> findByIsReturned(Boolean isReturned);
 
     @Query("SELECT rr FROM RentalRecord rr " +
-           "LEFT JOIN rr.reservation r " +
-           "WHERE rr.product.id = :productId " +
-           "AND rr.isReturned = false")
+            "LEFT JOIN rr.reservation r " +
+            "WHERE rr.product.id = :productId " +
+            "AND rr.isReturned = false")
     List<RentalRecord> findActiveRentalsByProductId(@Param("productId") Long productId);
 }

@@ -17,8 +17,10 @@ import static org.hamcrest.Matchers.notNullValue;
 
 public class campsiteSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private CampsiteRepository campsiteRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private CampsiteRepository campsiteRepository;
 
     @Given("캠프사이트 {int}개가 등록되어 있다")
     public void 캠프사이트N개가등록되어있다(int count) {

@@ -17,8 +17,10 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class reservationCancellationSteps {
 
-    @Autowired private TestContext context;
-    @Autowired private ReservationRepository reservationRepository;
+    @Autowired
+    private TestContext context;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
     // ── 액션 ──────────────────────────────────────────────────
 
