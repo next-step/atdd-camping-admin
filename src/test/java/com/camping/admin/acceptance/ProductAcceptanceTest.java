@@ -35,7 +35,7 @@ class ProductAcceptanceTest {
                 .extract().path("accessToken");
     }
 
-    // T-1: 상품 수정 요청은 302로 성공 응답을 주지만, 실제로는 값이 저장되지 않아 조회 시 이전 값이 그대로 나온다(레드).
+    // T-1: 상품 수정 요청은 302로 성공 응답을 주고, 조회 시 수정된 값으로 나온다.
     @Nested
     class T1_상품수정이저장되지않음 {
 

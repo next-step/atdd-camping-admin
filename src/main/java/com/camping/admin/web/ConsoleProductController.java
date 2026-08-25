@@ -3,6 +3,7 @@ package com.camping.admin.web;
 import com.camping.admin.domain.entity.Product;
 import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
+import com.camping.admin.service.ProductService;
 import java.math.BigDecimal;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,11 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ConsoleProductController {
 
     private final ProductRepository productRepository;
+    private final ProductService productService;
 
-    public ConsoleProductController(ProductRepository productRepository) {
+    public ConsoleProductController(ProductRepository productRepository, ProductService productService) {
         this.productRepository = productRepository;
+        this.productService = productService;
     }
 
     @GetMapping
@@ -75,27 +78,24 @@ public class ConsoleProductController {
 
     @PostMapping("/{id}")
     public String update(@PathVariable Long id, @RequestParam Map<String, String> params, RedirectAttributes redirectAttributes) {
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find product with id: " + id));
+        String name = params.get("name");
 
-        if (params.containsKey("name")) {
-            product.setName(params.get("name"));
-        }
-        if (params.containsKey("stockQuantity")) {
-            try {
-                product.setStockQuantity(Integer.valueOf(params.get("stockQuantity")));
-            } catch (Exception ignore) {}
-        }
-        if (params.containsKey("price")) {
-            try {
-                product.setPrice(new BigDecimal(params.get("price")));
-            } catch (Exception ignore) {}
-        }
-        if (params.containsKey("productType")) {
-            try {
-                product.setProductType(ProductType.valueOf(params.get("productType")));
-            } catch (Exception ignore) {}
-        }
+        Integer stockQuantity = null;
+        try {
+            stockQuantity = params.containsKey("stockQuantity") ? Integer.valueOf(params.get("stockQuantity")) : null;
+        } catch (Exception ignore) {}
+
+        BigDecimal price = null;
+        try {
+            price = params.containsKey("price") ? new BigDecimal(params.get("price")) : null;
+        } catch (Exception ignore) {}
+
+        ProductType productType = null;
+        try {
+            productType = params.containsKey("productType") ? ProductType.valueOf(params.get("productType")) : null;
+        } catch (Exception ignore) {}
+
+        productService.update(id, name, stockQuantity, price, productType);
 
         redirectAttributes.addFlashAttribute("success", "상품이 수정되었습니다.");
         return "redirect:/console/products";
