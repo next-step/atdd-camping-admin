@@ -143,7 +143,7 @@ public class SalesService {
                             RevenueEntryResponse.EntryType.RESERVATION,
                             "예약 #" + r.getId(),
                             new java.math.BigDecimal(nights).multiply(new java.math.BigDecimal("50000")),
-                            r.getCreatedAt()
+                            r.getReservationDate().atStartOfDay()
                     ));
                 });
 
