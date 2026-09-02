@@ -1,0 +1,22 @@
+{
+  "description": "Gate Codex Stop on repeated full Gradle test failures.",
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 \"$(git rev-parse --show-toplevel)/.codex/hooks/test_gate.py\"",
+            "timeout": 600
+          },
+          {
+            "type": "command",
+            "command": "/usr/bin/python3 -c 'import json,pathlib,re,subprocess; root=subprocess.run([\"git\",\"rev-parse\",\"--show-toplevel\"],stdin=subprocess.DEVNULL,capture_output=True,text=True,check=True).stdout.strip(); doc=(pathlib.Path(root)/\"docs/acceptance-criteria.md\").read_text(encoding=\"utf-8\"); tickets=re.findall(r\"(?ms)^##[ \\t]+(T-[0-9]+)\\b[^\\n]*(?:\\n|\\Z)(.*?)(?=^##[ \\t]|\\Z)\",doc); section=lambda body,title:(re.search(r\"(?ms)^###[ \\t]+\"+title+r\"[ \\t]*\\n(.*?)(?=^#{1,3}[ \\t]|\\Z)\",body) or [None,\"\"])[1]; issues=[\"티켓 섹션 없음 또는 빈 문서\"] if not tickets else [ticket+\": \"+label+\" 누락\" for ticket,body in tickets for label,ok in [(\"범위와 이유 본문\",bool(re.search(r\"(?m)^[ \\t]*(?!#{1,6}[ \\t])(?=\\S)[^\\n]*[^\\s#*+_-]\",section(body,\"범위와 이유\"))))]+[(word+\" 예시\",bool(re.search(r\"(?m)^[ \\t]*-[ \\t]+\"+word+r\"[ \\t]+\\S\",section(body,\"시나리오\")))) for word in (\"Given\",\"When\",\"Then\")] if not ok]; print(json.dumps({\"systemMessage\":\"AC_FORMAT 경고(차단 안 함): \"+\"; \".join(issues)},ensure_ascii=False)) if issues else None' 2>/dev/null || printf '%s\\n' '{\"systemMessage\":\"AC_FORMAT 경고(차단 안 함): Git 루트 또는 docs/acceptance-criteria.md를 읽지 못했습니다. 경로와 읽기 권한을 확인하세요.\"}'",
+            "statusMessage": "인수 조건 형식 확인 (경고 전용)",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}
