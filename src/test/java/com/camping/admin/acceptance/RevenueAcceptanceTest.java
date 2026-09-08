@@ -75,4 +75,41 @@ class RevenueAcceptanceTest {
                     .isEqualTo(reservationDate);
         }
     }
+
+    // T-3: SalesService의 매출 계산 세 곳(generateDailyRevenueReport 등)이 취소된
+    // 예약을 걸러내도록 고쳐, 예약 #14(revenue-cancel-reset.sql)를 취소하면 그 매출이
+    // 매출 리포트에서 빠진다 — 그린이다.
+    @Nested
+    class T3_취소한예약이매출에그대로남음 {
+
+        @Test
+        @Sql("/sql/revenue-cancel-reset.sql")
+        void 취소한_예약의_매출은_일별리포트에서_빠져야한다() {
+            LocalDate today = LocalDate.now();
+
+            double totalBeforeCancel = given()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().get("/admin/reports/revenue/daily?date=" + today)
+                    .then().statusCode(200)
+                    .extract().jsonPath().getDouble("totalReservationRevenue");
+
+            given()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .contentType(ContentType.JSON)
+                    .body("{\"status\":\"CANCELLED\"}")
+                    .when().patch("/admin/reservations/14/status")
+                    .then().statusCode(200)
+                    .body("status", org.hamcrest.Matchers.equalTo("CANCELLED"));
+
+            double totalAfterCancel = given()
+                    .header("Authorization", "Bearer " + accessToken)
+                    .when().get("/admin/reports/revenue/daily?date=" + today)
+                    .then().statusCode(200)
+                    .extract().jsonPath().getDouble("totalReservationRevenue");
+
+            assertThat(totalAfterCancel)
+                    .as("예약 #14를 취소했으니 그 매출(1박, 50000원)이 오늘 매출에서 빠져야 한다")
+                    .isEqualTo(totalBeforeCancel - 50000.0);
+        }
+    }
 }
