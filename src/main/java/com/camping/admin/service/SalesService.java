@@ -62,6 +62,7 @@ public class SalesService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
+                .filter(r -> !"CANCELLED".equals(r.getStatus()))
                 .filter(r -> r.getReservationDate() != null && r.getReservationDate().equals(date))
                 .map(r -> {
                     long nights = java.time.temporal.ChronoUnit.DAYS.between(r.getStartDate(), r.getEndDate());
@@ -90,6 +91,7 @@ public class SalesService {
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         BigDecimal totalReservationRevenue = reservationRepository.findAll().stream()
+                .filter(r -> !"CANCELLED".equals(r.getStatus()))
                 .filter(r -> r.getReservationDate() != null)
                 .filter(r -> {
                     LocalDate d = r.getReservationDate();
@@ -131,6 +133,7 @@ public class SalesService {
                 )));
 
         reservationRepository.findAll().stream()
+                .filter(r -> !"CANCELLED".equals(r.getStatus()))
                 .filter(r -> r.getReservationDate() != null)
                 .filter(r -> {
                     LocalDate d = r.getReservationDate();
@@ -143,7 +146,7 @@ public class SalesService {
                             RevenueEntryResponse.EntryType.RESERVATION,
                             "예약 #" + r.getId(),
                             new java.math.BigDecimal(nights).multiply(new java.math.BigDecimal("50000")),
-                            r.getCreatedAt()
+                            r.getReservationDate().atStartOfDay()
                     ));
                 });
 

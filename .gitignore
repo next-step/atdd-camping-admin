@@ -1,4 +1,6 @@
-.claude/
+.claude/*
+!.claude/skills/
+!.claude/hooks/
 .gradle/
 .idea/
 build/

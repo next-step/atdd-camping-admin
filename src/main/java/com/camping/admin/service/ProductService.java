@@ -1,7 +1,9 @@
 package com.camping.admin.service;
 
 import com.camping.admin.domain.entity.Product;
+import com.camping.admin.domain.enums.ProductType;
 import com.camping.admin.repository.ProductRepository;
+import java.math.BigDecimal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,6 +14,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class ProductService {
 
     private final ProductRepository productRepository;
+
+    @Transactional
+    public void update(Long productId, String name, Integer stockQuantity, BigDecimal price, ProductType productType) {
+        Product product = findById(productId);
+        if (name != null) {
+            product.setName(name);
+        }
+        if (stockQuantity != null) {
+            product.setStockQuantity(stockQuantity);
+        }
+        if (price != null) {
+            product.setPrice(price);
+        }
+        if (productType != null) {
+            product.setProductType(productType);
+        }
+    }
 
     @Transactional
     public void decreaseStock(Long productId, Integer quantity) {

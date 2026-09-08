@@ -1,0 +1,40 @@
+---
+name: atdd-test
+description: ATDD 2단계(인수 테스트). acceptance-criteria.md의 규칙을 검증하는 테스트를 작성하고 레드인지 실행 확인한다. 통과 조건을 채우면 이어서 3단계(atdd-implement)를 수행한다.
+---
+
+# 2. 인수 테스트
+
+`docs/principles.md`, `docs/plan.md`를 먼저 읽는다.
+
+## 입력
+
+- `docs/acceptance-criteria.md`에 정리된 해당 티켓의 규칙/예시/이유
+- `docs/test-guide.md`(테스트 작성 제약)
+
+이 티켓의 인수 조건이 `acceptance-criteria.md`에 없으면 진행하지 않는다. 먼저
+`/atdd-criteria <티켓번호>`부터 실행하라고 사용자에게 안내하고 종료한다.
+
+## 하는 일
+
+- 인수 조건을 검증하는 테스트를 작성한다.
+- `./gradlew test` (결과 줄이 안 보이면 `./gradlew test --rerun-tasks`)로 실행한다.
+
+## 남기는 것
+
+- 테스트 코드
+- 초안 작성 중 사용자에게 받은 제약은 `docs/test-guide.md`에 규칙 한 줄로 남긴다.
+
+## AI에게 주는 지시
+
+- 버그 수정(구현)은 이 단계에서 하지 않는다.
+- 경계값은 별도 테스트 케이스로 분리한다.
+- 테스트에 쓸 시드 데이터는 추측하지 않고 `src/main/resources/data.sql`을 직접 읽어
+  확인한 값을 쓴다.
+- 지금 코드로 실행하면 관련 테스트가 실패(레드)하는 것이 정상임을 명시한다.
+
+## 통과 조건
+
+인수 테스트가 지금 실패하는지 확인한다. 실패하지 않으면 지금 동작을 겨눈 잘못된
+초안이니 다시 쓴다. 레드인 것을 확인했으면 통과이며, 진행 여부를 사용자에게 묻지
+않고 곧바로 `/atdd-implement <티켓번호>`를 수행한다.
